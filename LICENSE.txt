@@ -1,0 +1,9 @@
+Copyright (c) 2026 Gilberto Leonardo Dominguez Garcia - RedCorp 802.11 México
+
+PROPIEDAD INTELECTUAL - TODOS LOS DERECHOS RESERVADOS.
+
+Se otorga permiso para visualizar y ejecutar este software con fines demostrativos o educativos. 
+Queda estrictamente prohibida la reproducción, modificación o distribución comercial 
+del código fuente sin el consentimiento expreso del autor.
+
+El software se proporciona "tal cual", sin garantía de ningún tipo.
