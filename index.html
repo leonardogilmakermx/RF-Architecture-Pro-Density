@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>RF Architecture Pro - Full Analysis Console</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 20px; background-color: #f0f2f5; color: #1c1e21; }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+        .header-area { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #e4e6eb; padding-bottom: 15px; margin-bottom: 20px; }
+        h2 { color: #0062cc; margin: 0; }
+        .signature { font-size: 0.85rem; color: #555; text-align: right; }
+        
+        .report-params { display: none; margin-bottom: 20px; width: 100%; border-collapse: collapse; }
+        .report-params td { padding: 8px; border: 1px solid #ddd; font-size: 0.9rem; }
+        .report-params th { background: #f8f9fa; padding: 8px; border: 1px solid #ddd; text-align: left; font-size: 0.8rem; text-transform: uppercase; }
+
+        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 25px; background: #f7f8fa; padding: 20px; border-radius: 10px; border: 1px solid #ddd; }
+        .input-group { display: flex; flex-direction: column; }
+        label { font-weight: 600; font-size: 0.75rem; color: #606770; margin-bottom: 5px; text-transform: uppercase; }
+        input, select { padding: 10px; border: 1px solid #ccd0d5; border-radius: 6px; font-size: 0.9rem; }
+        .cci-bg { background: #fff3cd; padding: 10px; border-radius: 6px; border: 1px solid #ffeeba; }
+        
+        button { grid-column: 1 / -1; padding: 14px; background: #0062cc; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button:hover { background: #004a99; }
+        
+        .status-panel { display: flex; justify-content: space-around; align-items: center; background: #2c3e50; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .signal-icon { display: flex; align-items: flex-end; gap: 3px; height: 30px; }
+        .bar { width: 8px; background: #555; border-radius: 1px; }
+        .bar.active.green { background: #2ecc71; }
+        .bar.active.yellow { background: #f1c40f; }
+        .bar.active.red { background: #e74c3c; }
+
+        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .full-width { grid-column: 1 / -1; }
+        .chart-card { background: #fff; padding: 15px; border: 1px solid #eee; border-radius: 8px; }
+        .chart-wrapper { position: relative; height: 280px; }
+        h3 { font-size: 0.9rem; color: #444; margin-bottom: 10px; text-align: center; background: #e9ecef; padding: 5px; border-radius: 4px; }
+        
+        @media print { 
+            .controls, button, .header-btns { display: none !important; } 
+            .report-params { display: table !important; }
+            .container { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 10px; }
+            body { background-color: white; margin: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-area">
+        <div>
+            <h2>Análisis RF: Cobertura, Airtime y QoE</h2>
+            <p style="font-size: 0.75rem; color: #777; margin-top: 5px;">Simulación diseñada por Ing. G. Leonardo Dominguez Garcia</p>
+        </div>
+        <div class="signature">
+            <div class="header-btns">
+                <button onclick="window.print()" style="padding: 6px 12px; font-size: 0.7rem; background: #6c757d; border:none; border-radius:4px; color:white; cursor:pointer;">GENERAR REPORTE PDF</button>
+            </div>
+            <p style="margin-top: 10px;">&copy; 2026 - RF Cobertura y Airtime predictivo</p>
+        </div>
+    </div>
+
+    <table class="report-params">
+        <tr>
+            <th>Potencia AP</th>
+            <th>Altura AP</th>
+            <th>Frecuencia</th>
+            <th>Inicio Bloque</th>
+            <th>Interferencia (CCI)</th>
+        </tr>
+        <tr>
+            <td id="repPotencia">-</td>
+            <td id="repAltura">-</td>
+            <td id="repFrecuencia">-</td>
+            <td id="repBloque">-</td>
+            <td id="repCCI">-</td>
+        </tr>
+    </table>
+    
+    <div class="controls">
+        <div class="input-group"><label>Potencia AP (dBm)</label><input type="number" id="potencia" value="32"></div>
+        <div class="input-group"><label>Altura AP (m)</label><input type="number" id="altura" value="4"></div>
+        <div class="input-group">
+            <label>Frecuencia</label>
+            <select id="frecuencia">
+                <option value="5.2" selected>5.2 GHz</option>
+                <option value="2.4">2.4 GHz</option>
+                <option value="6.0">6.0 GHz</option>
+            </select>
+        </div>
+        <div class="input-group"><label>Inicio Bloque (m)</label><input type="number" id="inicioBloque" value="15"></div>
+        <div class="input-group cci-bg"><label>Interferencia (CCI)</label><input type="number" id="cci" value="0"></div>
+        <button onclick="actualizarTodo()">EJECUTAR SIMULACIÓN PROFESIONAL</button>
+    </div>
+
+    <div class="status-panel">
+        <div><strong>Punto Crítico (30m):</strong></div>
+        <div id="statusText">RSSI: -dBm</div>
+        <div class="signal-icon" id="signalBars">
+            <div class="bar" style="height: 20%"></div><div class="bar" style="height: 40%"></div><div class="bar" style="height: 60%"></div><div class="bar" style="height: 80%"></div><div class="bar" style="height: 100%"></div>
+        </div>
+        <div id="throughputText">Throughput: 0 Mbps</div>
+        <div id="airtimeText" style="color: #f1c40f;">Air Time: 0%</div>
+        <div id="qoeText" style="font-weight: bold;">QoE: -</div>
+    </div>
+
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h3>RSSI: Trayectoria Horizontal</h3>
+            <div class="chart-wrapper"><canvas id="chartH"></canvas></div>
+        </div>
+        <div class="chart-card">
+            <h3>RSSI: Trayectoria Real (Slant)</h3>
+            <div class="chart-wrapper"><canvas id="chartR"></canvas></div>
+        </div>
+        <div class="chart-card">
+            <h3>Throughput Estimado (Capacidad Neta)</h3>
+            <div class="chart-wrapper"><canvas id="chartT"></canvas></div>
+        </div>
+        <div class="chart-card">
+            <h3>Utilización de Airtime (%)</h3>
+            <div class="chart-wrapper"><canvas id="chartA"></canvas></div>
+        </div>
+        <div class="chart-card full-width">
+            <h3>Soporte de Dispositivos Simultáneos por Servicio</h3>
+            <div class="chart-wrapper"><canvas id="chartS"></canvas></div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px; font-size: 0.7rem; color: #999; border-top: 1px solid #eee; padding-top: 10px;">
+        Ing. G. Leonardo Dominguez Garcia - Wireless Infrastructure Architect
+    </div>
+</div>
+
+<script>
+let objs = {};
+
+function calcularData(distH, potencia, altura, freq, numPers, ini, cci) {
+    const hEf = Math.abs(altura - 1.2);
+    const distR = Math.sqrt(Math.pow(distH, 2) + Math.pow(hEf, 2));
+    const fsplR = (20 * Math.log10(distR)) + (20 * Math.log10(freq)) + 32.44;
+    const fsplH = (20 * Math.log10(distH)) + (20 * Math.log10(freq)) + 32.44;
+    
+    let att = distH >= ini ? Math.min((Math.log10(numPers + 1) * 6) + ((distH - ini) * 0.7), 45) : 0;
+    const rssiR = Math.max(-100, potencia - fsplR - att);
+    const rssiH = Math.max(-100, potencia - fsplH - att);
+
+    // Airtime dinámico
+    const factorBajaSeñal = Math.abs(Math.min(0, rssiR + 65)) / 2;
+    const airtimeUse = Math.min(98, (cci * 10) + (numPers / 350) + factorBajaSeñal);
+
+    let factorMod = Math.pow(Math.max(0, Math.min(1, (rssiR + 92) / 45)), 1.7);
+    const tputFinal = (factorMod * 1000) * ((100 - airtimeUse) / 100) / (1 + (cci * 0.2));
+
+    return { rssiH, rssiR, tput: Math.max(0, tputFinal), airtimeUse };
+}
+
+function actualizarTodo() {
+    const p = parseFloat(document.getElementById('potencia').value);
+    const a = parseFloat(document.getElementById('altura').value);
+    const f = parseFloat(document.getElementById('frecuencia').value);
+    const ini = parseFloat(document.getElementById('inicioBloque').value);
+    const cci = parseFloat(document.getElementById('cci').value);
+    
+    document.getElementById('repPotencia').innerText = p + " dBm";
+    document.getElementById('repAltura').innerText = a + " m";
+    document.getElementById('repFrecuencia').innerText = f + " GHz";
+    document.getElementById('repBloque').innerText = ini + " m";
+    document.getElementById('repCCI').innerText = cci;
+
+    const dists = [1, 5, 10, 15, 20, 25, 30, 40, 50, 60];
+    const res = dists.map(d => ({
+        d,
+        p10: calcularData(d, p, a, f, 10, ini, cci),
+        p100: calcularData(d, p, a, f, 100, ini, cci),
+        p1000: calcularData(d, p, a, f, 1000, ini, cci)
+    }));
+
+    const ref = calcularData(30, p, a, f, 1000, ini, cci);
+    document.getElementById('statusText').innerText = `RSSI: ${ref.rssiR.toFixed(1)} dBm`;
+    document.getElementById('throughputText').innerText = `Troughput: ${ref.tput.toFixed(0)} Mbps`;
+    document.getElementById('airtimeText').innerText = `Air Time: ${ref.airtimeUse.toFixed(0)}%`;
+    
+    let qoe = "CRÍTICO"; let qoeColor = "#e74c3c";
+    if (ref.rssiR > -67 && ref.airtimeUse < 60) { qoe = "EXCELENTE"; qoeColor = "#2ecc71"; }
+    else if (ref.rssiR > -78 && ref.airtimeUse < 85) { qoe = "ACEPTABLE"; qoeColor = "#f1c40f"; }
+    document.getElementById('qoeText').innerText = `QoE: ${qoe}`;
+    document.getElementById('qoeText').style.color = qoeColor;
+
+    actualizarBarras(ref.rssiR);
+
+    // Gráficas Estándar
+    render('chartH', dists, res, 'rssiH', 'dBm', -100, -20, false);
+    render('chartR', dists, res, 'rssiR', 'dBm', -100, -20, false);
+    render('chartT', dists, res, 'tput', 'Mbps', 0, 1000, true);
+    
+    // PARCHE: Airtime Multiline
+    renderAirtime('chartA', dists, res);
+    
+    renderCapacidad('chartS', dists, res.map(r => r.p1000.tput));
+}
+
+function render(id, labels, res, key, yTitle, min, max, isFill) {
+    const ctx = document.getElementById(id).getContext('2d');
+    if (objs[id]) objs[id].destroy();
+    objs[id] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels.map(l => l+'m'),
+            datasets: [
+                { label: '10 Pers.', data: res.map(r => r.p10[key]), borderColor: '#28a745', fill: false },
+                { label: '100 Pers.', data: res.map(r => r.p100[key]), borderColor: '#fd7e14', fill: false },
+                { label: '1000 Pers.', data: res.map(r => r.p1000[key]), borderColor: '#dc3545', fill: isFill, backgroundColor: 'rgba(220, 53, 69, 0.1)' },
+                ...(id.includes('chartH') || id.includes('chartR') ? [{ label: 'KPI -67', data: Array(labels.length).fill(-67), borderColor: '#999', borderDash: [5,5], pointRadius: 0 }] : [])
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { min, max, title: { display: true, text: yTitle } } } }
+    });
+}
+
+function renderAirtime(id, labels, res) {
+    const ctx = document.getElementById(id).getContext('2d');
+    if (objs[id]) objs[id].destroy();
+    objs[id] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels.map(l => l+'m'),
+            datasets: [
+                { label: 'Airtime 10 P', data: res.map(r => r.p10.airtimeUse), borderColor: '#28a745', fill: false },
+                { label: 'Airtime 100 P', data: res.map(r => r.p100.airtimeUse), borderColor: '#fd7e14', fill: false },
+                { label: 'Airtime 1000 P', data: res.map(r => r.p1000.airtimeUse), borderColor: '#9b59b6', fill: true, backgroundColor: 'rgba(155, 89, 182, 0.1)' }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100, title: { display: true, text: '%' } } } }
+    });
+}
+
+function renderCapacidad(id, labels, tputArray) {
+    const ctx = document.getElementById(id).getContext('2d');
+    if (objs[id]) objs[id].destroy();
+    objs[id] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels.map(l => l+'m'),
+            datasets: [
+                { label: 'WhatsApp (0.1M)', data: tputArray.map(t => Math.floor(t / 0.1)), backgroundColor: '#28a745' },
+                { label: 'HD Video (5M)', data: tputArray.map(t => Math.floor(t / 5)), backgroundColor: '#ffc107' },
+                { label: '4K Stream (25M)', data: tputArray.map(t => Math.floor(t / 25)), backgroundColor: '#dc3545' }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { type: 'logarithmic' } } }
+    });
+}
+
+function actualizarBarras(rssi) {
+    const bars = document.querySelectorAll('.bar');
+    let active = 0, color = 'red';
+    if (rssi > -60) active = 5, color = 'green';
+    else if (rssi > -70) active = 4, color = 'green';
+    else if (rssi > -80) active = 3, color = 'yellow';
+    else if (rssi > -90) active = 2, color = 'red';
+    bars.forEach((b, i) => b.className = 'bar' + (i < active ? ` active ${color}` : ''));
+}
+
+actualizarTodo();
+</script>
+</body>
+</html>
