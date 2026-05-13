@@ -4,72 +4,213 @@
     <meta charset="UTF-8">
     <title>RF Architecture Pro - Full Analysis Console</title>
     <meta name="description" content="Consola profesional de análisis de RF para alta densidad. Cálculo de RSSI, Airtime y QoE para eventos masivos. Diseñado por Ing. G. Leonardo Dominguez Garcia.">
-<meta name="keywords" content="RF Architecture, RedCorp, Wi-Fi 7, Airtime Efficiency, Wireless Infrastructure, ESIME Zacatenco, Radiofrecuencia, Alta Densidad Wi-Fi">
-<meta name="author" content="Gilberto Leonardo Dominguez Garcia - RedCorp 802.11 México">
+    <meta name="keywords" content="RF Architecture, RedCorp, Wi-Fi 7, Airtime Efficiency, Wireless Infrastructure, ESIME Zacatenco, Radiofrecuencia, Alta Densidad Wi-Fi">
+    <meta name="author" content="Gilberto Leonardo Dominguez Garcia - RedCorp 802.11 México">
 
-<meta property="og:title" content="RF Architecture Pro - Full Analysis Console">
-<meta property="og:description" content="Simulador predictivo de cobertura y capacidad para despliegues de infraestructura inalámbrica profesional.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://tu-usuario.github.io/RF-Architecture-Pro-Density/">
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "RF Architecture Pro Simulator",
-  "operatingSystem": "Web",
-  "applicationCategory": "EngineeringApplication",
-  "author": {
-    "@type": "Person",
-    "name": "Gilberto Leonardo Dominguez Garcia",
-    "jobTitle": "Wireless Infrastructure Architect",
-    "affiliation": {
-      "@type": "Organization",
-      "name": "RedCorp 802.11 México"
-    }
-  },
-  "description": "Herramienta de simulación de radiofrecuencia para cálculo de Airtime y degradación por densidad humana."
-}
-</script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 20px; background-color: #f0f2f5; color: #1c1e21; }
-        .container { max-width: 1200px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
-        .header-area { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #e4e6eb; padding-bottom: 15px; margin-bottom: 20px; }
-        h2 { color: #0062cc; margin: 0; }
-        .signature { font-size: 0.85rem; color: #555; text-align: right; }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #f0f2f5; 
+            color: #1c1e21; 
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1); 
+        }
+        .header-area { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-start; 
+            border-bottom: 2px solid #e4e6eb; 
+            padding-bottom: 15px; 
+            margin-bottom: 20px; 
+        }
+        h2 { 
+            color: #0062cc; 
+            margin: 0; 
+        }
+        .signature { 
+            font-size: 0.85rem; 
+            color: #555; 
+            text-align: right; 
+        }
         
-        .report-params { display: none; margin-bottom: 20px; width: 100%; border-collapse: collapse; }
-        .report-params td { padding: 8px; border: 1px solid #ddd; font-size: 0.9rem; }
-        .report-params th { background: #f8f9fa; padding: 8px; border: 1px solid #ddd; text-align: left; font-size: 0.8rem; text-transform: uppercase; }
+        .report-params { 
+            display: none; 
+            margin-bottom: 20px; 
+            width: 100%; 
+            border-collapse: collapse; 
+        }
+        .report-params td { 
+            padding: 8px; 
+            border: 1px solid #ddd; 
+            font-size: 0.9rem; 
+        }
+        .report-params th { 
+            background: #f8f9fa; 
+            padding: 8px; 
+            border: 1px solid #ddd; 
+            text-align: left; 
+            font-size: 0.8rem; 
+            text-transform: uppercase; 
+        }
 
-        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 25px; background: #f7f8fa; padding: 20px; border-radius: 10px; border: 1px solid #ddd; }
-        .input-group { display: flex; flex-direction: column; }
-        label { font-weight: 600; font-size: 0.75rem; color: #606770; margin-bottom: 5px; text-transform: uppercase; }
-        input, select { padding: 10px; border: 1px solid #ccd0d5; border-radius: 6px; font-size: 0.9rem; }
-        .cci-bg { background: #fff3cd; padding: 10px; border-radius: 6px; border: 1px solid #ffeeba; }
+        .controls { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+            gap: 15px; 
+            margin-bottom: 25px; 
+            background: #f7f8fa; 
+            padding: 20px; 
+            border-radius: 10px; 
+            border: 1px solid #ddd; 
+        }
+        .input-group { 
+            display: flex; 
+            flex-direction: column; 
+        }
+        label { 
+            font-weight: 600; 
+            font-size: 0.75rem; 
+            color: #606770; 
+            margin-bottom: 5px; 
+            text-transform: uppercase; 
+        }
+        input, select { 
+            padding: 10px; 
+            border: 1px solid #ccd0d5; 
+            border-radius: 6px; 
+            font-size: 0.9rem; 
+        }
+        .cci-bg { 
+            background: #fff3cd; 
+            padding: 10px; 
+            border-radius: 6px; 
+            border: 1px solid #ffeeba; 
+        }
         
-        button { grid-column: 1 / -1; padding: 14px; background: #0062cc; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        button:hover { background: #004a99; }
+        button { 
+            grid-column: 1 / -1; 
+            padding: 14px; 
+            background: #0062cc; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: 0.2s; 
+        }
+        button:hover { 
+            background: #004a99; 
+        }
         
-        .status-panel { display: flex; justify-content: space-around; align-items: center; background: #2c3e50; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-        .signal-icon { display: flex; align-items: flex-end; gap: 3px; height: 30px; }
-        .bar { width: 8px; background: #555; border-radius: 1px; }
-        .bar.active.green { background: #2ecc71; }
-        .bar.active.yellow { background: #f1c40f; }
-        .bar.active.red { background: #e74c3c; }
+        .status-panel { 
+            display: flex; 
+            justify-content: space-around; 
+            align-items: center; 
+            background: #2c3e50; 
+            color: white; 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+        }
+        .signal-icon { 
+            display: flex; 
+            align-items: flex-end; 
+            gap: 3px; 
+            height: 30px; 
+        }
+        .bar { 
+            width: 8px; 
+            background: #555; 
+            border-radius: 1px; 
+        }
+        .bar.active.green { 
+            background: #2ecc71; 
+        }
+        .bar.active.yellow { 
+            background: #f1c40f; 
+        }
+        .bar.active.red { 
+            background: #e74c3c; 
+        }
 
-        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .full-width { grid-column: 1 / -1; }
-        .chart-card { background: #fff; padding: 15px; border: 1px solid #eee; border-radius: 8px; }
-        .chart-wrapper { position: relative; height: 280px; }
-        h3 { font-size: 0.9rem; color: #444; margin-bottom: 10px; text-align: center; background: #e9ecef; padding: 5px; border-radius: 4px; }
+        .charts-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 20px; 
+        }
+        .full-width { 
+            grid-column: 1 / -1; 
+        }
+        .chart-card { 
+            background: #fff; 
+            padding: 15px; 
+            border: 1px solid #eee; 
+            border-radius: 8px; 
+        }
+        .chart-wrapper { 
+            position: relative; 
+            height: 280px; 
+        }
+        h3 { 
+            font-size: 0.9rem; 
+            color: #444; 
+            margin-bottom: 10px; 
+            text-align: center; 
+            background: #e9ecef; 
+            padding: 5px; 
+            border-radius: 4px; 
+        }
         
+        .glossary-section {
+            margin-top: 30px; 
+            padding: 20px; 
+            background: #f8f9fa; 
+            border: 1px solid #e4e6eb; 
+            border-radius: 8px; 
+            font-size: 0.85rem; 
+            color: #444;
+        }
+        .glossary-grid {
+            display: grid; 
+            grid-template-columns: 1fr 1fr 1fr; 
+            gap: 20px;
+        }
+        .glossary-item {
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        .glossary-item strong {
+            color: #0062cc;
+            display: block;
+            margin-bottom: 3px;
+        }
+
         @media print { 
-            .controls, button, .header-btns { display: none !important; } 
-            .report-params { display: table !important; }
-            .container { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 10px; }
-            body { background-color: white; margin: 0; }
+            .controls, button, .header-btns, .glossary-section { 
+                display: none !important; 
+            } 
+            .report-params { 
+                display: table !important; 
+            }
+            .container { 
+                box-shadow: none; 
+                border: none; 
+                width: 100%; 
+                max-width: 100%; 
+                padding: 10px; 
+            }
+            body { 
+                background-color: white; 
+                margin: 0; 
+            }
         }
     </style>
 </head>
@@ -85,48 +226,80 @@
             <div class="header-btns">
                 <button onclick="window.print()" style="padding: 6px 12px; font-size: 0.7rem; background: #6c757d; border:none; border-radius:4px; color:white; cursor:pointer;">GENERAR REPORTE PDF</button>
             </div>
-            <p style="margin-top: 10px;">&copy; 2026 - RF Cobertura y Airtime predictivo</p>
+            <p style="margin-top: 10px;">&copy; 2026 - México</p>
         </div>
     </div>
 
     <table class="report-params">
         <tr>
+            <th>Protocolo</th>
             <th>Potencia AP</th>
-            <th>Altura AP</th>
             <th>Frecuencia</th>
-            <th>Inicio Bloque</th>
             <th>Interferencia (CCI)</th>
         </tr>
         <tr>
+            <td id="repTech">-</td>
             <td id="repPotencia">-</td>
-            <td id="repAltura">-</td>
             <td id="repFrecuencia">-</td>
-            <td id="repBloque">-</td>
             <td id="repCCI">-</td>
         </tr>
     </table>
     
     <div class="controls">
-        <div class="input-group"><label>Potencia AP (dBm)</label><input type="number" id="potencia" value="32"></div>
-        <div class="input-group"><label>Altura AP (m)</label><input type="number" id="altura" value="4"></div>
+        <div class="input-group">
+            <label>Tecnología / Protocolo</label>
+            <select id="tecnologia">
+                <option value="legacy">Wi-Fi 6 / 5 (Estándar)</option>
+                <option value="mlo" selected>Wi-Fi 7 (MLO - Multi Link)</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Tipo de Antena</label>
+            <select id="tipoAntena" onchange="toggleBeamwidth()">
+                <option value="omni" selected>Omnidireccional</option>
+                <option value="sec">Sectorial (Alta Densidad)</option>
+            </select>
+        </div>
+        <div class="input-group" id="beamGroup" style="display:none;">
+            <label>Beamwidth (Apertura Horiz °)</label>
+            <input type="number" id="beamwidth" value="60">
+        </div>
+        <div class="input-group">
+            <label>Potencia AP (dBm)</label>
+            <input type="number" id="potencia" value="32">
+        </div>
+        <div class="input-group">
+            <label>Altura AP (m)</label>
+            <input type="number" id="altura" value="4">
+        </div>
         <div class="input-group">
             <label>Frecuencia</label>
             <select id="frecuencia">
-                <option value="5" selected>5GHz</option>
-                <option value="2.4">2.4GHz</option>
-                <option value="6">6GHz</option>
+                <option value="5" selected>5 GHz</option>
+                <option value="2.4">2.4 GHz</option>
+                <option value="6">6 GHz</option>
             </select>
         </div>
-        <div class="input-group"><label>Inicio Bloque (m)</label><input type="number" id="inicioBloque" value="15"></div>
-        <div class="input-group cci-bg"><label>Interferencia (CCI)</label><input type="number" id="cci" value="0"></div>
+        <div class="input-group">
+            <label>Inicio Bloque (m)</label>
+            <input type="number" id="inicioBloque" value="15">
+        </div>
+        <div class="input-group cci-bg">
+            <label>Interferencia (CCI)</label>
+            <input type="number" id="cci" value="0">
+        </div>
         <button onclick="actualizarTodo()">EJECUTAR SIMULACIÓN PROFESIONAL</button>
     </div>
 
     <div class="status-panel">
-        <div><strong>Punto Crítico (30m):</strong></div>
+        <div><strong style="color: #f1c40f;">ANÁLISIS A 30m:</strong> [Límite Real: <span id="distanciaCritica">-</span>]</div>
         <div id="statusText">RSSI: -dBm</div>
         <div class="signal-icon" id="signalBars">
-            <div class="bar" style="height: 20%"></div><div class="bar" style="height: 40%"></div><div class="bar" style="height: 60%"></div><div class="bar" style="height: 80%"></div><div class="bar" style="height: 100%"></div>
+            <div class="bar" style="height: 20%"></div>
+            <div class="bar" style="height: 40%"></div>
+            <div class="bar" style="height: 60%"></div>
+            <div class="bar" style="height: 80%"></div>
+            <div class="bar" style="height: 100%"></div>
         </div>
         <div id="throughputText">Throughput: 0 Mbps</div>
         <div id="airtimeText" style="color: #f1c40f;">Air Time: 0%</div>
@@ -139,7 +312,7 @@
             <div class="chart-wrapper"><canvas id="chartH"></canvas></div>
         </div>
         <div class="chart-card">
-            <h3>RSSI: Trayectoria Real (Slant)</h3>
+            <h3>RSSI: Trayectoria Real (Slant Path)</h3>
             <div class="chart-wrapper"><canvas id="chartR"></canvas></div>
         </div>
         <div class="chart-card">
@@ -156,142 +329,304 @@
         </div>
     </div>
 
-    <div style="text-align: center; margin-top: 20px; font-size: 0.7rem; color: #999; border-top: 1px solid #eee; padding-top: 10px;">
-        Ing. G. Leonardo Dominguez Garcia - Wireless Infrastructure Architect
+    <div class="glossary-section">
+        <h3 style="background: #2c3e50; color: white; margin-bottom: 15px; text-transform: uppercase; padding: 5px 15px; border-radius: 4px;">Glosario y Notas de Ingeniería RF - RedCorp</h3>
+        <div class="glossary-grid">
+            <div>
+                <div class="glossary-item"><strong>Beamwidth:</strong> Apertura de haz. Define el ángulo de cobertura de una antena sectorial antes de la caída de ganancia nominal de 3dB.</div>
+                <div class="glossary-item"><strong>RSSI (dBm):</strong> Nivel de potencia recibida. El umbral de -67 dBm es el estándar de oro para aplicaciones críticas de voz y video.</div>
+                <div class="glossary-item"><strong>CCI (Interferencia):</strong> Interferencia por solapamiento de canales. Representa el "ruido" generado por otros APs en el mismo canal.</div>
+            </div>
+            <div>
+                <div class="glossary-item"><strong>QoE (Experiencia):</strong> Calidad de Experiencia del usuario final. Indica si el servicio es percibido como fluido, aceptable o inoperable.</div>
+                <div class="glossary-item"><strong>MLO (Wi-Fi 7):</strong> Multi-Link Operation. Tecnología que permite el uso concurrente de múltiples bandas para mayor estabilidad.</div>
+                <div class="glossary-item"><strong>Slant Path:</strong> Cálculo de la hipotenusa real de propagación considerando la altura relativa entre el AP y el dispositivo móvil.</div>
+            </div>
+            <div>
+                <div class="glossary-item"><strong>Geometría de Montaje:</strong> Modelo optimizado para <strong>Instalación Cenital (Techo/Poste)</strong>. La altura efectiva descuenta 1.2m del plano del usuario móvil para precisión en el cálculo.</div>
+                <div class="glossary-item"><strong>Atenuación por Patrón:</strong> En modo Sectorial, se aplica una penalización matemática de ganancia al salir del haz (Beamwidth) configurado en el eje principal.</div>
+                <div class="glossary-item"><strong>Polarización y MIMO:</strong> Se asume alineación ideal, emulando sistemas MIMO modernos que compensan desajustes de fase causados por la movilidad del usuario.</div>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px; font-size: 0.7rem; color: #999; padding-top: 10px;">
+        Desarrollado por: Gilberto Leonardo Dominguez Garcia - Wireless Infrastructure Architect
     </div>
 </div>
 
 <script>
-let objs = {};
+/**
+ * SISTEMA DE GESTIÓN DE GRÁFICAS - REDCORP
+ */
+let chartInstances = {};
 
-function calcularData(distH, potencia, altura, freq, numPers, ini, cci) {
+/**
+ * CONTROL DE VISIBILIDAD DE BEAMWIDTH
+ */
+function toggleBeamwidth() {
+    const tipo = document.getElementById('tipoAntena').value;
+    const beamGroup = document.getElementById('beamGroup');
+    if (tipo === 'sec') {
+        beamGroup.style.display = 'flex';
+    } else {
+        beamGroup.style.display = 'none';
+    }
+}
+
+/**
+ * CORE ALGORITHM: CÁLCULO DE PROPAGACIÓN RF PROFESIONAL
+ */
+function calcularData(distH, potencia, altura, freq, numPers, ini, cci, tipoAnt, beam) {
     const hEf = Math.abs(altura - 1.2);
     const distR = Math.sqrt(Math.pow(distH, 2) + Math.pow(hEf, 2));
-    const fsplR = (20 * Math.log10(distR)) + (20 * Math.log10(freq)) + 32.44;
-    const fsplH = (20 * Math.log10(distH)) + (20 * Math.log10(freq)) + 32.44;
     
-    let att = distH >= ini ? Math.min((Math.log10(numPers + 1) * 6) + ((distH - ini) * 0.7), 45) : 0;
-    const rssiR = Math.max(-100, potencia - fsplR - att);
-    const rssiH = Math.max(-100, potencia - fsplH - att);
+    // Free Space Path Loss (FSPL)
+    const fsplR = (20 * Math.log10(distR || 0.1)) + (20 * Math.log10(freq)) + 32.44;
+    const fsplH = (20 * Math.log10(distH || 0.1)) + (20 * Math.log10(freq)) + 32.44;
+    
+    // Lógica de Antena Sectorial: Penalización Angular
+    let antLoss = 0;
+    if (tipoAnt === 'sec') {
+        const anguloDeg = Math.atan2(distH, hEf) * (180 / Math.PI);
+        antLoss = Math.min(12 * Math.pow(anguloDeg / beam, 2), 25);
+    }
 
-    // Airtime dinámico
+    // Atenuación por obstrucción humana
+    let att = 0;
+    if (distH >= ini) {
+        att = Math.min((Math.log10(numPers + 1) * 6) + ((distH - ini) * 0.7), 45);
+    }
+    
+    const rssiR = Math.max(-100, potencia - fsplR - att - antLoss);
+    const rssiH = Math.max(-100, potencia - fsplH - att - antLoss);
+
+    // Cálculo de Airtime basado en interferencia y ruido
     const factorBajaSeñal = Math.abs(Math.min(0, rssiR + 65)) / 2;
     const airtimeUse = Math.min(98, (cci * 10) + (numPers / 350) + factorBajaSeñal);
 
+    // Estimación de Throughput según modulación QAM
     let factorMod = Math.pow(Math.max(0, Math.min(1, (rssiR + 92) / 45)), 1.7);
     const tputFinal = (factorMod * 1000) * ((100 - airtimeUse) / 100) / (1 + (cci * 0.2));
 
-    return { rssiH, rssiR, tput: Math.max(0, tputFinal), airtimeUse };
+    return {
+        rssiH: rssiH,
+        rssiR: rssiR,
+        tput: Math.max(0.1, tputFinal),
+        airtimeUse: airtimeUse
+    };
 }
 
+/**
+ * FUNCIÓN PRINCIPAL DE ACTUALIZACIÓN DE DATOS Y RENDERIZADO
+ */
 function actualizarTodo() {
     const p = parseFloat(document.getElementById('potencia').value);
     const a = parseFloat(document.getElementById('altura').value);
     const f = parseFloat(document.getElementById('frecuencia').value);
     const ini = parseFloat(document.getElementById('inicioBloque').value);
     const cci = parseFloat(document.getElementById('cci').value);
+    const tech = document.getElementById('tecnologia').value;
+    const tAnt = document.getElementById('tipoAntena').value;
+    const bW = parseFloat(document.getElementById('beamwidth').value);
     
+    // Sincronizar Reporte PDF
+    document.getElementById('repTech').innerText = tech === 'mlo' ? "Wi-Fi 7 MLO" : "Estándar";
     document.getElementById('repPotencia').innerText = p + " dBm";
-    document.getElementById('repAltura').innerText = a + " m";
     document.getElementById('repFrecuencia').innerText = f + " GHz";
-    document.getElementById('repBloque').innerText = ini + " m";
     document.getElementById('repCCI').innerText = cci;
 
-    const dists = [1, 5, 10, 15, 20, 25, 30, 40, 50, 60];
-    const res = dists.map(d => ({
-        d,
-        p10: calcularData(d, p, a, f, 10, ini, cci),
-        p100: calcularData(d, p, a, f, 100, ini, cci),
-        p1000: calcularData(d, p, a, f, 1000, ini, cci)
-    }));
-
-    const ref = calcularData(30, p, a, f, 1000, ini, cci);
-    document.getElementById('statusText').innerText = `RSSI: ${ref.rssiR.toFixed(1)} dBm`;
-    document.getElementById('throughputText').innerText = `Troughput: ${ref.tput.toFixed(0)} Mbps`;
-    document.getElementById('airtimeText').innerText = `Air Time: ${ref.airtimeUse.toFixed(0)}%`;
+    // Dataset detallado para Punto Crítico (1m a 60m)
+    const distsExtensas = Array.from({length: 60}, (_, i) => i + 1);
+    const distsGrafica = [1, 5, 10, 15, 20, 25, 30, 40, 50, 60];
     
-    let qoe = "CRÍTICO"; let qoeColor = "#e74c3c";
-    if (ref.rssiR > -67 && ref.airtimeUse < 60) { qoe = "EXCELENTE"; qoeColor = "#2ecc71"; }
-    else if (ref.rssiR > -78 && ref.airtimeUse < 85) { qoe = "ACEPTABLE"; qoeColor = "#f1c40f"; }
-    document.getElementById('qoeText').innerText = `QoE: ${qoe}`;
+    let puntoCriticoCalculado = "60+"; // Inicialización segura
+
+    // Escaneo de metros para hallar el límite real corregido
+    for (let d = 1; d <= 60; d++) {
+        let p1000 = calcularData(d, p, a, f, 1000, ini, cci, tAnt, bW);
+        if (tech === 'mlo') {
+            p1000.airtimeUse *= 0.55;
+            p1000.tput *= 1.65;
+        }
+        // Condición de ruptura de QoE Aceptable
+        if (p1000.rssiR < -75 || p1000.airtimeUse > 90) {
+            puntoCriticoCalculado = d;
+            break; // Detener escaneo al primer incumplimiento
+        }
+    }
+
+    // Dataset para gráficas
+    const res = distsGrafica.map(function(d) {
+        let base = {
+            p10: calcularData(d, p, a, f, 10, ini, cci, tAnt, bW),
+            p100: calcularData(d, p, a, f, 100, ini, cci, tAnt, bW),
+            p1000: calcularData(d, p, a, f, 1000, ini, cci, tAnt, bW)
+        };
+        if (tech === 'mlo') {
+            ['p10', 'p100', 'p1000'].forEach(function(k) {
+                base[k].airtimeUse = base[k].airtimeUse * 0.55;
+                base[k].tput = base[k].tput * 1.65;
+            });
+        }
+        return { dist: d, p10: base.p10, p100: base.p100, p1000: base.p1000 };
+    });
+
+    // Referencia fija para estatus (30m)
+    const refData = res.find(function(r) { return r.dist === 30; }).p1000;
+    
+    // Actualizar Interfaz de Usuario
+    document.getElementById('distanciaCritica').innerText = puntoCriticoCalculado + (typeof puntoCriticoCalculado === 'number' ? " m" : "");
+    document.getElementById('statusText').innerText = "RSSI: " + refData.rssiR.toFixed(1) + " dBm";
+    document.getElementById('throughputText').innerText = "Throughput: " + refData.tput.toFixed(0) + " Mbps";
+    document.getElementById('airtimeText').innerText = "Air Time: " + refData.airtimeUse.toFixed(0) + "%";
+    
+    // Lógica QoE
+    let qoe = "CRÍTICO";
+    let qoeColor = "#e74c3c";
+    if (refData.rssiR > -72 && refData.airtimeUse < 75) {
+        qoe = "EXCELENTE";
+        qoeColor = "#2ecc71";
+    } else if (refData.rssiR >= -82 && refData.airtimeUse < 92) {
+        qoe = "ACEPTABLE";
+        qoeColor = "#f1c40f";
+    }
+    
+    document.getElementById('qoeText').innerText = "QoE: " + qoe;
     document.getElementById('qoeText').style.color = qoeColor;
 
-    actualizarBarras(ref.rssiR);
+    actualizarBarras(refData.rssiR);
 
-    // Gráficas Estándar
-    render('chartH', dists, res, 'rssiH', 'dBm', -100, -20, false);
-    render('chartR', dists, res, 'rssiR', 'dBm', -100, -20, false);
-    render('chartT', dists, res, 'tput', 'Mbps', 0, 1000, true);
-    
-    // PARCHE: Airtime Multiline
-    renderAirtime('chartA', dists, res);
-    
-    renderCapacidad('chartS', dists, res.map(r => r.p1000.tput));
+    // Renderizado de las 5 gráficas
+    renderLineChart('chartH', distsGrafica, res, 'rssiH', 'dBm', -100, -20);
+    renderLineChart('chartR', distsGrafica, res, 'rssiR', 'dBm', -100, -20);
+    renderThroughputChart('chartT', distsGrafica, res);
+    renderAirtimeChart('chartA', distsGrafica, res);
+    renderCapacidadChart('chartS', distsGrafica, res.map(function(r) { return r.p1000.tput; }));
 }
 
-function render(id, labels, res, key, yTitle, min, max, isFill) {
+/**
+ * FUNCIÓN RENDERIZADO: RSSI (LÍNEAS)
+ */
+function renderLineChart(id, labels, res, key, yTitle, min, max) {
     const ctx = document.getElementById(id).getContext('2d');
-    if (objs[id]) objs[id].destroy();
-    objs[id] = new Chart(ctx, {
+    if (chartInstances[id]) { chartInstances[id].destroy(); }
+    
+    chartInstances[id] = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: labels.map(l => l+'m'),
+            labels: labels.map(function(l) { return l + 'm'; }),
             datasets: [
-                { label: '10 Pers.', data: res.map(r => r.p10[key]), borderColor: '#28a745', fill: false },
-                { label: '100 Pers.', data: res.map(r => r.p100[key]), borderColor: '#fd7e14', fill: false },
-                { label: '1000 Pers.', data: res.map(r => r.p1000[key]), borderColor: '#dc3545', fill: isFill, backgroundColor: 'rgba(220, 53, 69, 0.1)' },
-                ...(id.includes('chartH') || id.includes('chartR') ? [{ label: 'KPI -67', data: Array(labels.length).fill(-67), borderColor: '#999', borderDash: [5,5], pointRadius: 0 }] : [])
+                { label: '10 P', data: res.map(function(r) { return r.p10[key]; }), borderColor: '#28a745', fill: false, borderWidth: 3 },
+                { label: '100 P', data: res.map(function(r) { return r.p100[key]; }), borderColor: '#fd7e14', fill: false, borderWidth: 3 },
+                { label: '1000 P', data: res.map(function(r) { return r.p1000[key]; }), borderColor: '#dc3545', fill: true, backgroundColor: 'rgba(220, 53, 69, 0.05)', borderWidth: 3 }
             ]
         },
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { min, max, title: { display: true, text: yTitle } } } }
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: min, max: max, title: { display: true, text: yTitle } } } }
     });
 }
 
-function renderAirtime(id, labels, res) {
+/**
+ * FUNCIÓN RENDERIZADO: THROUGHPUT ESTIMADO (DINÁMICO)
+ */
+function renderThroughputChart(id, labels, res) {
     const ctx = document.getElementById(id).getContext('2d');
-    if (objs[id]) objs[id].destroy();
-    objs[id] = new Chart(ctx, {
+    if (chartInstances[id]) { chartInstances[id].destroy(); }
+    
+    const allTput = res.flatMap(r => [r.p10.tput, r.p100.tput, r.p1000.tput]);
+    const maxTput = Math.max(...allTput);
+    const yMax = maxTput > 1000 ? Math.ceil(maxTput / 500) * 500 : Math.ceil(maxTput / 100) * 100;
+
+    chartInstances[id] = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: labels.map(l => l+'m'),
+            labels: labels.map(l => l + 'm'),
             datasets: [
-                { label: 'Airtime 10 P', data: res.map(r => r.p10.airtimeUse), borderColor: '#28a745', fill: false },
-                { label: 'Airtime 100 P', data: res.map(r => r.p100.airtimeUse), borderColor: '#fd7e14', fill: false },
-                { label: 'Airtime 1000 P', data: res.map(r => r.p1000.airtimeUse), borderColor: '#9b59b6', fill: true, backgroundColor: 'rgba(155, 89, 182, 0.1)' }
+                { label: '10 P', data: res.map(r => r.p10.tput), borderColor: '#28a745', borderWidth: 4, tension: 0.3, fill: false },
+                { label: '100 P', data: res.map(r => r.p100.tput), borderColor: '#fd7e14', borderWidth: 4, tension: 0.3, fill: false },
+                { label: '1000 P', data: res.map(r => r.p1000.tput), borderColor: '#dc3545', borderWidth: 4, tension: 0.3, fill: true, backgroundColor: 'rgba(220, 53, 69, 0.1)' }
+            ]
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            scales: { 
+                y: { 
+                    beginAtZero: true, 
+                    max: yMax + (yMax * 0.1),
+                    title: { display: true, text: 'Mbps' } 
+                } 
+            } 
+        }
+    });
+}
+
+/**
+ * FUNCIÓN RENDERIZADO: AIRTIME
+ */
+function renderAirtimeChart(id, labels, res) {
+    const ctx = document.getElementById(id).getContext('2d');
+    if (chartInstances[id]) { chartInstances[id].destroy(); }
+    chartInstances[id] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels.map(function(l) { return l + 'm'; }),
+            datasets: [
+                { label: '10 P', data: res.map(function(r) { return r.p10.airtimeUse; }), borderColor: '#28a745', fill: false },
+                { label: '100 P', data: res.map(function(r) { return r.p100.airtimeUse; }), borderColor: '#fd7e14', fill: false },
+                { label: '1000 P', data: res.map(function(r) { return r.p1000.airtimeUse; }), borderColor: '#9b59b6', fill: true, backgroundColor: 'rgba(155, 89, 182, 0.05)' }
             ]
         },
         options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100, title: { display: true, text: '%' } } } }
     });
 }
 
-function renderCapacidad(id, labels, tputArray) {
+/**
+ * FUNCIÓN RENDERIZADO: CAPACIDAD POR SERVICIO
+ */
+function renderCapacidadChart(id, labels, tputArray) {
     const ctx = document.getElementById(id).getContext('2d');
-    if (objs[id]) objs[id].destroy();
-    objs[id] = new Chart(ctx, {
+    if (chartInstances[id]) { chartInstances[id].destroy(); }
+    const capRealista = function(tput, req) {
+        let teorico = tput / req;
+        if (req < 1) return Math.min(teorico * 0.4, 512);
+        return Math.floor(teorico * 0.85);
+    };
+    chartInstances[id] = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: labels.map(l => l+'m'),
+            labels: labels.map(function(l) { return l + 'm'; }),
             datasets: [
-                { label: 'WhatsApp (0.1M)', data: tputArray.map(t => Math.floor(t / 0.1)), backgroundColor: '#28a745' },
-                { label: 'HD Video (5M)', data: tputArray.map(t => Math.floor(t / 5)), backgroundColor: '#ffc107' },
-                { label: '4K Stream (25M)', data: tputArray.map(t => Math.floor(t / 25)), backgroundColor: '#dc3545' }
+                { label: 'WhatsApp', data: tputArray.map(function(t) { return capRealista(t, 0.1); }), backgroundColor: '#28a745' },
+                { label: 'HD Video', data: tputArray.map(function(t) { return capRealista(t, 5); }), backgroundColor: '#ffc107' },
+                { label: '4K Stream', data: tputArray.map(function(t) { return capRealista(t, 25); }), backgroundColor: '#dc3545' }
             ]
         },
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { type: 'logarithmic' } } }
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, title: { display: true, text: 'Disp.' }, max: 600 } } }
     });
 }
 
+/**
+ * ACTUALIZACIÓN DE BARRAS DE SEÑAL
+ */
 function actualizarBarras(rssi) {
-    const bars = document.querySelectorAll('.bar');
-    let active = 0, color = 'red';
-    if (rssi > -60) active = 5, color = 'green';
-    else if (rssi > -70) active = 4, color = 'green';
-    else if (rssi > -80) active = 3, color = 'yellow';
-    else if (rssi > -90) active = 2, color = 'red';
-    bars.forEach((b, i) => b.className = 'bar' + (i < active ? ` active ${color}` : ''));
+    const bars = document.querySelectorAll('#signalBars .bar');
+    let active = 0; let color = 'red';
+    if (rssi > -62) { active = 5; color = 'green'; }
+    else if (rssi > -72) { active = 4; color = 'green'; }
+    else if (rssi > -82) { active = 3; color = 'yellow'; }
+    else if (rssi > -92) { active = 2; color = 'red'; }
+    else if (rssi > -100) { active = 1; color = 'red'; }
+    bars.forEach(function(b, i) {
+        b.className = 'bar';
+        if (i < active) { b.classList.add('active'); b.classList.add(color); }
+    });
 }
 
-actualizarTodo();
+window.onload = function() {
+    toggleBeamwidth();
+    actualizarTodo();
+};
 </script>
 </body>
 </html>
