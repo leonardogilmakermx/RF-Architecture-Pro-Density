@@ -2,215 +2,135 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>RF Architecture Pro - Full Analysis Console</title>
-    <meta name="description" content="Consola profesional de análisis de RF para alta densidad. Cálculo de RSSI, Airtime y QoE para eventos masivos. Diseñado por Ing. G. Leonardo Dominguez Garcia.">
-    <meta name="keywords" content="RF Architecture, RedCorp, Wi-Fi 7, Airtime Efficiency, Wireless Infrastructure, ESIME Zacatenco, Radiofrecuencia, Alta Densidad Wi-Fi">
+    <title>RF Architecture Pro - Balanced Spatial Channels, Per-AP Height Z & Radio Control</title>
+    <meta name="description" content="Consola profesional de análisis de RF para alta densidad con balanceo estricto de canales y refinamiento espacial, Altura Z individual, control de radios (2 radios Wi-Fi 6 / 3 radios Wi-Fi 7), Beamwidth H×V, elipse -3 dB ocultable, validador PSD 6 GHz LPI, .hdwp y Flyer Wifi. Diseñado por Ing. G. Leonardo Dominguez Garcia.">
     <meta name="author" content="Gilberto Leonardo Dominguez Garcia - RedCorp 802.11 México">
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { 
-            font-family: 'Segoe UI', Arial, sans-serif; 
-            margin: 20px; 
-            background-color: #f0f2f5; 
-            color: #1c1e21; 
-        }
-        .container { 
-            max-width: 1200px; 
-            margin: auto; 
-            background: white; 
-            padding: 30px; 
-            border-radius: 15px; 
-            box-shadow: 0 8px 30px rgba(0,0,0,0.1); 
-        }
-        .header-area { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: flex-start; 
-            border-bottom: 2px solid #e4e6eb; 
-            padding-bottom: 15px; 
-            margin-bottom: 20px; 
-        }
-        h2 { 
-            color: #0062cc; 
-            margin: 0; 
-        }
-        .signature { 
-            font-size: 0.85rem; 
-            color: #555; 
-            text-align: right; 
-        }
-        
-        .report-params { 
-            display: none; 
-            margin-bottom: 20px; 
-            width: 100%; 
-            border-collapse: collapse; 
-        }
-        .report-params td { 
-            padding: 8px; 
-            border: 1px solid #ddd; 
-            font-size: 0.9rem; 
-        }
-        .report-params th { 
-            background: #f8f9fa; 
-            padding: 8px; 
-            border: 1px solid #ddd; 
-            text-align: left; 
-            font-size: 0.8rem; 
-            text-transform: uppercase; 
-        }
-
-        .controls { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
-            gap: 15px; 
-            margin-bottom: 25px; 
-            background: #f7f8fa; 
-            padding: 20px; 
-            border-radius: 10px; 
-            border: 1px solid #ddd; 
-        }
-        .input-group { 
-            display: flex; 
-            flex-direction: column; 
-        }
-        label { 
-            font-weight: 600; 
-            font-size: 0.75rem; 
-            color: #606770; 
-            margin-bottom: 5px; 
-            text-transform: uppercase; 
-        }
-        input, select { 
-            padding: 10px; 
-            border: 1px solid #ccd0d5; 
-            border-radius: 6px; 
-            font-size: 0.9rem; 
-        }
-        .cci-bg { 
-            background: #fff3cd; 
-            padding: 10px; 
-            border-radius: 6px; 
-            border: 1px solid #ffeeba; 
-        }
-        
-        button { 
-            grid-column: 1 / -1; 
-            padding: 14px; 
-            background: #0062cc; 
-            color: white; 
-            border: none; 
-            border-radius: 6px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            transition: 0.2s; 
-        }
-        button:hover { 
-            background: #004a99; 
-        }
-        
-        .status-panel { 
-            display: flex; 
-            justify-content: space-around; 
-            align-items: center; 
-            background: #2c3e50; 
-            color: white; 
-            padding: 15px; 
-            border-radius: 8px; 
-            margin-bottom: 20px; 
-        }
-        .signal-icon { 
-            display: flex; 
-            align-items: flex-end; 
-            gap: 3px; 
-            height: 30px; 
-        }
-        .bar { 
-            width: 8px; 
-            background: #555; 
-            border-radius: 1px; 
-        }
-        .bar.active.green { 
-            background: #2ecc71; 
-        }
-        .bar.active.yellow { 
-            background: #f1c40f; 
-        }
-        .bar.active.red { 
-            background: #e74c3c; 
-        }
-
-        .charts-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 20px; 
-        }
-        .full-width { 
-            grid-column: 1 / -1; 
-        }
-        .chart-card { 
-            background: #fff; 
-            padding: 15px; 
-            border: 1px solid #eee; 
-            border-radius: 8px; 
-        }
-        .chart-wrapper { 
-            position: relative; 
-            height: 280px; 
-        }
-        h3 { 
-            font-size: 0.9rem; 
-            color: #444; 
-            margin-bottom: 10px; 
-            text-align: center; 
-            background: #e9ecef; 
-            padding: 5px; 
-            border-radius: 4px; 
-        }
-        
-        .glossary-section {
-            margin-top: 30px; 
-            padding: 20px; 
-            background: #f8f9fa; 
-            border: 1px solid #e4e6eb; 
-            border-radius: 8px; 
-            font-size: 0.85rem; 
-            color: #444;
-        }
-        .glossary-grid {
-            display: grid; 
-            grid-template-columns: 1fr 1fr 1fr; 
-            gap: 20px;
-        }
-        .glossary-item {
-            margin-bottom: 15px;
-            line-height: 1.4;
-        }
-        .glossary-item strong {
-            color: #0062cc;
-            display: block;
-            margin-bottom: 3px;
-        }
-
-        @media print { 
-            .controls, button, .header-btns, .glossary-section { 
-                display: none !important; 
-            } 
-            .report-params { 
-                display: table !important; 
-            }
-            .container { 
-                box-shadow: none; 
-                border: none; 
-                width: 100%; 
-                max-width: 100%; 
-                padding: 10px; 
-            }
-            body { 
-                background-color: white; 
-                margin: 0; 
-            }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 20px; background-color: #f0f2f5; color: #1c1e21; }
+        .container { max-width: 1360px; margin: auto; background: white; padding: 28px; border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+        .header-area { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #e4e6eb; padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+        h2 { color: #0062cc; margin: 0; }
+        .signature { font-size: 0.85rem; color: #555; text-align: right; }
+        .header-btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+        .btn-hdwp-save { padding: 7px 13px; font-size: 0.74rem; background: #0062cc; border: none; border-radius: 5px; color: white; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-hdwp-save:hover { background: #004a99; }
+        .btn-hdwp-load { padding: 7px 13px; font-size: 0.74rem; background: #0d9488; border: none; border-radius: 5px; color: white; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-hdwp-load:hover { background: #0f766e; }
+        .btn-pdf-print { padding: 7px 13px; font-size: 0.74rem; background: #6c757d; border: none; border-radius: 5px; color: white; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-pdf-print:hover { background: #5a6268; }
+        .report-params { display: none; margin-bottom: 20px; width: 100%; border-collapse: collapse; }
+        .report-params td, .report-params th { padding: 8px; border: 1px solid #ddd; font-size: 0.8rem; }
+        .report-params th { background: #f8f9fa; text-align: left; text-transform: uppercase; }
+        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 12px; margin-bottom: 20px; background: #f7f8fa; padding: 18px; border-radius: 10px; border: 1px solid #ddd; }
+        .input-group { display: flex; flex-direction: column; }
+        label { font-weight: 600; font-size: 0.68rem; color: #606770; margin-bottom: 5px; text-transform: uppercase; }
+        input, select { padding: 8px; border: 1px solid #ccd0d5; border-radius: 6px; font-size: 0.85rem; }
+        .zone-bg { background: #e8f4fd; padding: 9px; border-radius: 6px; border: 1px solid #b8daff; }
+        .height-bg { background: #eafaf1; padding: 9px; border-radius: 6px; border: 1px solid #a9dfbf; }
+        .xy-bg { background: #e0f7fa; padding: 9px; border-radius: 6px; border: 1px solid #80deea; }
+        .flyer-device-bg { background: #ede7f6; padding: 9px; border-radius: 6px; border: 1px solid #b39ddb; }
+        .cci-auto-bg { background: #fff8e1; padding: 9px; border-radius: 6px; border: 1px solid #ffe082; }
+        .reg-bg { background: #fce4ec; padding: 9px; border-radius: 6px; border: 1px solid #f48fb1; }
+        .opt-bg { background: #e8f5e9; padding: 9px; border-radius: 6px; border: 1px solid #81c784; grid-column: span 2; }
+        .opt-dual { display: grid; grid-template-columns: 1fr 1.25fr; gap: 6px; align-items: center; }
+        .btn-auto-opt { padding: 9px 10px !important; background: #10b981; color: #0f172a; border: none; border-radius: 6px; font-weight: 800; font-size: 0.78rem; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3); }
+        .btn-auto-opt:hover { background: #059669; color: #ffffff; }
+        .cci-readout { padding: 8px 10px; background: #1e293b; color: #10b981; border-radius: 6px; font-weight: bold; font-size: 0.82rem; text-align: center; border: 1px solid #475569; }
+        .users-bg { background: #fdebd0; padding: 9px; border-radius: 6px; border: 1px solid #f5cba7; grid-column: span 2; }
+        .users-dual { display: grid; grid-template-columns: 1fr 1.2fr; gap: 6px; }
+        .height-stepper { display: flex; gap: 4px; align-items: center; }
+        .height-stepper input { width: 100%; text-align: center; font-weight: bold; }
+        .btn-step { padding: 7px 9px !important; background: #28a745; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
+        .btn-step:hover { background: #1e7e34; }
+        button.main-btn { grid-column: 1 / -1; padding: 13px; background: #0062cc; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.95rem; }
+        button.main-btn:hover { background: #004a99; }
+        .psd-alert-banner { display: none; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; background: #fffbeb; border: 1px solid #f59e0b; border-left: 5px solid #d97706; color: #92400e; padding: 10px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 0.83rem; }
+        .btn-psd-fix { padding: 6px 12px; background: #d97706; color: #ffffff; border: none; border-radius: 5px; font-size: 0.76rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-psd-fix:hover { background: #b45309; }
+        .global-semaphore-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; background: #1e293b; color: #f8fafc; padding: 14px 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #334155; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .semaphore-left { display: flex; align-items: center; gap: 14px; }
+        .traffic-lights { display: flex; gap: 7px; background: #0f172a; padding: 7px 11px; border-radius: 20px; border: 1px solid #475569; }
+        .light-bulb { width: 15px; height: 15px; border-radius: 50%; background: #334155; transition: 0.25s; }
+        .light-bulb.red.on { background: #ef4444; box-shadow: 0 0 12px #ef4444; }
+        .light-bulb.yellow.on { background: #f59e0b; box-shadow: 0 0 12px #f59e0b; }
+        .light-bulb.green.on { background: #10b981; box-shadow: 0 0 12px #10b981; }
+        .semaphore-verdict { font-size: 1rem; font-weight: 800; letter-spacing: 0.3px; }
+        .semaphore-reason { font-size: 0.78rem; color: #cbd5e1; margin-top: 2px; }
+        .flyer-live-badge { display: flex; align-items: center; gap: 16px; background: rgba(15, 23, 42, 0.75); padding: 9px 16px; border-radius: 8px; border-left: 4px solid #00e5ff; font-size: 0.84rem; }
+        .sim-card { background: #0f172a; color: #e2e8f0; padding: 18px; border-radius: 10px; margin-bottom: 22px; border: 1px solid #334155; }
+        .sim-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #1e293b; }
+        .sim-header h3 { background: transparent; color: #38bdf8; margin: 0; padding: 0; font-size: 1rem; text-align: left; }
+        .layer-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .layer-select { background: #1e293b; color: #f8fafc; border: 1px solid #475569; padding: 6px 10px; border-radius: 5px; font-size: 0.78rem; }
+        .cad-toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; background: #1e293b; padding: 9px 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #334155; }
+        .toolbar-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .btn-tool { padding: 6px 10px; background: #334155; color: #f8fafc; border: 1px solid #475569; border-radius: 5px; font-size: 0.74rem; font-weight: 600; cursor: pointer; transition: 0.15s; }
+        .btn-tool:hover { background: #475569; }
+        .btn-tool.active { background: #f59e0b; color: #0f172a; border-color: #fbbf24; }
+        .btn-tool.ap-move-active { background: #38bdf8; color: #0f172a; border-color: #7dd3fc; }
+        .btn-tool.ap-add-active { background: #10b981; color: #0f172a; border-color: #34d399; }
+        .btn-tool.ap-del-active { background: #ef4444; color: #ffffff; border-color: #f87171; }
+        .btn-tool.ap-edit-active { background: #a855f7; color: #ffffff; border-color: #c084fc; }
+        .btn-tool.calibrate-on { background: #ec4899; color: #ffffff; border-color: #f472b6; animation: pulseCal 1.2s infinite; }
+        .btn-tool.zone-on { background: #10b981; color: #0f172a; border-color: #34d399; animation: pulseZone 1.2s infinite; }
+        .chk-overlay-label { display: flex; align-items: center; gap: 5px; font-size: 0.74rem; color: #e2e8f0; background: #0f172a; padding: 5px 9px; border-radius: 5px; border: 1px solid #475569; cursor: pointer; text-transform: none; margin: 0; font-weight: 600; }
+        .chk-overlay-label input { margin: 0; padding: 0; cursor: pointer; accent-color: #c084fc; }
+        .ap-inspector-bar { display: none; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; background: rgba(168, 85, 247, 0.16); border: 1px solid #a855f7; color: #f3e8ff; padding: 9px 14px; border-radius: 7px; margin-bottom: 10px; font-size: 0.8rem; }
+        .ap-inspector-controls { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+        .ap-inspector-controls label { color: #e9d5ff; margin: 0; font-size: 0.72rem; }
+        .ap-inspector-controls input[type="number"] { width: 58px; padding: 4px 6px; background: #0f172a; color: #ffffff; border: 1px solid #a855f7; border-radius: 4px; font-weight: bold; text-align: center; }
+        .radio-toggles-wrap { display: flex; align-items: center; gap: 6px; background: rgba(15, 23, 42, 0.75); padding: 4px 9px; border-radius: 5px; border: 1px solid #7e22ce; }
+        .radio-chk { display: flex; align-items: center; gap: 4px; font-size: 0.74rem; color: #f8fafc; cursor: pointer; text-transform: none !important; font-weight: 700; }
+        .radio-chk input { width: auto; margin: 0; cursor: pointer; accent-color: #10b981; }
+        @keyframes pulseCal { 0% { box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(236, 72, 153, 0); } 100% { box-shadow: 0 0 0 0 rgba(236, 72, 153, 0); } }
+        @keyframes pulseZone { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+        .zoom-badge { background: #0f172a; color: #38bdf8; padding: 4px 8px; border-radius: 4px; font-size: 0.74rem; font-weight: bold; border: 1px solid #334155; }
+        .calib-banner { display: none; background: rgba(236, 72, 153, 0.18); border: 1px solid #ec4899; color: #fbcfe8; padding: 8px 14px; border-radius: 6px; margin-bottom: 10px; font-size: 0.81rem; font-weight: 600; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .sim-legend { display: flex; gap: 14px; font-size: 0.76rem; align-items: center; flex-wrap: wrap; }
+        .legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; }
+        .master-canvas-wrap { position: relative; width: 100%; height: 450px; background: #090d16; border: 1px solid #334155; border-radius: 8px; overflow: hidden; cursor: grab; }
+        .master-canvas-wrap:active { cursor: grabbing; }
+        #masterCanvas { width: 100%; height: 100%; display: block; }
+        .engineering-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 14px; }
+        .kpi-box { background: #1e293b; border: 1px solid #334155; border-left: 4px solid #38bdf8; padding: 10px 14px; border-radius: 6px; }
+        .kpi-box .kpi-title { font-size: 0.7rem; text-transform: uppercase; color: #94a3b8; margin-bottom: 4px; }
+        .kpi-box .kpi-val { font-size: 1rem; font-weight: bold; color: #f8fafc; }
+        .kpi-box .kpi-sub { font-size: 0.75rem; color: #cbd5e1; margin-top: 2px; }
+        .btn-snap { padding: 7px 14px; background: #00e5ff; color: #0f172a; border: none; border-radius: 5px; font-size: 0.76rem; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 8px rgba(0, 229, 255, 0.25); }
+        .btn-snap:hover { background: #00b8d4; }
+        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .full-width { grid-column: 1 / -1; }
+        .chart-card { background: #fff; padding: 15px; border: 1px solid #eee; border-radius: 8px; min-width: 0; }
+        .chart-wrapper { position: relative; height: 300px; width: 100%; }
+        h3 { font-size: 0.9rem; color: #444; margin-bottom: 10px; text-align: center; background: #e9ecef; padding: 6px; border-radius: 4px; }
+        .ap-schedule-section { margin-top: 25px; background: #ffffff; border: 1px solid #dce1e7; border-radius: 10px; padding: 18px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        .ap-schedule-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; border-bottom: 2px solid #0062cc; padding-bottom: 8px; }
+        .ap-schedule-header h3 { margin: 0; background: transparent; color: #0062cc; font-size: 1rem; text-align: left; padding: 0; }
+        .btn-csv { padding: 7px 14px; background: #10b981; color: #ffffff; border: none; border-radius: 5px; font-size: 0.78rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-csv:hover { background: #059669; }
+        .ap-table-wrapper { max-height: 320px; overflow-y: auto; border: 1px solid #e4e6eb; border-radius: 6px; }
+        .ap-schedule-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+        .ap-schedule-table th { position: sticky; top: 0; background: #2c3e50; color: #ffffff; text-align: left; padding: 9px 12px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.4px; }
+        .ap-schedule-table td { padding: 8px 12px; border-bottom: 1px solid #e9ecef; color: #2d3748; }
+        .ap-schedule-table tr:nth-child(even) { background-color: #f8fafc; }
+        .ch-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; color: #0f172a; font-weight: 800; font-size: 0.75rem; }
+        .glossary-section { margin-top: 25px; padding: 20px; background: #f8f9fa; border: 1px solid #e4e6eb; border-radius: 8px; font-size: 0.85rem; color: #444; }
+        .glossary-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+        .glossary-item { margin-bottom: 15px; line-height: 1.4; }
+        .glossary-item strong { color: #0062cc; display: block; margin-bottom: 3px; }
+        @media print {
+            @page { margin: 10mm; size: auto; }
+            .controls, button, .header-btns, .glossary-section, .layer-controls, .cad-toolbar, .btn-csv, .btn-psd-fix, .ap-inspector-bar { display: none !important; }
+            .report-params { display: table !important; }
+            .charts-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 12px !important; width: 100% !important; }
+            .chart-card { padding: 8px !important; break-inside: avoid; page-break-inside: avoid; overflow: hidden !important; }
+            .chart-wrapper { height: 220px !important; width: 100% !important; max-width: 100% !important; }
+            .chart-wrapper canvas { max-width: 100% !important; max-height: 220px !important; }
+            .ap-table-wrapper { max-height: none !important; overflow: visible !important; }
+            .ap-schedule-section { page-break-before: always; border: 1px solid #999; }
+            .container { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 4px; margin: 0; }
+            body { background-color: white; margin: 0; }
         }
     </style>
 </head>
@@ -224,108 +144,357 @@
         </div>
         <div class="signature">
             <div class="header-btns">
-                <button onclick="window.print()" style="padding: 6px 12px; font-size: 0.7rem; background: #6c757d; border:none; border-radius:4px; color:white; cursor:pointer;">GENERAR REPORTE PDF</button>
+                <input type="file" id="hdwpInput" accept=".hdwp,.json" style="display:none;" onchange="importarProyectoHDWP(event)">
+                <button type="button" class="btn-hdwp-save" onclick="guardarProyectoHDWP()">&#128190; GUARDAR PROYECTO (.HDWP)</button>
+                <button type="button" class="btn-hdwp-load" onclick="document.getElementById('hdwpInput').click()">&#128194; IMPORTAR PROYECTO (.HDWP)</button>
+                <button type="button" class="btn-pdf-print" onclick="window.print()">GENERAR REPORTE PDF</button>
             </div>
-            <p style="margin-top: 10px;">&copy; 2026 - México</p>
+            <p id="projectStatusLabel" style="margin-top: 8px; font-size: 0.76rem; color: #0d9488; font-weight: 600;">Proyecto: Nuevo Diseño RF (Plano Limpio) &copy; 2026 - México</p>
         </div>
     </div>
 
     <table class="report-params">
         <tr>
-            <th>Protocolo</th>
-            <th>Potencia AP</th>
-            <th>Frecuencia</th>
-            <th>Interferencia (CCI)</th>
+            <th>Protocolo / País</th><th>Potencia AP / Altura Z</th><th>Banda / Canal / Espectro</th><th>Polígono Delimitado (Área)</th><th>Aforo y Postura</th><th>CCI Auto / Agente Flyer Wifi</th>
         </tr>
         <tr>
-            <td id="repTech">-</td>
-            <td id="repPotencia">-</td>
-            <td id="repFrecuencia">-</td>
-            <td id="repCCI">-</td>
+            <td id="repTech">-</td><td id="repPotencia">-</td><td id="repFrecuencia">-</td><td id="repZona">-</td><td id="repCohorte">-</td><td id="repCCI">-</td>
         </tr>
     </table>
     
     <div class="controls">
         <div class="input-group">
             <label>Tecnología / Protocolo</label>
-            <select id="tecnologia">
-                <option value="legacy">Wi-Fi 6 / 5 (Estándar)</option>
-                <option value="mlo" selected>Wi-Fi 7 (MLO - Multi Link)</option>
+            <select id="tecnologia" onchange="alCambiarTecnologia()">
+                <option value="legacy">Wi-Fi 6 / 5 (2 Radios: 2.4/5)</option>
+                <option value="mlo" selected>Wi-Fi 7 MLO (3 Radios: 2.4/5/6)</option>
+            </select>
+        </div>
+        <div class="input-group reg-bg">
+            <label>País / Regulación RF</label>
+            <select id="paisRegulacion" onchange="actualizarMenuEspectroDFS(); actualizarTodo();">
+                <option value="MX" selected>México (IFT)</option>
+                <option value="US">EE. UU. / Canadá (FCC)</option>
+                <option value="EU">Europa / UK (ETSI)</option>
+                <option value="BR">Brasil / LATAM 6G (ANATEL)</option>
+                <option value="JP">Japón (MIC)</option>
             </select>
         </div>
         <div class="input-group">
-            <label>Tipo de Antena</label>
-            <select id="tipoAntena" onchange="toggleBeamwidth()">
-                <option value="omni" selected>Omnidireccional</option>
-                <option value="sec">Sectorial (Alta Densidad)</option>
+            <label>Tipo de Antena APs</label>
+            <select id="tipoAntena" onchange="toggleBeamwidth(); actualizarTodo();">
+                <option value="omni">Omnidireccional (+4 dBi)</option>
+                <option value="sec" selected>Sectorial HD (+9 dBi)</option>
             </select>
         </div>
-        <div class="input-group" id="beamGroup" style="display:none;">
-            <label>Beamwidth (Apertura Horiz °)</label>
-            <input type="number" id="beamwidth" value="60">
+        <div class="input-group" id="montajeSecGroup" style="display:flex;">
+            <label>Montaje Sectorial</label>
+            <select id="montajeSectorial" onchange="toggleBeamwidth(); actualizarTodo();">
+                <option value="techo" selected>Techo hacia el Piso (Elipse -Z)</option>
+                <option value="muro">Muro / Grada Lateral (Azimut)</option>
+            </select>
+        </div>
+        <div class="input-group" id="beamHGroup" style="display:flex;">
+            <label>Beamwidth H / Azimut (°)</label>
+            <input type="number" id="beamwidthH" value="60" min="15" max="120" onchange="actualizarTodo()">
+        </div>
+        <div class="input-group" id="beamVGroup" style="display:flex;">
+            <label>Beamwidth V / Elevación (°)</label>
+            <input type="number" id="beamwidthV" value="30" min="15" max="120" onchange="actualizarTodo()">
+        </div>
+        <div class="input-group" id="azimutGroup" style="display:flex;">
+            <label>Rotación Global (°)</label>
+            <input type="number" id="azimut" value="0" min="0" max="360" step="15" onchange="actualizarTodo()">
         </div>
         <div class="input-group">
-            <label>Potencia AP (dBm)</label>
-            <input type="number" id="potencia" value="32">
+            <label>Potencia Tx Global (dBm)</label>
+            <input type="number" id="potencia" value="18" min="1" max="30" onchange="actualizarTodo()">
         </div>
-        <div class="input-group">
-            <label>Altura AP (m)</label>
-            <input type="number" id="altura" value="4">
+        <div class="input-group height-bg">
+            <label>Altura APs Global Z (m)</label>
+            <div class="height-stepper">
+                <button type="button" class="btn-step" title="Bajar AP (-0.5m)" onclick="ajustarAltura(-0.5)">&#9660;</button>
+                <input type="number" id="altura" value="12.0" step="0.5" min="0.5" max="45" onchange="actualizarTodo()">
+                <button type="button" class="btn-step" title="Subir AP (+0.5m)" onclick="ajustarAltura(0.5)">&#9650;</button>
+            </div>
+        </div>
+        <div class="input-group flyer-device-bg">
+            <label>Dispositivo Flyer Wifi (Offset)</label>
+            <select id="perfilDispositivo" onchange="activarCaminataFlyer(); actualizarTodo();">
+                <option value="-3">Laptop / MacBook (-3 dB Offset)</option>
+                <option value="-10" selected>Smartphone / Celular (-10 dB Offset)</option>
+                <option value="-11">Terminal IoT / POS (-11 dB Offset)</option>
+            </select>
+        </div>
+        <div class="input-group xy-bg">
+            <label>Flyer Wifi Eje X (m)</label>
+            <input type="number" id="apPosX" value="60" min="-20" max="1000" step="0.5" onchange="activarCaminataFlyer(); actualizarTodo();">
+        </div>
+        <div class="input-group xy-bg">
+            <label>Flyer Wifi Eje Y (m)</label>
+            <input type="number" id="apPosY" value="37.5" min="0" max="1000" step="0.5" onchange="activarCaminataFlyer(); actualizarTodo();">
         </div>
         <div class="input-group">
             <label>Frecuencia</label>
-            <select id="frecuencia">
-                <option value="5" selected>5 GHz</option>
+            <select id="frecuencia" onchange="actualizarAnchosCanal(); actualizarMenuEspectroDFS(); actualizarTodo();">
                 <option value="2.4">2.4 GHz</option>
-                <option value="6">6 GHz</option>
+                <option value="5">5 GHz</option>
+                <option value="6" selected>6 GHz</option>
             </select>
         </div>
         <div class="input-group">
-            <label>Inicio Bloque (m)</label>
-            <input type="number" id="inicioBloque" value="15">
+            <label>Ancho de Canal</label>
+            <select id="anchoCanal" onchange="actualizarMenuEspectroDFS(); actualizarTodo();">
+                <option value="20" selected>20 MHz (Alta Densidad)</option>
+                <option value="40">40 MHz (Alta Densidad)</option>
+                <option value="80">80 MHz (Estándar 6 GHz)</option>
+                <option value="160">160 MHz (Ultra Tput)</option>
+                <option value="320">320 MHz (Wi-Fi 7 Max)</option>
+            </select>
         </div>
-        <div class="input-group cci-bg">
-            <label>Interferencia (CCI)</label>
-            <input type="number" id="cci" value="0">
+        <div class="input-group cci-auto-bg">
+            <label>Espectro / Canales DFS</label>
+            <select id="modoDFS" onchange="actualizarTodo()">
+                <option value="con_dfs" selected>UNII-5 (Ch 1-93 | 24 Ch)</option>
+            </select>
         </div>
-        <button onclick="actualizarTodo()">EJECUTAR SIMULACIÓN PROFESIONAL</button>
+        <div class="input-group cci-auto-bg">
+            <label>CCI Calculado (Auto -82 dBm)</label>
+            <div id="cciAutoDisplay" class="cci-readout">CCI Auto: 0 APs (24 Ch)</div>
+        </div>
+        <div class="input-group opt-bg">
+            <label>Meta de Borde de Celda &amp; Auto-Optimización RF (Mínimo CCI)</label>
+            <div class="opt-dual">
+                <select id="metaOptimizacion" onchange="actualizarTodo()">
+                    <option value="-65">Meta: -65 dBm (VoIP / Misión Crítica)</option>
+                    <option value="-67" selected>Meta: -67 dBm (Estándar Oro HD)</option>
+                    <option value="-69">Meta: -69 dBm (Roaming / Datos)</option>
+                </select>
+                <button type="button" class="btn-auto-opt" onclick="autoOptimizarRF()">&#9889; AUTO-OPTIMIZAR A META (MÍNIMO CCI)</button>
+            </div>
+        </div>
+        <div class="input-group zone-bg">
+            <label>Inicio Base X (m)</label>
+            <input type="number" id="inicioBloque" value="0" min="0" max="800" step="0.5" onchange="alEditarCajaManual()">
+        </div>
+        <div class="input-group zone-bg">
+            <label>Inicio Base Y (m)</label>
+            <input type="number" id="inicioBloqueY" value="0" min="0" max="800" step="0.5" onchange="alEditarCajaManual()">
+        </div>
+        <div class="input-group zone-bg">
+            <label>Largo Base X (m)</label>
+            <input type="number" id="largoEspacio" value="120" min="2" max="1000" step="0.5" onchange="alEditarCajaManual()">
+        </div>
+        <div class="input-group zone-bg">
+            <label>Ancho Base Y (m)</label>
+            <input type="number" id="anchoEspacio" value="75" min="2" max="1000" step="0.5" onchange="alEditarCajaManual(); centrarFlyerEnZona();">
+        </div>
+        <div class="input-group users-bg">
+            <label>Cantidad de Dispositivos en Polígono (Editable 1 a 100,000 o Selección Rápida)</label>
+            <div class="users-dual">
+                <input type="number" id="numPersonasInput" value="8000" min="1" max="100000" step="10" onchange="sincronizarDesdeInputPersonas()">
+                <select id="presetPersonas" onchange="sincronizarDesdePreset()">
+                    <option value="10">Preset: 10 Dispositivos</option>
+                    <option value="100">Preset: 100 Dispositivos</option>
+                    <option value="200">Preset: 200 Dispositivos</option>
+                    <option value="400">Preset: 400 Dispositivos</option>
+                    <option value="800">Preset: 800 Dispositivos</option>
+                    <option value="1000">Preset: 1,000 Dispositivos</option>
+                    <option value="2000">Preset: 2,000 Dispositivos</option>
+                    <option value="3000">Preset: 3,000 Dispositivos</option>
+                    <option value="4000">Preset: 4,000 Dispositivos</option>
+                    <option value="5000">Preset: 5,000 Dispositivos</option>
+                    <option value="6000">Preset: 6,000 Dispositivos</option>
+                    <option value="8000" selected>Preset: 8,000 Dispositivos (Pepsi Center)</option>
+                    <option value="9000">Preset: 9,000 Dispositivos</option>
+                    <option value="10000">Preset: 10,000 Dispositivos</option>
+                    <option value="20000">Preset: 20,000 Dispositivos</option>
+                    <option value="50000">Preset: 50,000 Dispositivos</option>
+                    <option value="100000">Preset: 100,000 Dispositivos</option>
+                    <option value="all">Ver Comparativa Multi-Escala</option>
+                </select>
+            </div>
+        </div>
+        <div class="input-group cci-auto-bg">
+            <label>Postura de la Gente</label>
+            <select id="posturaGente" onchange="if(estadoSimulacion.simulacionIniciada) regenerarAudiencia(); actualizarTodo();">
+                <option value="parada">Parada (Concierto / Expo 1.75m)</option>
+                <option value="sentada">Sentada (Auditorio / Gala 1.25m)</option>
+                <option value="mixta" selected>Mixta (50% Sentada / 50% Parada)</option>
+            </select>
+        </div>
+        <button class="main-btn" id="btnMainRun" onclick="activarSimulacionCompleta()">CÁLCULO DE ALTA DENSIDAD Y SINCRONIZACIÓN DEL FLYER WI-FI</button>
     </div>
 
-    <div class="status-panel">
-        <div><strong style="color: #f1c40f;">ANÁLISIS A 30m:</strong> [Límite Real: <span id="distanciaCritica">-</span>]</div>
-        <div id="statusText">RSSI: -dBm</div>
-        <div class="signal-icon" id="signalBars">
-            <div class="bar" style="height: 20%"></div>
-            <div class="bar" style="height: 40%"></div>
-            <div class="bar" style="height: 60%"></div>
-            <div class="bar" style="height: 80%"></div>
-            <div class="bar" style="height: 100%"></div>
+    <div id="psdAlertBanner" class="psd-alert-banner">
+        <span id="psdAlertText">Aviso PSD 6 GHz LPI...</span>
+        <button type="button" class="btn-psd-fix" onclick="ajustarPotenciaALimitePSD()">&#9878; Ajustar Tx al Tope Legal PSD</button>
+    </div>
+
+    <div class="global-semaphore-bar">
+        <div class="semaphore-left">
+            <div class="traffic-lights">
+                <div id="bulbRed" class="light-bulb red"></div>
+                <div id="bulbYellow" class="light-bulb yellow"></div>
+                <div id="bulbGreen" class="light-bulb green on"></div>
+            </div>
+            <div>
+                <div id="globalVerdict" class="semaphore-verdict" style="color:#38bdf8;">PLANO LIMPIO LISTO — CALIBRA METROS Y TRAZA TU POLÍGONO</div>
+                <div id="globalReason" class="semaphore-reason">Importa tu plano, calibra la escala en metros y delimita el área con "3. Polígono" para calcular los APs.</div>
+            </div>
         </div>
-        <div id="throughputText">Throughput: 0 Mbps</div>
-        <div id="airtimeText" style="color: #f1c40f;">Air Time: 0%</div>
-        <div id="qoeText" style="font-weight: bold;">QoE: -</div>
+        <div class="flyer-live-badge">
+            <div>
+                <div id="flyerBadgeHeader" style="font-size:0.7rem; color:#38bdf8; text-transform:uppercase; font-weight:bold;">Telemetría en Agente "Flyer Wifi" (Smartphone: Offset -10 dB)</div>
+                <div id="flyerStatusLine" style="margin-top:2px; font-weight:bold; color:#f8fafc;">En espera de polígono de cobertura o cálculo de alta densidad...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sim-card">
+        <div class="sim-header">
+            <div>
+                <h3>Plano Maestro de Diseño RF (Eje X, Y) — Balanceo Espacial de Canales, Altura Z y Radios por AP</h3>
+                <span id="simSubTitle" style="font-size:0.75rem; color:#94a3b8;">Paso 1: Plano | Paso 2: Calibrar | Paso 3: Polígono | Paso 4: Editar Radios (2.4/5/6), Altura Z, Tx y Rotación por AP</span>
+            </div>
+            <div class="layer-controls">
+                <select id="capaVisual" class="layer-select" onchange="estadoSimulacion.heatmapDirty = true; actualizarTodo();">
+                    <option value="heatmap_aps" selected>Vista: Sembrado de APs en Polígono + Flyer Wifi</option>
+                    <option value="solo_ap_principal">Vista: Evaluar 1 Solo AP Central vs Flyer Wifi</option>
+                    <option value="trafico_clientes">Vista: Densidad de Clientes en Polígono + Flyer Wifi</option>
+                </select>
+                <button type="button" class="btn-snap" onclick="moverFlyerAlCentro()">&#128205; Posicionar Flyer Wifi en Centro</button>
+            </div>
+        </div>
+
+        <div class="cad-toolbar">
+            <div class="toolbar-group">
+                <input type="file" id="floorplanInput" accept="image/*" style="display:none;" onchange="cargarImagenPlano(event)">
+                <button type="button" class="btn-tool" onclick="document.getElementById('floorplanInput').click()">&#128193; 1. Plano</button>
+                <button type="button" id="btnCalibrar" class="btn-tool" onclick="iniciarModoCalibracion()">&#128207; 2. Calibrar</button>
+                <button type="button" id="btnDelimitarZona" class="btn-tool" onclick="iniciarModoPoligonoIrregular()">&#11040; 3. Polígono</button>
+                <button type="button" id="btnLimpiarLienzo" class="btn-tool" onclick="limpiarLienzoSimulacion()">&#129529; Limpiar</button>
+                <button type="button" id="btnClearImg" class="btn-tool" style="display:none; background:#7f1d1d;" onclick="limpiarImagenPlano()">&#10006; Img</button>
+                <div style="display:flex; align-items:center; gap:5px; font-size:0.74rem; color:#cbd5e1; margin-left:2px;">
+                    <span>Opac:</span>
+                    <input type="range" id="opacidadPlano" min="10" max="100" value="85" style="width:50px; padding:0;" oninput="estadoSimulacion.opacidadImg = this.value / 100;">
+                </div>
+            </div>
+            <div class="toolbar-group">
+                <button type="button" id="btnModoFlyer" class="btn-tool active" onclick="cambiarModoCursor('flyer')">&#129485; Flyer</button>
+                <button type="button" id="btnModoEditAP" class="btn-tool" onclick="cambiarModoCursor('edit_ap')" title="Haz clic en un AP para editar sus Radios, Altura Z, Potencia Tx y Rotación">&#9881; Editar AP</button>
+                <button type="button" id="btnModoMoveAP" class="btn-tool" onclick="cambiarModoCursor('move_ap')" title="Arrastra cualquier AP dentro del polígono válido">&#10021; Mover</button>
+                <button type="button" id="btnModoAddAP" class="btn-tool" onclick="cambiarModoCursor('add_ap')" title="Haz clic dentro del polígono válido para añadir un AP">&#10133; Añadir</button>
+                <button type="button" id="btnModoDelAP" class="btn-tool" onclick="cambiarModoCursor('del_ap')" title="Haz clic sobre un AP existente para quitarlo">&#128465; Quitar</button>
+                <button type="button" id="btnResetAutoAPs" class="btn-tool" style="display:none; background:#6366f1;" onclick="resetearAPsAAuto()" title="Descarta la edición manual y restaura el sembrado automático">&#8634; Auto</button>
+                <label class="chk-overlay-label" title="Desmarca para ocultar las líneas punteadas del haz y las distancias de la elipse -3 dB">
+                    <input type="checkbox" id="chkMostrarAnillos" checked onchange="estadoSimulacion.mostrarAnillos = this.checked;">
+                    Haz -3 dB
+                </label>
+                <button type="button" id="btnModoPan" class="btn-tool" onclick="cambiarModoCursor('pan')">&#9995; Pan</button>
+                <button type="button" class="btn-tool" onclick="aplicarZoomBoton(1.25)">&#128269;+</button>
+                <button type="button" class="btn-tool" onclick="aplicarZoomBoton(0.8)">&#128269;&minus;</button>
+                <button type="button" class="btn-tool" onclick="resetearZoomVista()">1:1</button>
+                <span id="zoomLevelText" class="zoom-badge">1.0x</span>
+            </div>
+        </div>
+
+        <div id="apInspectorBar" class="ap-inspector-bar">
+            <div>
+                <strong id="inspAPTitle" style="color:#d8b4fe;">Inspector AP-1</strong>
+                <span id="inspAPCoords" style="font-size:0.74rem; color:#cbd5e1; margin-left:6px;">(X: -, Y: -)</span>
+            </div>
+            <div class="ap-inspector-controls">
+                <div class="radio-toggles-wrap" title="Activa o desactiva los radios individuales de este AP">
+                    <span style="font-size:0.7rem; color:#d8b4fe; font-weight:700; margin-right:2px;">RADIOS:</span>
+                    <label class="radio-chk"><input type="checkbox" id="inspR24" checked onchange="aplicarCambioInspectorAP()"> 2.4 GHz</label>
+                    <label class="radio-chk"><input type="checkbox" id="inspR5" checked onchange="aplicarCambioInspectorAP()"> 5 GHz</label>
+                    <label class="radio-chk" id="inspR6Wrap"><input type="checkbox" id="inspR6" checked onchange="aplicarCambioInspectorAP()"> 6 GHz</label>
+                </div>
+                <label for="inspZInput">Z (m):</label>
+                <input type="number" id="inspZInput" min="0.5" max="45" step="0.5" onchange="aplicarCambioInspectorAP()">
+                <label for="inspTxInput">Tx (dBm):</label>
+                <input type="number" id="inspTxInput" min="1" max="30" step="1" onchange="aplicarCambioInspectorAP()">
+                <label for="inspAzInput">Rot (°):</label>
+                <input type="number" id="inspAzInput" min="0" max="360" step="15" onchange="aplicarCambioInspectorAP()">
+                <button type="button" class="btn-tool" style="background:#475569;" onclick="restaurarAPSeleccionadoAGlobal()">Restaurar Global</button>
+                <button type="button" class="btn-tool" style="background:#ef4444; border:none;" onclick="cerrarInspectorAP()">Cerrar</button>
+            </div>
+        </div>
+
+        <div id="calibBanner" class="calib-banner">
+            <span id="calibInstruction">MODO ACTIVO...</span>
+            <div style="display:flex; gap:6px;">
+                <button type="button" id="btnUndoVertex" class="btn-tool" style="display:none; background:#475569;" onclick="deshacerUltimoVertice()">&#8630; Deshacer Punto</button>
+                <button type="button" id="btnClosePoly" class="btn-tool" style="display:none; background:#10b981; color:#0f172a; border:none;" onclick="intentarCerrarPoligonoIrregular()">&#10004; Cerrar Polígono</button>
+                <button type="button" class="btn-tool" style="background:#ef4444; border:none;" onclick="cancelarModosEspeciales()">Salir</button>
+            </div>
+        </div>
+
+        <div class="sim-legend" style="margin-bottom: 10px;">
+            <span><i class="legend-dot" style="background:#00e5ff; box-shadow:0 0 8px #00e5ff;"></i><strong id="legendFlyerLabel">Flyer Wifi (Cliente Móvil):</strong> Arrástralo o haz Zoom</span>
+            <span><i class="legend-dot" style="background:#38bdf8; border:1px dashed #fff;"></i><strong>Polígono Delimitado</strong></span>
+            <span><i class="legend-dot" style="background:#475569; border:1px dashed #94a3b8;"></i><strong>AP Radio OFF</strong></span>
+            <span><i class="legend-dot" style="background:#10b981;"></i>&ge; -65 dBm</span>
+            <span><i class="legend-dot" style="background:#eab308;"></i>-67 a -72 dBm (Roaming)</span>
+            <span><i class="legend-dot" style="background:#ef4444;"></i>&lt; -75 dBm</span>
+        </div>
+
+        <div class="master-canvas-wrap" id="canvasWrap">
+            <canvas id="masterCanvas" width="1260" height="450"></canvas>
+        </div>
+
+        <div class="engineering-kpis">
+            <div class="kpi-box">
+                <div class="kpi-title">Sembrado y Radios Activos</div>
+                <div class="kpi-val" id="kpiNumAPs">Plano Limpio (0 APs)</div>
+                <div class="kpi-sub" id="kpiGridInfo">Traza el polígono o ejecuta el cálculo para sembrar APs</div>
+            </div>
+            <div class="kpi-box" style="border-left-color: #10b981;">
+                <div class="kpi-title" id="kpiFlyerBoxTitle">Señal en "Flyer Wifi"</div>
+                <div class="kpi-val" id="kpiFlyerSignal">Sin señal activa</div>
+                <div class="kpi-sub" id="kpiFlyerAPRef">Esperando sembrado de APs en el plano</div>
+            </div>
+            <div class="kpi-box" style="border-left-color: #f59e0b;">
+                <div class="kpi-title">Contención Co-Canal &amp; Elipse -3 dB</div>
+                <div class="kpi-val" id="kpiClientesPorAP">CCI Auto: 0 APs</div>
+                <div class="kpi-sub" id="kpiDensidadM2">Canales disponibles: -</div>
+            </div>
+            <div class="kpi-box" style="border-left-color: #a855f7;">
+                <div class="kpi-title">AP Conectado a "Flyer Wifi"</div>
+                <div class="kpi-val" id="kpiSondaRSSI">Sin asociación activa</div>
+                <div class="kpi-sub" id="kpiSondaDetalle">Posición Flyer: X=-m, Y=-m</div>
+            </div>
+        </div>
     </div>
 
     <div class="charts-grid">
-        <div class="chart-card">
-            <h3>RSSI: Trayectoria Horizontal</h3>
-            <div class="chart-wrapper"><canvas id="chartH"></canvas></div>
+        <div class="chart-card"><h3 id="titleH">RSSI Percibido por Flyer Wifi vs Distancia Ideal 2D</h3><div class="chart-wrapper"><canvas id="chartH"></canvas></div></div>
+        <div class="chart-card"><h3 id="titleR">RSSI Real 3D en Flyer Wifi (Con Offset de Dispositivo + Obstrucción)</h3><div class="chart-wrapper"><canvas id="chartR"></canvas></div></div>
+        <div class="chart-card"><h3 id="titleT">Throughput Neto Percibido por Celda según Distancia al AP (Mbps)</h3><div class="chart-wrapper"><canvas id="chartT"></canvas></div></div>
+        <div class="chart-card"><h3 id="titleA">Utilización de Airtime por Celda según Distancia al AP (%)</h3><div class="chart-wrapper"><canvas id="chartA"></canvas></div></div>
+        <div class="chart-card full-width"><h3 id="titleS">Soporte de Dispositivos Simultáneos por Celda según Perfil Flyer Wifi</h3><div class="chart-wrapper"><canvas id="chartS"></canvas></div></div>
+    </div>
+
+    <div class="ap-schedule-section">
+        <div class="ap-schedule-header">
+            <div>
+                <h3 id="scheduleTitle">Tabla Ejecutiva de Sembrado de APs, Coordenadas (X, Y, Z) y Plan de Frecuencias</h3>
+                <span id="scheduleSubtitle" style="font-size:0.78rem; color:#606770;">El listado se generará automáticamente al trazar el polígono o ejecutar el cálculo</span>
+            </div>
+            <button type="button" class="btn-csv" onclick="exportarTablaAPsCSV()">&#128229; Exportar Plan de APs a CSV (Excel)</button>
         </div>
-        <div class="chart-card">
-            <h3>RSSI: Trayectoria Real (Slant Path)</h3>
-            <div class="chart-wrapper"><canvas id="chartR"></canvas></div>
-        </div>
-        <div class="chart-card">
-            <h3>Throughput Estimado (Capacidad Neta)</h3>
-            <div class="chart-wrapper"><canvas id="chartT"></canvas></div>
-        </div>
-        <div class="chart-card">
-            <h3>Utilización de Airtime (%)</h3>
-            <div class="chart-wrapper"><canvas id="chartA"></canvas></div>
-        </div>
-        <div class="chart-card full-width">
-            <h3>Soporte de Dispositivos Simultáneos por Servicio</h3>
-            <div class="chart-wrapper"><canvas id="chartS"></canvas></div>
+        <div class="ap-table-wrapper">
+            <table class="ap-schedule-table">
+                <thead>
+                    <tr>
+                        <th>ID AP</th><th>Coord. (X, Y, Z)</th><th>Radios Activos</th><th>Banda / Canal Asignado</th><th>Potencia Tx / EIRP</th><th>Antena / Montaje (H×V)</th><th>Radio Meta / Elipse -3dB</th><th>Carga Estimada</th>
+                    </tr>
+                </thead>
+                <tbody id="apScheduleBody">
+                    <tr><td colspan="8" style="text-align:center; color:#64748b; padding:18px;">Plano limpio. Importa un plano, calibra metros y traza un polígono irregular para generar la tabla de APs.</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -333,19 +502,16 @@
         <h3 style="background: #2c3e50; color: white; margin-bottom: 15px; text-transform: uppercase; padding: 5px 15px; border-radius: 4px;">Glosario y Notas de Ingeniería RF - RedCorp</h3>
         <div class="glossary-grid">
             <div>
-                <div class="glossary-item"><strong>Beamwidth:</strong> Apertura de haz. Define el ángulo de cobertura de una antena sectorial antes de la caída de ganancia nominal de 3dB.</div>
-                <div class="glossary-item"><strong>RSSI (dBm):</strong> Nivel de potencia recibida. El umbral de -67 dBm es el estándar de oro para aplicaciones críticas de voz y video.</div>
-                <div class="glossary-item"><strong>CCI (Interferencia):</strong> Interferencia por solapamiento de canales. Representa el "ruido" generado por otros APs en el mismo canal.</div>
+                <div class="glossary-item"><strong>Balanceo Estricto de Canales + Swap Pass:</strong> Reparte equitativamente los canales disponibles entre los radios activos (ej. 4-4-3 en 2.4 GHz) y ejecuta intercambios espaciales para maximizar la distancia entre APs co-canal.</div>
+                <div class="glossary-item"><strong>Altura Z Individual por AP:</strong> Permite modelar techos a distinto nivel recalculando el *Slant Path* 3D y la elipse `-3 dB` exacta de cada AP.</div>
             </div>
             <div>
-                <div class="glossary-item"><strong>QoE (Experiencia):</strong> Calidad de Experiencia del usuario final. Indica si el servicio es percibido como fluido, aceptable o inoperable.</div>
-                <div class="glossary-item"><strong>MLO (Wi-Fi 7):</strong> Multi-Link Operation. Tecnología que permite el uso concurrente de múltiples bandas para mayor estabilidad.</div>
-                <div class="glossary-item"><strong>Slant Path:</strong> Cálculo de la hipotenusa real de propagación considerando la altura relativa entre el AP y el dispositivo móvil.</div>
+                <div class="glossary-item"><strong>Control Individual de Radios (2.4 / 5 / 6 GHz):</strong> En modo <strong>Wi-Fi 7 (MLO)</strong> cada AP cuenta con 3 radios independientes; en <strong>Wi-Fi 6/5</strong> cuenta con 2 radios (2.4 y 5 GHz).</div>
+                <div class="glossary-item"><strong>Validador PSD en 6 GHz LPI:</strong> Verifica el tope de $5\text{ dBm/MHz}$ en IFT/FCC/ANATEL ($18\text{ dBm}$ EIRP en $20\text{ MHz}$) o $23\text{ dBm}$ en ETSI/MIC.</div>
             </div>
             <div>
-                <div class="glossary-item"><strong>Geometría de Montaje:</strong> Modelo optimizado para <strong>Instalación Cenital (Techo/Poste)</strong>. La altura efectiva descuenta 1.2m del plano del usuario móvil para precisión en el cálculo.</div>
-                <div class="glossary-item"><strong>Atenuación por Patrón:</strong> En modo Sectorial, se aplica una penalización matemática de ganancia al salir del haz (Beamwidth) configurado en el eje principal.</div>
-                <div class="glossary-item"><strong>Polarización y MIMO:</strong> Se asume alineación ideal, emulando sistemas MIMO modernos que compensan desajustes de fase causados por la movilidad del usuario.</div>
+                <div class="glossary-item"><strong>Archivos de Proyecto Portable (.HDWP):</strong> Guarda Altura Z individual, radios activos/inactivos, Tx y Rotación de cada AP, país regulatorio, polígono irregular y plano opcional.</div>
+                <div class="glossary-item"><strong>Modulación MCS Exacta:</strong> Diferencia automáticamente entre <strong>MCS 10-11 (1024-QAM)</strong> para Wi-Fi 6/5 y <strong>MCS 12-13 (4K-QAM)</strong> para Wi-Fi 7 MLO.</div>
             </div>
         </div>
     </div>
@@ -356,276 +522,1125 @@
 </div>
 
 <script>
-/**
- * SISTEMA DE GESTIÓN DE GRÁFICAS - REDCORP
- */
-let chartInstances = {};
+const PALETA_CANALES = ['#f59e0b', '#10b981', '#3b82f6', '#ec4899', '#a855f7', '#06b6d4', '#eab308', '#f97316', '#14b8a6', '#6366f1'];
 
-/**
- * CONTROL DE VISIBILIDAD DE BEAMWIDTH
- */
-function toggleBeamwidth() {
-    const tipo = document.getElementById('tipoAntena').value;
-    const beamGroup = document.getElementById('beamGroup');
-    if (tipo === 'sec') {
-        beamGroup.style.display = 'flex';
+const REGULACIONES_PAIS = {
+    MX: { nombre: 'México (IFT)', g5_no_dfs: { 20: [36,40,44,48,149,153,157,161,165], 40: [38,46,151,159], 80: [42,155], 160: [50] }, g5_dfs: { 20: [52,56,60,64,100,104,108,112,116,132,136], 40: [54,62,102,110,134], 80: [58,106], 160: [] }, g6_full: false, g6_psd_dbm_mhz: 5, g6_max_eirp_lpi: 30 },
+    US: { nombre: 'EE. UU. / Canadá (FCC)', g5_no_dfs: { 20: [36,40,44,48,149,153,157,161,165], 40: [38,46,151,159], 80: [42,155], 160: [50] }, g5_dfs: { 20: [52,56,60,64,100,104,108,112,116,120,124,128,132,136,140,144], 40: [54,62,102,110,118,126,134,142], 80: [58,106,122,138], 160: [114] }, g6_full: true, g6_psd_dbm_mhz: 5, g6_max_eirp_lpi: 30 },
+    EU: { nombre: 'Europa / UK (ETSI)', g5_no_dfs: { 20: [36,40,44,48], 40: [38,46], 80: [42], 160: [50] }, g5_dfs: { 20: [52,56,60,64,100,104,108,112,116,120,124,128,132,136,140], 40: [54,62,102,110,118,126,134], 80: [58,106,122], 160: [114] }, g6_full: false, g6_psd_dbm_mhz: 10, g6_max_eirp_lpi: 23 },
+    BR: { nombre: 'Brasil / LATAM 6G (ANATEL)', g5_no_dfs: { 20: [36,40,44,48,149,153,157,161,165], 40: [38,46,151,159], 80: [42,155], 160: [50] }, g5_dfs: { 20: [52,56,60,64,100,104,108,112,116,120,124,128,132,136,140,144], 40: [54,62,102,110,118,126,134,142], 80: [58,106,122,138], 160: [114] }, g6_full: true, g6_psd_dbm_mhz: 5, g6_max_eirp_lpi: 30 },
+    JP: { nombre: 'Japón (MIC)', g5_no_dfs: { 20: [36,40,44,48], 40: [38,46], 80: [42], 160: [50] }, g5_dfs: { 20: [52,56,60,64,100,104,108,112,116,120,124,128,132,136,140,144], 40: [54,62,102,110,118,126,134,142], 80: [58,106,122,138], 160: [114] }, g6_full: false, g6_psd_dbm_mhz: 10, g6_max_eirp_lpi: 23 }
+};
+
+let chartInstances = {};
+let estadoSimulacion = {
+    simulacionIniciada: false, modoManualAPs: false, apArrastradoIdx: -1, apSeleccionadoIdx: -1, mostrarAnillos: true,
+    nombreProyecto: 'Diseno_Alta_Densidad_RedCorp', personas: [], apsOptimos: [], totalAPsCalculados: 0, cciCalculadoAuto: 0,
+    canalesDisponiblesPool: [], gridCols: 1, gridRows: 1, radioCeldaMeta: 14, radioHaz3dBH: 6.3, radioHaz3dBV: 2.9, txMaxLegalPSD: 18,
+    planoAnchoM: 120, planoAltoM: 75, poligonoZona: [], poligonoPersonalizadoActivo: false, polyDraft: [], polyHover: null, polyHoverCruza: false,
+    areaPoligonoRealM2: 9000, modoCursor: 'flyer', arrastrandoFlyer: false, arrastrandoPan: false, panStartMouse: { x: 0, y: 0 },
+    zoom: 1.0, panX: 0, panY: 0, imagenPlano: null, imagenPlanoDataURL: null, opacidadImg: 0.85, calibPt1: null, calibPt2: null,
+    flyerWalkPhase: 0, flyerMovingTimer: 0, geometriaMapa: null, heatmapCacheCanvas: document.createElement('canvas'), heatmapDirty: true, evalFlyerActual: null, params: {}
+};
+
+function getAPTx(ap, pGlobal) { return (ap && typeof ap.customTx === 'number' && !isNaN(ap.customTx)) ? ap.customTx : pGlobal; }
+function getAPAzimut(ap, azGlobal) { return (ap && typeof ap.customAzimut === 'number' && !isNaN(ap.customAzimut)) ? ap.customAzimut : azGlobal; }
+function getAPZ(ap, zGlobal) { return (ap && typeof ap.customZ === 'number' && !isNaN(ap.customZ)) ? ap.customZ : zGlobal; }
+function getAPRadios(ap) { if (!ap.radios) ap.radios = { r24: true, r5: true, r6: true }; return ap.radios; }
+function isAPActiveInBand(ap, freq, tech) {
+    const r = getAPRadios(ap);
+    if (freq === 2.4) return Boolean(r.r24);
+    if (freq === 5) return Boolean(r.r5);
+    if (freq === 6) return (tech === 'mlo') && Boolean(r.r6);
+    return true;
+}
+function formatRadiosTexto(ap, tech) {
+    const r = getAPRadios(ap), list = [];
+    if (r.r24) list.push('2.4');
+    if (r.r5) list.push('5');
+    if (tech === 'mlo' && r.r6) list.push('6');
+    return list.length ? list.join(' / ') + ' GHz' : 'Todos OFF';
+}
+function calcularElipse3dB(zAP, postura, bWH, bWV) {
+    const altDisp = postura === 'sentada' ? 0.90 : (postura === 'mixta' ? 1.08 : 1.25);
+    const hEf = Math.max(0.5, Math.abs(zAP - altDisp));
+    return { rH: Number((hEf * Math.tan((bWH / 2) * (Math.PI / 180))).toFixed(1)), rV: Number((hEf * Math.tan((bWV / 2) * (Math.PI / 180))).toFixed(1)) };
+}
+
+function alCambiarTecnologia() { if (estadoSimulacion.apSeleccionadoIdx >= 0) abrirInspectorAP(estadoSimulacion.apSeleccionadoIdx); actualizarTodo(); }
+
+function abrirInspectorAP(idx) {
+    if (idx < 0 || idx >= estadoSimulacion.apsOptimos.length) return;
+    estadoSimulacion.apSeleccionadoIdx = idx;
+    const ap = estadoSimulacion.apsOptimos[idx], r = getAPRadios(ap);
+    const tech = document.getElementById('tecnologia').value || 'mlo';
+    document.getElementById('inspAPTitle').innerText = `Inspector ${ap.id} ${ap.canal ? '[C' + ap.canal + ']' : '[OFF]'}`;
+    document.getElementById('inspAPCoords').innerText = `(X: ${ap.x}m, Y: ${ap.y}m)`;
+    document.getElementById('inspZInput').value = getAPZ(ap, parseFloat(document.getElementById('altura').value) || 12.0);
+    document.getElementById('inspTxInput').value = getAPTx(ap, parseFloat(document.getElementById('potencia').value) || 18);
+    document.getElementById('inspAzInput').value = getAPAzimut(ap, parseFloat(document.getElementById('azimut').value) || 0);
+    document.getElementById('inspR24').checked = Boolean(r.r24);
+    document.getElementById('inspR5').checked = Boolean(r.r5);
+    document.getElementById('inspR6').checked = Boolean(r.r6);
+    document.getElementById('inspR6Wrap').style.display = (tech === 'mlo') ? 'flex' : 'none';
+    document.getElementById('apInspectorBar').style.display = 'flex';
+}
+function cerrarInspectorAP() { estadoSimulacion.apSeleccionadoIdx = -1; document.getElementById('apInspectorBar').style.display = 'none'; }
+function aplicarCambioInspectorAP() {
+    const idx = estadoSimulacion.apSeleccionadoIdx; if (idx < 0 || idx >= estadoSimulacion.apsOptimos.length) return;
+    const ap = estadoSimulacion.apsOptimos[idx];
+    const zVal = Math.max(0.5, Math.min(45, parseFloat(document.getElementById('inspZInput').value) || 12.0));
+    const txVal = Math.max(1, Math.min(30, parseFloat(document.getElementById('inspTxInput').value) || 18));
+    let azVal = (((parseFloat(document.getElementById('inspAzInput').value) || 0) % 360) + 360) % 360;
+    document.getElementById('inspZInput').value = zVal; document.getElementById('inspTxInput').value = txVal; document.getElementById('inspAzInput').value = azVal;
+    ap.customZ = zVal; ap.customTx = txVal; ap.customAzimut = azVal;
+    ap.radios = { r24: document.getElementById('inspR24').checked, r5: document.getElementById('inspR5').checked, r6: document.getElementById('inspR6').checked };
+    estadoSimulacion.modoManualAPs = true; document.getElementById('btnResetAutoAPs').style.display = 'inline-block';
+    actualizarTodo(); abrirInspectorAP(idx);
+}
+function restaurarAPSeleccionadoAGlobal() {
+    const idx = estadoSimulacion.apSeleccionadoIdx; if (idx < 0 || idx >= estadoSimulacion.apsOptimos.length) return;
+    const ap = estadoSimulacion.apsOptimos[idx];
+    ap.customZ = null; ap.customTx = null; ap.customAzimut = null; ap.radios = { r24: true, r5: true, r6: true };
+    actualizarTodo(); abrirInspectorAP(idx);
+}
+function renumerarAPs() {
+    estadoSimulacion.apsOptimos.forEach((ap, i) => { ap.num = i + 1; ap.id = 'AP-' + (i + 1); });
+    estadoSimulacion.totalAPsCalculados = estadoSimulacion.apsOptimos.length;
+    document.getElementById('btnResetAutoAPs').style.display = estadoSimulacion.modoManualAPs ? 'inline-block' : 'none';
+}
+function resetearAPsAAuto() { estadoSimulacion.modoManualAPs = false; cerrarInspectorAP(); document.getElementById('btnResetAutoAPs').style.display = 'none'; actualizarTodo(); }
+
+function calcularTopeEIRP6GHzLPI(paisCod, bw) {
+    const reg = REGULACIONES_PAIS[paisCod] || REGULACIONES_PAIS.MX;
+    return Math.min(reg.g6_max_eirp_lpi, Math.round(reg.g6_psd_dbm_mhz + 10 * Math.log10(bw)));
+}
+function validarYMostrarAlertaPSD(paisCod, freq, bw, potenciaTx, tipoAnt) {
+    const banner = document.getElementById('psdAlertBanner');
+    if (freq !== 6) { banner.style.display = 'none'; return; }
+    const reg = REGULACIONES_PAIS[paisCod] || REGULACIONES_PAIS.MX, gain = (tipoAnt === 'sec') ? 9 : 4, eirpActual = potenciaTx + gain;
+    const maxEIRP = calcularTopeEIRP6GHzLPI(paisCod, bw), maxTxLegal = Math.max(1, maxEIRP - gain);
+    estadoSimulacion.txMaxLegalPSD = maxTxLegal;
+    if (eirpActual > maxEIRP) {
+        document.getElementById('psdAlertText').innerHTML = `<strong>⚠️ Aviso Regulatorio 6 GHz LPI (${reg.nombre}):</strong> Con <strong>${potenciaTx} dBm Tx + ${gain} dBi = ${eirpActual} dBm EIRP</strong> en <strong>${bw} MHz</strong> excedes el límite PSD (${reg.g6_psd_dbm_mhz} dBm/MHz &rarr; tope <strong>${maxEIRP} dBm EIRP</strong>, máx. <strong>${maxTxLegal} dBm Tx</strong>).`;
+        banner.style.display = 'flex';
+    } else banner.style.display = 'none';
+}
+function ajustarPotenciaALimitePSD() { document.getElementById('potencia').value = estadoSimulacion.txMaxLegalPSD; actualizarTodo(); }
+
+function obtenerPoolCanales(freq, bw, modoDFS, paisCod) {
+    const reg = REGULACIONES_PAIS[paisCod] || REGULACIONES_PAIS.MX, incluirDFS = (modoDFS === 'con_dfs');
+    if (freq === 2.4) return bw >= 40 ? [3] : [1, 6, 11];
+    if (freq === 5) return incluirDFS ? [...(reg.g5_no_dfs[bw] || reg.g5_no_dfs[20]), ...(reg.g5_dfs[bw] || [])] : [...(reg.g5_no_dfs[bw] || reg.g5_no_dfs[20])];
+    const usarFull = reg.g6_full && (modoDFS !== 'solo_unii5');
+    if (bw === 20) return Array.from({ length: usarFull ? 59 : 24 }, (_, i) => 1 + i * 4);
+    if (bw === 40) return Array.from({ length: usarFull ? 29 : 12 }, (_, i) => 3 + i * 8);
+    if (bw === 80) return Array.from({ length: usarFull ? 14 : 6 }, (_, i) => 7 + i * 16);
+    if (bw === 160) return Array.from({ length: usarFull ? 7 : 3 }, (_, i) => 15 + i * 32);
+    return Array.from({ length: usarFull ? 3 : 1 }, (_, i) => 31 + i * 64);
+}
+function actualizarMenuEspectroDFS() {
+    const pais = document.getElementById('paisRegulacion').value || 'MX', reg = REGULACIONES_PAIS[pais] || REGULACIONES_PAIS.MX;
+    const freq = parseFloat(document.getElementById('frecuencia').value) || 6, bw = parseInt(document.getElementById('anchoCanal').value) || 20;
+    const sel = document.getElementById('modoDFS'), valPrevio = sel.value; sel.innerHTML = '';
+    if (freq === 2.4) { sel.innerHTML = `<option value="con_dfs">ISM 2.4 GHz (${bw >= 40 ? 1 : 3} Ch sin DFS)</option>`; }
+    else if (freq === 5) {
+        const nNoDFS = (reg.g5_no_dfs[bw] || []).length, nDFS = (reg.g5_dfs[bw] || []).length;
+        const op1 = document.createElement('option'); op1.value = 'con_dfs'; op1.textContent = `Incluir DFS (${nNoDFS + nDFS} Ch: ${nNoDFS} + ${nDFS} DFS)`;
+        const op2 = document.createElement('option'); op2.value = 'sin_dfs'; op2.textContent = `Sin DFS (${nNoDFS} Ch Usables)`;
+        sel.appendChild(op1); sel.appendChild(op2); sel.value = (valPrevio === 'sin_dfs') ? 'sin_dfs' : 'con_dfs';
     } else {
-        beamGroup.style.display = 'none';
+        const chUnii5 = obtenerPoolCanales(6, bw, 'solo_unii5', pais).length;
+        if (reg.g6_full) {
+            const chFull = obtenerPoolCanales(6, bw, 'con_dfs', pais).length;
+            const op1 = document.createElement('option'); op1.value = 'con_dfs'; op1.textContent = `UNII-5 a UNII-8 (Ch 1–233 | ${chFull} Ch)`;
+            const op2 = document.createElement('option'); op2.value = 'solo_unii5'; op2.textContent = `Solo UNII-5 (Ch 1–93 | ${chUnii5} Ch)`;
+            sel.appendChild(op1); sel.appendChild(op2); sel.value = (valPrevio === 'solo_unii5') ? 'solo_unii5' : 'con_dfs';
+        } else {
+            const op1 = document.createElement('option'); op1.value = 'solo_unii5'; op1.textContent = `UNII-5 Regulado (Ch 1–93 | ${chUnii5} Ch)`;
+            sel.appendChild(op1);
+        }
     }
+}
+function obtenerSubBandaCanal(freq, canal) {
+    if (freq === 2.4) return 'ISM 2.4 GHz';
+    if (freq === 6) return canal <= 93 ? 'UNII-5 (5.925–6.425 GHz)' : (canal <= 113 ? 'UNII-6' : (canal <= 181 ? 'UNII-7' : 'UNII-8'));
+    if (canal >= 36 && canal <= 50) return 'UNII-1 (No-DFS)';
+    if (canal >= 52 && canal <= 64) return 'UNII-2A (DFS)';
+    if (canal >= 100 && canal <= 144) return 'UNII-2C (DFS)';
+    return 'UNII-3 (No-DFS)';
+}
+
+function limpiarLienzoSimulacion() {
+    cancelarModosEspeciales(); cerrarInspectorAP();
+    estadoSimulacion.simulacionIniciada = false; estadoSimulacion.modoManualAPs = false; estadoSimulacion.poligonoPersonalizadoActivo = false;
+    estadoSimulacion.poligonoZona = []; estadoSimulacion.apsOptimos = []; estadoSimulacion.personas = [];
+    estadoSimulacion.totalAPsCalculados = 0; estadoSimulacion.evalFlyerActual = null; estadoSimulacion.heatmapDirty = true;
+    document.getElementById('btnResetAutoAPs').style.display = 'none'; actualizarTodo();
+}
+function activarSimulacionCompleta() {
+    estadoSimulacion.simulacionIniciada = true;
+    if (!estadoSimulacion.poligonoPersonalizadoActivo || estadoSimulacion.poligonoZona.length < 3) sincronizarPoligonoDesdeInputsRect();
+    regenerarAudiencia(); actualizarTodo();
+}
+
+function guardarProyectoHDWP() {
+    const nombreSugerido = prompt('Nombre del proyecto (.hdwp):', estadoSimulacion.nombreProyecto || 'Pepsi_Center_WiFi7');
+    if (nombreSugerido === null) return;
+    const nombreLimpio = (nombreSugerido.trim() || 'Proyecto_RF_RedCorp').replace(/[^a-zA-Z0-9_\-áéíóúÁÉÍÓÚñÑ ]/g, '_');
+    estadoSimulacion.nombreProyecto = nombreLimpio;
+    let incluirImagen = false;
+    if (estadoSimulacion.imagenPlanoDataURL) incluirImagen = confirm('Tienes un plano arquitectónico cargado.\n\n• ACEPTAR: incrustar imagen en .hdwp.\n• CANCELAR: guardar solo datos y polígono (< 3 KB para correo).');
+    const proyectoData = {
+        format: 'HDWP', version: '3.1', author: 'Ing. G. Leonardo Dominguez Garcia - RedCorp 802.11 México',
+        timestamp: new Date().toISOString(), projectName: nombreLimpio,
+        simulacionIniciada: estadoSimulacion.simulacionIniciada, modoManualAPs: estadoSimulacion.modoManualAPs, mostrarAnillos: estadoSimulacion.mostrarAnillos,
+        rfInputs: {
+            tecnologia: document.getElementById('tecnologia').value, paisRegulacion: document.getElementById('paisRegulacion').value,
+            tipoAntena: document.getElementById('tipoAntena').value, montajeSectorial: document.getElementById('montajeSectorial').value,
+            beamwidthH: parseFloat(document.getElementById('beamwidthH').value) || 60, beamwidthV: parseFloat(document.getElementById('beamwidthV').value) || 30,
+            azimut: parseFloat(document.getElementById('azimut').value) || 0, potencia: parseFloat(document.getElementById('potencia').value) || 18,
+            altura: parseFloat(document.getElementById('altura').value) || 12.0, perfilDispositivo: document.getElementById('perfilDispositivo').value,
+            flyerX: parseFloat(document.getElementById('apPosX').value) || 60, flyerY: parseFloat(document.getElementById('apPosY').value) || 37.5,
+            frecuencia: document.getElementById('frecuencia').value, anchoCanal: parseInt(document.getElementById('anchoCanal').value) || 20,
+            modoDFS: document.getElementById('modoDFS').value, metaOptimizacion: document.getElementById('metaOptimizacion').value,
+            inicioBloque: parseFloat(document.getElementById('inicioBloque').value) || 0, inicioBloqueY: parseFloat(document.getElementById('inicioBloqueY').value) || 0,
+            largoEspacio: parseFloat(document.getElementById('largoEspacio').value) || 120, anchoEspacio: parseFloat(document.getElementById('anchoEspacio').value) || 75,
+            numPersonasInput: parseInt(document.getElementById('numPersonasInput').value) || 8000, presetPersonas: document.getElementById('presetPersonas').value,
+            posturaGente: document.getElementById('posturaGente').value, capaVisual: document.getElementById('capaVisual').value
+        },
+        spatialGeometry: {
+            planoAnchoM: estadoSimulacion.planoAnchoM, planoAltoM: estadoSimulacion.planoAltoM,
+            poligonoPersonalizadoActivo: estadoSimulacion.poligonoPersonalizadoActivo, poligonoZona: estadoSimulacion.poligonoZona,
+            areaPoligonoRealM2: estadoSimulacion.areaPoligonoRealM2, opacidadImg: estadoSimulacion.opacidadImg,
+            manualAPs: estadoSimulacion.modoManualAPs ? estadoSimulacion.apsOptimos.map(ap => ({ num: ap.num, id: ap.id, x: ap.x, y: ap.y, customZ: ap.customZ ?? null, customTx: ap.customTx ?? null, customAzimut: ap.customAzimut ?? null, radios: getAPRadios(ap) })) : null,
+            floorplanDataURL: incluirImagen ? estadoSimulacion.imagenPlanoDataURL : null
+        }
+    };
+    const blob = new Blob([JSON.stringify(proyectoData, null, 2)], { type: 'application/octet-stream' }), url = URL.createObjectURL(blob);
+    const link = document.createElement('a'); link.setAttribute('href', url); link.setAttribute('download', `${nombreLimpio}.hdwp`);
+    document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
+    document.getElementById('projectStatusLabel').innerText = `Proyecto guardado: ${nombreLimpio}.hdwp © 2026 - México`;
+}
+
+function importarProyectoHDWP(event) {
+    const file = event.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (!data || data.format !== 'HDWP' || !data.rfInputs) { alert('Archivo .hdwp no válido.'); return; }
+            const inp = data.rfInputs; cerrarInspectorAP();
+            estadoSimulacion.nombreProyecto = data.projectName || file.name.replace(/\.hdwp$/i, '');
+            if (data.mostrarAnillos !== undefined) { estadoSimulacion.mostrarAnillos = Boolean(data.mostrarAnillos); document.getElementById('chkMostrarAnillos').checked = estadoSimulacion.mostrarAnillos; }
+            document.getElementById('tecnologia').value = inp.tecnologia || 'mlo';
+            document.getElementById('paisRegulacion').value = inp.paisRegulacion || 'MX';
+            document.getElementById('tipoAntena').value = inp.tipoAntena || 'sec';
+            document.getElementById('montajeSectorial').value = inp.montajeSectorial || 'techo';
+            toggleBeamwidth();
+            document.getElementById('beamwidthH').value = inp.beamwidthH || inp.beamwidth || 60;
+            document.getElementById('beamwidthV').value = inp.beamwidthV || inp.beamwidth || 30;
+            document.getElementById('azimut').value = inp.azimut || 0;
+            document.getElementById('potencia').value = inp.potencia || 18;
+            document.getElementById('altura').value = inp.altura || 12.0;
+            document.getElementById('perfilDispositivo').value = inp.perfilDispositivo || '-10';
+            document.getElementById('apPosX').value = inp.flyerX !== undefined ? inp.flyerX : 60;
+            document.getElementById('apPosY').value = inp.flyerY !== undefined ? inp.flyerY : 37.5;
+            document.getElementById('frecuencia').value = inp.frecuencia || '6';
+            actualizarAnchosCanal();
+            document.getElementById('anchoCanal').value = String(inp.anchoCanal || 20);
+            actualizarMenuEspectroDFS();
+            if (inp.modoDFS) document.getElementById('modoDFS').value = inp.modoDFS;
+            document.getElementById('metaOptimizacion').value = inp.metaOptimizacion || '-67';
+            document.getElementById('inicioBloque').value = inp.inicioBloque || 0;
+            document.getElementById('inicioBloqueY').value = inp.inicioBloqueY || 0;
+            document.getElementById('largoEspacio').value = inp.largoEspacio || 120;
+            document.getElementById('anchoEspacio').value = inp.anchoEspacio || 75;
+            document.getElementById('numPersonasInput').value = inp.numPersonasInput || 8000;
+            document.getElementById('presetPersonas').value = inp.presetPersonas || '8000';
+            document.getElementById('posturaGente').value = inp.posturaGente || 'mixta';
+            document.getElementById('capaVisual').value = inp.capaVisual || 'heatmap_aps';
+
+            if (data.spatialGeometry) {
+                const geo = data.spatialGeometry;
+                estadoSimulacion.planoAnchoM = geo.planoAnchoM || inp.largoEspacio || 120;
+                estadoSimulacion.planoAltoM = geo.planoAltoM || inp.anchoEspacio || 75;
+                estadoSimulacion.poligonoPersonalizadoActivo = Boolean(geo.poligonoPersonalizadoActivo);
+                if (Array.isArray(geo.poligonoZona) && geo.poligonoZona.length >= 3) {
+                    estadoSimulacion.poligonoZona = geo.poligonoZona;
+                    estadoSimulacion.areaPoligonoRealM2 = geo.areaPoligonoRealM2 || calcularAreaPoligonoM2(geo.poligonoZona);
+                    estadoSimulacion.simulacionIniciada = data.simulacionIniciada !== undefined ? data.simulacionIniciada : true;
+                } else { estadoSimulacion.simulacionIniciada = Boolean(data.simulacionIniciada); if (estadoSimulacion.simulacionIniciada) sincronizarPoligonoDesdeInputsRect(); }
+                if (data.modoManualAPs && Array.isArray(geo.manualAPs) && geo.manualAPs.length > 0) {
+                    estadoSimulacion.modoManualAPs = true;
+                    estadoSimulacion.apsOptimos = geo.manualAPs.map((ap, i) => ({
+                        num: i + 1, id: 'AP-' + (i + 1), x: ap.x, y: ap.y,
+                        customZ: (typeof ap.customZ === 'number') ? ap.customZ : null, customTx: (typeof ap.customTx === 'number') ? ap.customTx : null, customAzimut: (typeof ap.customAzimut === 'number') ? ap.customAzimut : null,
+                        radios: ap.radios ? { r24: Boolean(ap.radios.r24), r5: Boolean(ap.radios.r5), r6: Boolean(ap.radios.r6) } : { r24: true, r5: true, r6: true },
+                        canal: 36, colorCanal: PALETA_CANALES[i % PALETA_CANALES.length]
+                    }));
+                    document.getElementById('btnResetAutoAPs').style.display = 'inline-block';
+                } else { estadoSimulacion.modoManualAPs = false; document.getElementById('btnResetAutoAPs').style.display = 'none'; }
+                estadoSimulacion.opacidadImg = geo.opacidadImg || 0.85; document.getElementById('opacidadPlano').value = Math.round(estadoSimulacion.opacidadImg * 100);
+                if (geo.floorplanDataURL) {
+                    const img = new Image();
+                    img.onload = function() { estadoSimulacion.imagenPlano = img; estadoSimulacion.imagenPlanoDataURL = geo.floorplanDataURL; document.getElementById('btnClearImg').style.display = 'inline-block'; estadoSimulacion.heatmapDirty = true; };
+                    img.src = geo.floorplanDataURL;
+                } else { estadoSimulacion.imagenPlano = null; estadoSimulacion.imagenPlanoDataURL = null; document.getElementById('btnClearImg').style.display = 'none'; }
+            }
+            resetearZoomVista(); if (estadoSimulacion.simulacionIniciada) regenerarAudiencia(); actualizarTodo();
+            document.getElementById('projectStatusLabel').innerText = `Proyecto cargado: ${estadoSimulacion.nombreProyecto}.hdwp © 2026 - México`;
+        } catch (err) { alert('Error al leer .hdwp: ' + err.message); } finally { event.target.value = ''; }
+    };
+    reader.readAsText(file);
 }
 
 /**
- * CORE ALGORITHM: CÁLCULO DE PROPAGACIÓN RF PROFESIONAL
+ * ASIGNACIÓN BALANCEADA DE CANALES + REFINAMIENTO ESPACIAL (SWAP PASS) + CCI 3D
  */
-function calcularData(distH, potencia, altura, freq, numPers, ini, cci, tipoAnt, beam) {
-    const hEf = Math.abs(altura - 1.2);
-    const distR = Math.sqrt(Math.pow(distH, 2) + Math.pow(hEf, 2));
-    
-    // Free Space Path Loss (FSPL)
-    const fsplR = (20 * Math.log10(distR || 0.1)) + (20 * Math.log10(freq)) + 32.44;
-    const fsplH = (20 * Math.log10(distH || 0.1)) + (20 * Math.log10(freq)) + 32.44;
-    
-    // Lógica de Antena Sectorial: Penalización Angular
+function calcularCCIFisicoAutomatico(apsVisuales, totalAPsReales, potenciaTxGlobal, zGlobal, freq, bw, tipoAnt, montajeSec, bWH, bWV, areaPoligonoM2, numPers, postura, modoDFS, paisCod, capaVisual, tech) {
+    const poolCanales = obtenerPoolCanales(freq, bw, modoDFS, paisCod), numCanalesDisponibles = poolCanales.length;
+    estadoSimulacion.canalesDisponiblesPool = poolCanales;
+
+    const apsActivos = apsVisuales.filter(ap => isAPActiveInBand(ap, freq, tech));
+    apsVisuales.forEach(ap => { if (!isAPActiveInBand(ap, freq, tech)) { ap.canal = null; ap.colorCanal = '#475569'; } });
+
+    if (capaVisual === 'solo_ap_principal' || apsActivos.length <= 1) {
+        if (apsActivos.length > 0) { apsActivos[0].canal = poolCanales[0]; apsActivos[0].colorCanal = PALETA_CANALES[0]; }
+        return { cciPromedio: 0, numCanales: numCanalesDisponibles, activosEnBanda: apsActivos.length };
+    }
+
+    // FASE 1: Coloración espacial con balanceo estricto de carga por canal
+    const asignadosPorCanal = Array.from({ length: numCanalesDisponibles }, () => []);
+    apsActivos.forEach(ap => {
+        const minUso = Math.min(...asignadosPorCanal.map(lista => lista.length));
+        let mejorIndiceCanal = -1, maxDistMinima = -1;
+        for (let cIdx = 0; cIdx < numCanalesDisponibles; cIdx++) {
+            if (asignadosPorCanal[cIdx].length > minUso) continue;
+            if (minUso === 0) { mejorIndiceCanal = cIdx; break; }
+            let distMinAlCanal = Infinity;
+            const listaEnCanal = asignadosPorCanal[cIdx];
+            for (let k = 0; k < listaEnCanal.length; k++) {
+                const d = Math.hypot(ap.x - listaEnCanal[k].x, ap.y - listaEnCanal[k].y, getAPZ(ap, zGlobal) - getAPZ(listaEnCanal[k], zGlobal));
+                if (d < distMinAlCanal) distMinAlCanal = d;
+            }
+            if (distMinAlCanal > maxDistMinima) { maxDistMinima = distMinAlCanal; mejorIndiceCanal = cIdx; }
+        }
+        ap._cIdx = mejorIndiceCanal;
+        ap.canal = poolCanales[mejorIndiceCanal];
+        ap.colorCanal = PALETA_CANALES[mejorIndiceCanal % PALETA_CANALES.length];
+        asignadosPorCanal[mejorIndiceCanal].push(ap);
+    });
+
+    // FASE 2: Refinamiento espacial por intercambio (conserva balance exacto y maximiza separación co-canal)
+    const distMinCoCanal = (idxTarget, cIdxTest, idxIgnorar) => {
+        let minD = Infinity;
+        const apT = apsActivos[idxTarget], zT = getAPZ(apT, zGlobal);
+        for (let k = 0; k < apsActivos.length; k++) {
+            if (k === idxTarget || k === idxIgnorar) continue;
+            if (apsActivos[k]._cIdx === cIdxTest) {
+                const d = Math.hypot(apT.x - apsActivos[k].x, apT.y - apsActivos[k].y, zT - getAPZ(apsActivos[k], zGlobal));
+                if (d < minD) minD = d;
+            }
+        }
+        return minD;
+    };
+    for (let iter = 0; iter < 2; iter++) {
+        let huboMejora = false;
+        for (let i = 0; i < apsActivos.length; i++) {
+            for (let j = i + 1; j < apsActivos.length; j++) {
+                const cI = apsActivos[i]._cIdx, cJ = apsActivos[j]._cIdx;
+                if (cI === cJ) continue;
+                const actualMin = Math.min(distMinCoCanal(i, cI, -1), distMinCoCanal(j, cJ, -1));
+                const nuevoMin = Math.min(distMinCoCanal(i, cJ, j), distMinCoCanal(j, cI, i));
+                if (nuevoMin > actualMin + 0.5) {
+                    apsActivos[i]._cIdx = cJ; apsActivos[i].canal = poolCanales[cJ]; apsActivos[i].colorCanal = PALETA_CANALES[cJ % PALETA_CANALES.length];
+                    apsActivos[j]._cIdx = cI; apsActivos[j].canal = poolCanales[cI]; apsActivos[j].colorCanal = PALETA_CANALES[cI % PALETA_CANALES.length];
+                    huboMejora = true;
+                }
+            }
+        }
+        if (!huboMejora) break;
+    }
+
+    if (apsActivos.length <= numCanalesDisponibles) return { cciPromedio: 0, numCanales: numCanalesDisponibles, activosEnBanda: apsActivos.length };
+
+    const ccaThresholdDbm = -82 + (10 * Math.log10(bw / 20)), antennaGain = (tipoAnt === 'sec') ? 9.0 : 4.0;
+    const aislamientoLateralAPaAP = (tipoAnt === 'sec') ? ((montajeSec === 'techo' ? 15.0 : 10.0) * (60 / Math.max(25, Math.sqrt(bWH * bWV)))) : 0;
+    const densidadM2 = numPers / Math.max(4, areaPoligonoM2);
+    const factorClutterRecinto = (0.08 + Math.min(0.28, Math.log10(1 + densidadM2) * 0.14)) * (freq === 6 ? 1.2 : (freq === 5 ? 1.0 : 0.8));
+
+    let sumaCCI = 0, nEval = apsActivos.length;
+    for (let i = 0; i < nEval; i++) {
+        let vecinos = 0, zI = getAPZ(apsActivos[i], zGlobal);
+        for (let j = 0; j < nEval; j++) {
+            if (i === j) continue;
+            if (apsActivos[i].canal === apsActivos[j].canal) {
+                const eirpJ = getAPTx(apsActivos[j], potenciaTxGlobal) + antennaGain + (tipoAnt === 'sec' ? 2.0 : 3.5) - aislamientoLateralAPaAP;
+                const distAPs = Math.max(1.5, Math.hypot(apsActivos[i].x - apsActivos[j].x, apsActivos[i].y - apsActivos[j].y, zI - getAPZ(apsActivos[j], zGlobal)));
+                if ((eirpJ - ((20.8 * Math.log10(distAPs)) + (20 * Math.log10(freq)) + 32.44) - distAPs * factorClutterRecinto) >= ccaThresholdDbm) vecinos++;
+            }
+        }
+        sumaCCI += vecinos;
+    }
+    const factorEscalaMasiva = totalAPsReales > apsVisuales.length ? Math.min(2.5, totalAPsReales / Math.max(1, apsVisuales.length)) : 1.0;
+    return { cciPromedio: Math.min(12, Math.round((sumaCCI / Math.max(1, nEval)) * factorEscalaMasiva)), numCanales: numCanalesDisponibles, activosEnBanda: apsActivos.length };
+}
+
+function autoOptimizarRF() {
+    estadoSimulacion.simulacionIniciada = true;
+    if (!estadoSimulacion.poligonoPersonalizadoActivo || estadoSimulacion.poligonoZona.length < 3) sincronizarPoligonoDesdeInputsRect();
+    const metaDbm = parseFloat(document.getElementById('metaOptimizacion').value) || -67, freq = parseFloat(document.getElementById('frecuencia').value) || 6;
+    const altura = parseFloat(document.getElementById('altura').value) || 12.0, tipoAnt = document.getElementById('tipoAntena').value || 'sec';
+    const montajeSec = document.getElementById('montajeSectorial').value || 'techo', bWH = parseFloat(document.getElementById('beamwidthH').value) || 60;
+    const bWV = parseFloat(document.getElementById('beamwidthV').value) || 30, tech = document.getElementById('tecnologia').value || 'mlo';
+    const postura = document.getElementById('posturaGente').value || 'mixta', numPers = obtenerNumeroPersonasActivo(), perfilDisp = obtenerPerfilDispositivo(), areaTotal = Math.max(4, estadoSimulacion.areaPoligonoRealM2);
+
+    document.getElementById('anchoCanal').value = '20'; actualizarMenuEspectroDFS();
+    if (freq === 5 && numPers >= 800) document.getElementById('modoDFS').value = 'con_dfs';
+    const apsPorCapacidad = estadoSimulacion.modoManualAPs && estadoSimulacion.apsOptimos.length > 0 ? estadoSimulacion.apsOptimos.length : Math.max(1, Math.ceil(numPers / (tech === 'mlo' ? 200 : 140)));
+    const radioObjetivoM = Math.max(7, Math.min(22, Math.sqrt((areaTotal / apsPorCapacidad) / Math.PI) * 1.15));
+
+    let potenciaOptima = 14;
+    for (let pTest = 8; pTest <= 26; pTest++) {
+        potenciaOptima = pTest;
+        if (calcularDataRadialFlyer(radioObjetivoM, pTest, altura, freq, 20, numPers, areaTotal, 0, tipoAnt, montajeSec, bWH, bWV, tech, postura, apsPorCapacidad, perfilDisp).rssiR >= metaDbm) break;
+    }
+    document.getElementById('potencia').value = potenciaOptima; document.getElementById('capaVisual').value = 'heatmap_aps';
+    centrarFlyerEnZona(); regenerarAudiencia(); actualizarTodo();
+}
+
+function actualizarTablaEjecutivaAPs(apsLista, totalAPsReales, activosEnBanda, prm, radioMeta, clientesPorAP, numCanalesDisp) {
+    const tbody = document.getElementById('apScheduleBody'); if (!tbody) return; tbody.innerHTML = '';
+    if (!estadoSimulacion.simulacionIniciada || !apsLista || !apsLista.length) {
+        document.getElementById('scheduleTitle').innerText = 'Tabla Ejecutiva de Sembrado de APs, Coordenadas (X, Y, Z) y Plan de Frecuencias';
+        document.getElementById('scheduleSubtitle').innerText = 'El listado se generará automáticamente al trazar el polígono o ejecutar el cálculo';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#64748b; padding:18px;">Plano limpio. Importa un plano, calibra metros y traza un polígono irregular para generar la tabla de APs.</td></tr>';
+        return;
+    }
+    const reg = REGULACIONES_PAIS[prm.pais] || REGULACIONES_PAIS.MX, gain = (prm.tAnt === 'sec') ? 9 : 4;
+    document.getElementById('scheduleTitle').innerText = `Tabla Ejecutiva de Sembrado de APs — ${totalAPsReales.toLocaleString('es-MX')} AP(s) (${activosEnBanda} activos en ${prm.f} GHz)${estadoSimulacion.modoManualAPs ? ' [Edición Manual]' : ''}`;
+    document.getElementById('scheduleSubtitle').innerText = `${reg.nombre} | Polígono ${Math.round(estadoSimulacion.areaPoligonoRealM2).toLocaleString('es-MX')} m² | ${prm.f} GHz (${prm.bw} MHz) | Pool: ${numCanalesDisp} Ch | Meta: ${prm.metaDbm} dBm | CCI Auto: ${prm.cci} (* = ajuste individual)`;
+
+    apsLista.forEach(ap => {
+        const activo = isAPActiveInBand(ap, prm.f, prm.tech), subBanda = activo ? obtenerSubBandaCanal(prm.f, ap.canal) : 'Radio Apagado';
+        const apZ = getAPZ(ap, prm.a), apTx = getAPTx(ap, prm.p), eirp = apTx + gain, apAz = getAPAzimut(ap, prm.azimutDeg);
+        const zMark = typeof ap.customZ === 'number' ? '<strong>*</strong>' : '', txMark = typeof ap.customTx === 'number' ? '<strong>*</strong>' : '', azMark = typeof ap.customAzimut === 'number' ? '<strong>*</strong>' : '';
+        const elipseAP = calcularElipse3dB(apZ, prm.postura, prm.bWH, prm.bWV);
+        let patronStr = 'Omnidireccional (360°)';
+        if (prm.tAnt === 'sec') patronStr = (prm.montajeSec === 'techo') ? `Sectorial Techo -Z (${prm.bWH}°×${prm.bWV}° | Rot ${apAz}°${azMark})` : `Sectorial Muro (${prm.bWH}°×${prm.bWV}° | Az ${apAz}°${azMark})`;
+        const canalHtml = activo ? `<span class="ch-badge" style="background:${ap.colorCanal || '#f59e0b'};">Canal ${ap.canal}</span> <small style="color:#64748b;">(${subBanda})</small>` : `<span class="ch-badge" style="background:#cbd5e1; color:#475569;">RADIO OFF</span>`;
+        const tr = document.createElement('tr'); if (!activo) tr.style.opacity = '0.62';
+        tr.innerHTML = `<td><strong>${ap.id}</strong></td><td>${ap.x.toFixed(1)}, ${ap.y.toFixed(1)}, ${apZ.toFixed(1)}m${zMark}</td><td><strong>${formatRadiosTexto(ap, prm.tech)}</strong></td><td>${canalHtml}</td><td>${activo ? `${apTx} dBm Tx${txMark} <small style="color:#64748b;">(${eirp} dBm EIRP)</small>` : '—'}</td><td>${patronStr}</td><td>${activo ? `${radioMeta} m ${prm.tAnt === 'sec' ? `<small style="color:#7e22ce;">(${elipseAP.rH}×${elipseAP.rV}m)</small>` : ''}` : '—'}</td><td>${activo ? `~${clientesPorAP} Disp.` : '0 Disp.'}</td>`;
+        tbody.appendChild(tr);
+    });
+}
+
+function exportarTablaAPsCSV() {
+    if (!estadoSimulacion.simulacionIniciada || !estadoSimulacion.apsOptimos.length) { alert('Primero traza un polígono o ejecuta el cálculo.'); return; }
+    const prm = estadoSimulacion.params, aps = estadoSimulacion.apsOptimos, reg = REGULACIONES_PAIS[prm.pais] || REGULACIONES_PAIS.MX, gain = (prm.tAnt === 'sec') ? 9 : 4;
+    const activos = aps.filter(ap => isAPActiveInBand(ap, prm.f, prm.tech)).length, clientesPorAP = activos > 0 ? Math.ceil(prm.numPers / activos) : 0;
+    let csv = "Pais_Regulacion,ID_AP,Coord_X_m,Coord_Y_m,Altura_Z_m,Radios_Activos,Banda_Vista_GHz,Ancho_Canal_MHz,Canal_Asignado,SubBanda,Potencia_Tx_dBm,EIRP_dBm,Rotacion_Azimut_deg,Antena_Montaje,Radio_Meta_m,Elipse_3dB_H_m,Elipse_3dB_V_m,Meta_dBm,Clientes_Estimados,CCI_Auto\n";
+    aps.forEach(ap => {
+        const activo = isAPActiveInBand(ap, prm.f, prm.tech), subBanda = activo ? obtenerSubBandaCanal(prm.f, ap.canal) : 'RADIO_OFF';
+        const apZ = getAPZ(ap, prm.a), apTx = getAPTx(ap, prm.p), eirp = apTx + gain, apAz = getAPAzimut(ap, prm.azimutDeg), el = calcularElipse3dB(apZ, prm.postura, prm.bWH, prm.bWV);
+        const pat = prm.tAnt === 'sec' ? (prm.montajeSec === 'techo' ? `Sectorial Techo -Z (${prm.bWH}x${prm.bWV}deg)` : `Sectorial Muro (${prm.bWH}x${prm.bWV}deg)`) : 'Omnidireccional 360deg';
+        csv += `"${reg.nombre}",${ap.id},${ap.x.toFixed(1)},${ap.y.toFixed(1)},${apZ.toFixed(1)},"${formatRadiosTexto(ap, prm.tech)}",${prm.f},${prm.bw},${activo ? ap.canal : 'OFF'},"${subBanda}",${activo ? apTx : 0},${activo ? eirp : 0},${apAz},"${pat}",${estadoSimulacion.radioCeldaMeta},${el.rH},${el.rV},${prm.metaDbm},${activo ? clientesPorAP : 0},${prm.cci}\n`;
+    });
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' })), link = document.createElement('a');
+    link.setAttribute('href', url); link.setAttribute('download', `Plan_Sembrado_APs_${prm.pais}_${prm.f}GHz_${prm.numPers}Disp.csv`);
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+}
+
+function orientacionCCW(A, B, C) { return (C.y - A.y) * (B.x - A.x) > (B.y - A.y) * (C.x - A.x); }
+function segmentosSeCruzan(A, B, C, D) { return (orientacionCCW(A, C, D) !== orientacionCCW(B, C, D)) && (orientacionCCW(A, B, C) !== orientacionCCW(A, B, D)); }
+function nuevoSegmentoCruzaPoligono(vertices, nuevoPto, cerrando) {
+    const n = vertices.length; if (n < 2) return false;
+    for (let i = 0; i < n - 2; i++) { if (cerrando && i === 0) continue; if (segmentosSeCruzan(vertices[i], vertices[i + 1], vertices[n - 1], nuevoPto)) return true; }
+    return false;
+}
+function puntoDentroDePoligono(x, y, poly) {
+    if (!poly || poly.length < 3) return false;
+    let dentro = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+        const xi = poly[i].x, yi = poly[i].y, xj = poly[j].x, yj = poly[j].y;
+        if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / ((yj - yi) || 1e-9) + xi)) dentro = !dentro;
+    }
+    return dentro;
+}
+function calcularAreaPoligonoM2(poly) {
+    if (!poly || poly.length < 3) return 1;
+    let s = 0; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) s += (poly[j].x + poly[i].x) * (poly[j].y - poly[i].y);
+    return Math.max(1, Math.abs(s / 2));
+}
+function calcularCentroidePoligono(poly) {
+    if (!poly || !poly.length) return { x: estadoSimulacion.planoAnchoM / 2, y: estadoSimulacion.planoAltoM / 2 };
+    let sx = 0, sy = 0; poly.forEach(p => { sx += p.x; sy += p.y; }); return { x: sx / poly.length, y: sy / poly.length };
+}
+function obtenerBoundingBoxPoligono(poly) {
+    if (!poly || !poly.length) return { minX: 0, minY: 0, maxX: estadoSimulacion.planoAnchoM, maxY: estadoSimulacion.planoAltoM, largoX: estadoSimulacion.planoAnchoM, anchoY: estadoSimulacion.planoAltoM };
+    const xs = poly.map(p => p.x), ys = poly.map(p => p.y), minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+    return { minX, minY, maxX, maxY, largoX: Math.max(2, maxX - minX), anchoY: Math.max(2, maxY - minY) };
+}
+function sincronizarPoligonoDesdeInputsRect() {
+    const iniX = parseFloat(document.getElementById('inicioBloque').value) || 0, iniY = parseFloat(document.getElementById('inicioBloqueY').value) || 0;
+    const largoX = Math.max(2, parseFloat(document.getElementById('largoEspacio').value) || 120), anchoY = Math.max(2, parseFloat(document.getElementById('anchoEspacio').value) || 75);
+    estadoSimulacion.poligonoZona = [{ x: iniX, y: iniY }, { x: iniX + largoX, y: iniY }, { x: iniX + largoX, y: iniY + anchoY }, { x: iniX, y: iniY + anchoY }];
+    estadoSimulacion.areaPoligonoRealM2 = largoX * anchoY;
+}
+function alEditarCajaManual() {
+    const iniX = parseFloat(document.getElementById('inicioBloque').value) || 0, iniY = parseFloat(document.getElementById('inicioBloqueY').value) || 0;
+    const largoX = Math.max(2, parseFloat(document.getElementById('largoEspacio').value) || 120), anchoY = Math.max(2, parseFloat(document.getElementById('anchoEspacio').value) || 75);
+    estadoSimulacion.planoAnchoM = Math.max(20, iniX + largoX); estadoSimulacion.planoAltoM = Math.max(10, iniY + anchoY);
+    if (estadoSimulacion.simulacionIniciada) { estadoSimulacion.poligonoPersonalizadoActivo = false; sincronizarPoligonoDesdeInputsRect(); regenerarAudiencia(); }
+    actualizarTodo();
+}
+
+function cargarImagenPlano(event) {
+    const file = event.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const dataURL = e.target.result, img = new Image();
+        img.onload = function() {
+            estadoSimulacion.imagenPlano = img; estadoSimulacion.imagenPlanoDataURL = dataURL; document.getElementById('btnClearImg').style.display = 'inline-block';
+            const largoActual = parseFloat(document.getElementById('largoEspacio').value) || 120, nuevoAncho = Math.max(4, Number((largoActual * (img.height / img.width)).toFixed(1)));
+            estadoSimulacion.planoAnchoM = largoActual; estadoSimulacion.planoAltoM = nuevoAncho;
+            document.getElementById('inicioBloque').value = 0; document.getElementById('inicioBloqueY').value = 0;
+            document.getElementById('largoEspacio').value = largoActual; document.getElementById('anchoEspacio').value = nuevoAncho;
+            cerrarInspectorAP(); estadoSimulacion.simulacionIniciada = false; estadoSimulacion.modoManualAPs = false; estadoSimulacion.poligonoPersonalizadoActivo = false;
+            estadoSimulacion.poligonoZona = []; estadoSimulacion.apsOptimos = []; estadoSimulacion.personas = []; document.getElementById('btnResetAutoAPs').style.display = 'none';
+            document.getElementById('apPosX').value = (largoActual / 2).toFixed(1); document.getElementById('apPosY').value = (nuevoAncho / 2).toFixed(1);
+            resetearZoomVista(); actualizarTodo();
+        };
+        img.src = dataURL;
+    };
+    reader.readAsDataURL(file);
+}
+function limpiarImagenPlano() { estadoSimulacion.imagenPlano = null; estadoSimulacion.imagenPlanoDataURL = null; document.getElementById('floorplanInput').value = ''; document.getElementById('btnClearImg').style.display = 'none'; estadoSimulacion.heatmapDirty = true; }
+function iniciarModoCalibracion() {
+    cancelarModosEspeciales(); estadoSimulacion.modoCursor = 'calibrate'; document.getElementById('btnCalibrar').classList.add('calibrate-on');
+    const b = document.getElementById('calibBanner'); b.style.display = 'flex'; b.style.background = 'rgba(236,72,153,0.18)'; b.style.borderColor = '#ec4899';
+    document.getElementById('btnUndoVertex').style.display = 'none'; document.getElementById('btnClosePoly').style.display = 'none';
+    document.getElementById('calibInstruction').innerText = 'CALIBRACIÓN MÉTRICA (PASO 1 DE 2): Haz clic en el Punto Inicial (A)...'; document.getElementById('canvasWrap').style.cursor = 'crosshair';
+}
+function iniciarModoPoligonoIrregular() {
+    cancelarModosEspeciales(); estadoSimulacion.modoCursor = 'draw_polygon'; document.getElementById('btnDelimitarZona').classList.add('zone-on');
+    const b = document.getElementById('calibBanner'); b.style.display = 'flex'; b.style.background = 'rgba(16,185,129,0.18)'; b.style.borderColor = '#10b981';
+    document.getElementById('btnUndoVertex').style.display = 'inline-block'; document.getElementById('btnClosePoly').style.display = 'inline-block';
+    document.getElementById('calibInstruction').innerText = 'TRAZADO DE POLÍGONO IRREGULAR: Haz clic para colocar el Vértice 1 (Inicio)...'; document.getElementById('canvasWrap').style.cursor = 'crosshair';
+}
+function deshacerUltimoVertice() {
+    if (estadoSimulacion.polyDraft.length > 0) {
+        estadoSimulacion.polyDraft.pop();
+        document.getElementById('calibInstruction').innerText = estadoSimulacion.polyDraft.length === 0 ? 'Haz clic para colocar el Vértice 1...' : `Vértices trazados: ${estadoSimulacion.polyDraft.length}.`;
+    }
+}
+function intentarCerrarPoligonoIrregular() {
+    const draft = estadoSimulacion.polyDraft; if (draft.length < 3) { alert('Necesitas al menos 3 vértices.'); return; }
+    if (nuevoSegmentoCruzaPoligono(draft.map(d => ({ x: d.mX, y: d.mY })), { x: draft[0].mX, y: draft[0].mY }, true)) { alert('La línea de cierre cruza otro segmento. Deshaz el último punto.'); return; }
+    estadoSimulacion.poligonoZona = draft.map(p => ({ x: Number(p.mX.toFixed(2)), y: Number(p.mY.toFixed(2)) }));
+    estadoSimulacion.poligonoPersonalizadoActivo = true; estadoSimulacion.simulacionIniciada = true;
+    estadoSimulacion.modoManualAPs = false; cerrarInspectorAP(); document.getElementById('btnResetAutoAPs').style.display = 'none';
+    estadoSimulacion.areaPoligonoRealM2 = calcularAreaPoligonoM2(estadoSimulacion.poligonoZona);
+    const bbox = obtenerBoundingBoxPoligono(estadoSimulacion.poligonoZona);
+    document.getElementById('inicioBloque').value = Number(bbox.minX.toFixed(1)); document.getElementById('inicioBloqueY').value = Number(bbox.minY.toFixed(1));
+    document.getElementById('largoEspacio').value = Number(bbox.largoX.toFixed(1)); document.getElementById('anchoEspacio').value = Number(bbox.anchoY.toFixed(1));
+    cancelarModosEspeciales(); centrarFlyerEnZona(); regenerarAudiencia(); actualizarTodo();
+}
+function limpiarClasesBotonesModo() {
+    ['btnModoFlyer','btnModoPan'].forEach(id => document.getElementById(id).classList.remove('active'));
+    document.getElementById('btnModoEditAP').classList.remove('ap-edit-active');
+    document.getElementById('btnModoMoveAP').classList.remove('ap-move-active');
+    document.getElementById('btnModoAddAP').classList.remove('ap-add-active');
+    document.getElementById('btnModoDelAP').classList.remove('ap-del-active');
+}
+function cancelarModosEspeciales() {
+    estadoSimulacion.modoCursor = 'flyer'; estadoSimulacion.calibPt1 = null; estadoSimulacion.calibPt2 = null;
+    estadoSimulacion.polyDraft = []; estadoSimulacion.polyHover = null; estadoSimulacion.polyHoverCruza = false; estadoSimulacion.apArrastradoIdx = -1;
+    document.getElementById('btnCalibrar').classList.remove('calibrate-on'); document.getElementById('btnDelimitarZona').classList.remove('zone-on');
+    document.getElementById('calibBanner').style.display = 'none'; limpiarClasesBotonesModo();
+    document.getElementById('btnModoFlyer').classList.add('active'); document.getElementById('canvasWrap').style.cursor = 'grab';
+}
+function cambiarModoCursor(modo) {
+    cancelarModosEspeciales(); estadoSimulacion.modoCursor = modo; limpiarClasesBotonesModo();
+    const b = document.getElementById('calibBanner'); document.getElementById('btnUndoVertex').style.display = 'none'; document.getElementById('btnClosePoly').style.display = 'none';
+    if (modo === 'flyer') { document.getElementById('btnModoFlyer').classList.add('active'); document.getElementById('canvasWrap').style.cursor = 'grab'; }
+    else if (modo === 'pan') { document.getElementById('btnModoPan').classList.add('active'); document.getElementById('canvasWrap').style.cursor = 'all-scroll'; }
+    else if (modo === 'edit_ap') { document.getElementById('btnModoEditAP').classList.add('ap-edit-active'); document.getElementById('canvasWrap').style.cursor = 'pointer'; b.style.display = 'flex'; b.style.background = 'rgba(168,85,247,0.18)'; b.style.borderColor = '#a855f7'; document.getElementById('calibInstruction').innerText = 'INSPECTOR INDIVIDUAL: Haz clic sobre cualquier AP numerado para ajustar Radios, Altura Z, Potencia Tx y Rotación.'; }
+    else if (modo === 'move_ap') { document.getElementById('btnModoMoveAP').classList.add('ap-move-active'); document.getElementById('canvasWrap').style.cursor = 'move'; b.style.display = 'flex'; b.style.background = 'rgba(56,189,248,0.18)'; b.style.borderColor = '#38bdf8'; document.getElementById('calibInstruction').innerText = 'MODO MOVER AP: Haz clic y arrastra cualquier AP numerado dentro del polígono válido.'; }
+    else if (modo === 'add_ap') { document.getElementById('btnModoAddAP').classList.add('ap-add-active'); document.getElementById('canvasWrap').style.cursor = 'crosshair'; b.style.display = 'flex'; b.style.background = 'rgba(16,185,129,0.18)'; b.style.borderColor = '#10b981'; document.getElementById('calibInstruction').innerText = 'MODO AÑADIR AP: Haz clic dentro del polígono válido para colocar un nuevo AP.'; }
+    else if (modo === 'del_ap') { document.getElementById('btnModoDelAP').classList.add('ap-del-active'); document.getElementById('canvasWrap').style.cursor = 'pointer'; b.style.display = 'flex'; b.style.background = 'rgba(239,68,68,0.18)'; b.style.borderColor = '#ef4444'; document.getElementById('calibInstruction').innerText = 'MODO QUITAR AP: Haz clic sobre cualquier AP numerado en el plano para eliminarlo.'; }
+}
+function aplicarZoomBoton(factor) { const c = document.getElementById('masterCanvas'); aplicarZoomEnPunto(factor, c.width / 2, c.height / 2); }
+function aplicarZoomEnPunto(factor, cx, cy) {
+    const z0 = estadoSimulacion.zoom, z1 = Math.max(1.0, Math.min(8.0, z0 * factor)); if (z1 === z0) return;
+    if (z1 === 1.0) { estadoSimulacion.panX = 0; estadoSimulacion.panY = 0; }
+    else { estadoSimulacion.panX = cx - (cx - estadoSimulacion.panX) * (z1 / z0); estadoSimulacion.panY = cy - (cy - estadoSimulacion.panY) * (z1 / z0); }
+    estadoSimulacion.zoom = z1; document.getElementById('zoomLevelText').innerText = `${z1.toFixed(1)}x`;
+}
+function resetearZoomVista() { estadoSimulacion.zoom = 1.0; estadoSimulacion.panX = 0; estadoSimulacion.panY = 0; document.getElementById('zoomLevelText').innerText = '1.0x'; }
+function obtenerPerfilDispositivo() {
+    const v = parseFloat(document.getElementById('perfilDispositivo').value) || -10;
+    if (v === -3) return { offset: -3.0, nombre: 'Laptop', etiquetaCorta: 'Laptop (-3 dB)', factorMimo: 1.20 };
+    if (v === -11) return { offset: -11.0, nombre: 'IoT / POS', etiquetaCorta: 'IoT (-11 dB)', factorMimo: 0.65 };
+    return { offset: -10.0, nombre: 'Celular', etiquetaCorta: 'Celular (-10 dB)', factorMimo: 1.0 };
+}
+function activarCaminataFlyer() { estadoSimulacion.flyerMovingTimer = 18; estadoSimulacion.flyerWalkPhase += 0.65; }
+function sincronizarDesdePreset() {
+    const v = document.getElementById('presetPersonas').value; if (v !== 'all') document.getElementById('numPersonasInput').value = parseInt(v);
+    if (estadoSimulacion.simulacionIniciada) regenerarAudiencia(); actualizarTodo();
+}
+function sincronizarDesdeInputPersonas() {
+    const el = document.getElementById('numPersonasInput'); let v = Math.max(1, Math.min(100000, parseInt(el.value) || 1)); el.value = v;
+    const sel = document.getElementById('presetPersonas'); if (Array.from(sel.options).some(op => op.value === String(v))) sel.value = String(v);
+    if (estadoSimulacion.simulacionIniciada) regenerarAudiencia(); actualizarTodo();
+}
+function obtenerNumeroPersonasActivo() { return Math.max(1, Math.min(100000, parseInt(document.getElementById('numPersonasInput').value) || 1)); }
+function toggleBeamwidth() {
+    const esSec = document.getElementById('tipoAntena').value === 'sec';
+    ['montajeSecGroup','beamHGroup','beamVGroup','azimutGroup'].forEach(id => document.getElementById(id).style.display = esSec ? 'flex' : 'none');
+}
+function centrarFlyerEnZona() {
+    const c = (estadoSimulacion.poligonoZona && estadoSimulacion.poligonoZona.length >= 3) ? calcularCentroidePoligono(estadoSimulacion.poligonoZona) : { x: estadoSimulacion.planoAnchoM / 2, y: estadoSimulacion.planoAltoM / 2 };
+    document.getElementById('apPosX').value = c.x.toFixed(1); document.getElementById('apPosY').value = c.y.toFixed(1);
+}
+function moverFlyerAlCentro() { centrarFlyerEnZona(); activarCaminataFlyer(); actualizarTodo(); }
+function ajustarAltura(delta) { const el = document.getElementById('altura'); el.value = Math.max(0.5, Math.min(45, (parseFloat(el.value) || 12.0) + delta)).toFixed(1); actualizarTodo(); }
+function actualizarAnchosCanal() {
+    const freq = parseFloat(document.getElementById('frecuencia').value) || 6, sel = document.getElementById('anchoCanal'), prev = parseInt(sel.value) || 20;
+    let ops = freq === 2.4 ? [{ val: 20, text: '20 MHz (Estándar HD)' }, { val: 40, text: '40 MHz (No Rec. HD)' }]
+        : (freq === 5 ? [{ val: 20, text: '20 MHz (Alta Densidad)' }, { val: 40, text: '40 MHz (Balanceado HD)' }, { val: 80, text: '80 MHz (Alto Tput)' }, { val: 160, text: '160 MHz (Baja Densidad)' }]
+        : [{ val: 20, text: '20 MHz (Alta Densidad)' }, { val: 40, text: '40 MHz (Alta Densidad)' }, { val: 80, text: '80 MHz (Estándar 6 GHz)' }, { val: 160, text: '160 MHz (Ultra Tput)' }, { val: 320, text: '320 MHz (Wi-Fi 7 Max)' }]);
+    sel.innerHTML = ''; const fin = ops.some(o => o.val === prev) ? prev : 20;
+    ops.forEach(o => { const el = document.createElement('option'); el.value = o.val; el.textContent = o.text; if (o.val === fin) el.selected = true; sel.appendChild(el); });
+}
+
+function regenerarAudiencia() {
+    if (!estadoSimulacion.simulacionIniciada) { estadoSimulacion.personas = []; return; }
+    if (!estadoSimulacion.poligonoPersonalizadoActivo) sincronizarPoligonoDesdeInputsRect();
+    const poly = estadoSimulacion.poligonoZona, bbox = obtenerBoundingBoxPoligono(poly), postura = document.getElementById('posturaGente').value || 'mixta', numDibujar = Math.min(obtenerNumeroPersonasActivo(), 320), personas = [];
+    if (postura === 'sentada') {
+        const tot = Math.ceil(numDibujar * ((bbox.largoX * bbox.anchoY) / Math.max(1, estadoSimulacion.areaPoligonoRealM2)) * 1.25);
+        const cols = Math.max(2, Math.round(Math.sqrt(tot * (bbox.largoX / bbox.anchoY)))), rows = Math.max(2, Math.ceil(tot / cols));
+        for (let c = 0; c < cols && personas.length < numDibujar; c++) for (let r = 0; r < rows && personas.length < numDibujar; r++) {
+            const px = bbox.minX + ((c + 0.5) / cols) * bbox.largoX, py = bbox.minY + ((r + 0.5) / rows) * bbox.anchoY;
+            if (puntoDentroDePoligono(px, py, poly)) personas.push({ x: px, y: py, tipo: 'sentada' });
+        }
+    } else {
+        let intentos = 0;
+        while (personas.length < numDibujar && intentos < numDibujar * 15) {
+            intentos++; const px = bbox.minX + Math.random() * bbox.largoX, py = bbox.minY + Math.random() * bbox.anchoY;
+            if (puntoDentroDePoligono(px, py, poly)) personas.push({ x: px, y: py, tipo: (postura === 'mixta' && personas.length % 2 === 0) ? 'sentada' : 'parada' });
+        }
+    }
+    estadoSimulacion.personas = personas; estadoSimulacion.heatmapDirty = true;
+}
+
+function calcularSembradoIngenieria(numPers, bw, tech, radioCeldaMeta) {
+    const poly = estadoSimulacion.poligonoZona, areaReal = estadoSimulacion.areaPoligonoRealM2, bbox = obtenerBoundingBoxPoligono(poly);
+    const totalAPs = Math.max(1, Math.ceil(numPers / ((tech === 'mlo' ? 200 : 140) * (bw >= 40 ? 1.15 : 1.0))), Math.ceil(areaReal / Math.max(100, Math.PI * Math.pow(radioCeldaMeta * 0.85, 2))));
+    estadoSimulacion.totalAPsCalculados = totalAPs;
+    const apsParaDibujar = Math.min(totalAPs, 64), aps = [];
+    if (apsParaDibujar === 1) {
+        const c = calcularCentroidePoligono(poly);
+        aps.push({ num: 1, id: 'AP-1', x: Number(c.x.toFixed(1)), y: Number(c.y.toFixed(1)), customZ: null, customTx: null, customAzimut: null, radios: { r24: true, r5: true, r6: true }, canal: 36, colorCanal: PALETA_CANALES[0] });
+        estadoSimulacion.gridCols = 1; estadoSimulacion.gridRows = 1; return { totalAPs, apsVisuales: aps };
+    }
+    const celdas = Math.ceil(apsParaDibujar / Math.max(0.2, areaReal / Math.max(1, bbox.largoX * bbox.anchoY)));
+    const cols = Math.max(2, Math.round(Math.sqrt(celdas * (bbox.largoX / bbox.anchoY)))), rows = Math.max(2, Math.ceil(celdas / cols)), cand = [];
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+        const ax = bbox.minX + ((c + 0.5) / cols) * bbox.largoX, ay = bbox.minY + ((r + 0.5) / rows) * bbox.anchoY;
+        if (puntoDentroDePoligono(ax, ay, poly)) cand.push({ x: ax, y: ay });
+    }
+    if (!cand.length) cand.push(calcularCentroidePoligono(poly));
+    const paso = Math.max(1, cand.length / apsParaDibujar);
+    for (let i = 0; i < apsParaDibujar && Math.floor(i * paso) < cand.length; i++) {
+        const pt = cand[Math.floor(i * paso)];
+        aps.push({ num: i + 1, id: 'AP-' + (i + 1), x: Number(pt.x.toFixed(1)), y: Number(pt.y.toFixed(1)), customZ: null, customTx: null, customAzimut: null, radios: { r24: true, r5: true, r6: true }, canal: 36, colorCanal: PALETA_CANALES[i % PALETA_CANALES.length] });
+    }
+    estadoSimulacion.gridCols = cols; estadoSimulacion.gridRows = rows; return { totalAPs, apsVisuales: aps };
+}
+
+function calcularSenalEnFlyerXY(px, py, txX, txY, prm, esSectorial, angRad, txOv, zOv) {
+    const altCab = prm.postura === 'sentada' ? 1.25 : (prm.postura === 'mixta' ? 1.50 : 1.75), altDisp = prm.postura === 'sentada' ? 0.90 : (prm.postura === 'mixta' ? 1.08 : 1.25);
+    const fAbs = prm.postura === 'sentada' ? 0.68 : (prm.postura === 'mixta' ? 0.85 : 1.0), zU = typeof zOv === 'number' ? zOv : prm.a;
+    const hEf = Math.abs(zU - altDisp), dx = px - txX, dy = py - txY, dist2D = Math.hypot(dx, dy), dist3D = Math.hypot(dist2D, hEf);
+    const eirp = (typeof txOv === 'number' ? txOv : prm.p) + (esSectorial ? 9.0 : 4.0);
+    const fspl = (21.2 * Math.log10(Math.max(dist3D, 1.0))) + (20 * Math.log10(prm.f)) + 32.44;
+    let antLoss = 0;
+    if (esSectorial) {
+        if (prm.montajeSec === 'techo') {
+            const cosA = Math.cos(-angRad), sinA = Math.sin(-angRad), lx = dx * cosA - dy * sinA, ly = dx * sinA + dy * cosA;
+            antLoss = Math.min(3 * (Math.pow((Math.atan2(Math.abs(lx), Math.max(hEf, 0.5)) * 180 / Math.PI) / (prm.bWH / 2), 2) + Math.pow((Math.atan2(Math.abs(ly), Math.max(hEf, 0.5)) * 180 / Math.PI) / (prm.bWV / 2), 2)), 24);
+        } else {
+            let diffH = Math.abs(Math.atan2(dy, dx) - angRad); if (diffH > Math.PI) diffH = (2 * Math.PI) - diffH;
+            antLoss = Math.min(3 * (Math.pow((diffH * 180 / Math.PI) / (prm.bWH / 2), 2) + Math.pow(Math.abs((Math.atan2(hEf, Math.max(dist2D, 0.5)) * 180 / Math.PI) - 18) / (prm.bWV / 2), 2)), 24);
+        }
+    }
+    const dens = prm.numPers / Math.max(4, estadoSimulacion.areaPoligonoRealM2), fFreq = prm.f === 6 ? 1.25 : (prm.f === 5 ? 1.0 : 0.82);
+    let frac = 0; for (let s = 1; s <= 6; s++) if (puntoDentroDePoligono(txX + dx * (s / 6), txY + dy * (s / 6), estadoSimulacion.poligonoZona)) frac += (1 / 6);
+    const mMult = dist2D * frac; let att = 0;
+    if (mMult > 0.2) {
+        const fAlt = zU <= (altCab + 0.15) ? (1.65 + (altCab + 0.15 - zU) * 0.5) : Math.max(0.28, 1.0 - (Math.max(0, Math.atan2(zU - altDisp, Math.max(dist2D, 0.5)) * 180 / Math.PI) / 68));
+        att = Math.min(mMult * (0.22 + Math.min(Math.log10(1 + dens) * 0.65, 1.35)) * fFreq * fAbs * fAlt, 38);
+    }
+    const rssiCampoAP = Math.max(-95, eirp - fspl - att - antLoss);
+    return { rssiCampoAP, rssiCliente: Math.max(-105, rssiCampoAP + prm.clientOffset), dist3D };
+}
+
+function calcularDataRadialFlyer(distRadial, potencia, altura, freq, bw, numPers, areaPoligonoM2, cci, tipoAnt, montajeSec, bWH, bWV, tech, postura, numCeldasActivas, perfilDisp) {
+    const celdas = Math.max(1, numCeldasActivas || 1), altCab = postura === 'sentada' ? 1.25 : (postura === 'mixta' ? 1.50 : 1.75), altDisp = postura === 'sentada' ? 0.90 : (postura === 'mixta' ? 1.08 : 1.25);
+    const fAbs = postura === 'sentada' ? 0.68 : (postura === 'mixta' ? 0.85 : 1.0), hDelta = altura - altDisp, hEf = Math.abs(hDelta), distR = Math.hypot(distRadial, hEf);
+    const angElev = Math.atan2(hDelta, Math.max(distRadial, 0.5)) * (180 / Math.PI), eirp = potencia + (tipoAnt === 'sec' ? 9.0 : 4.0);
+    const fsplR = (21.2 * Math.log10(Math.max(distR, 1.0))) + (20 * Math.log10(freq)) + 32.44, fsplH = (20.0 * Math.log10(Math.max(distRadial, 1.0))) + (20 * Math.log10(freq)) + 32.44;
     let antLoss = 0;
     if (tipoAnt === 'sec') {
-        const anguloDeg = Math.atan2(distH, hEf) * (180 / Math.PI);
-        antLoss = Math.min(12 * Math.pow(anguloDeg / beam, 2), 25);
+        antLoss = montajeSec === 'techo'
+            ? Math.min(3 * Math.pow((Math.atan2(distRadial, Math.max(hEf, 0.5)) * 180 / Math.PI) / (Math.sqrt(bWH * bWV) / 2), 2), 22)
+            : Math.min(3 * Math.pow(Math.abs((Math.atan2(hEf, Math.max(distRadial, 0.5)) * 180 / Math.PI) - 18) / (bWV / 2), 2), 18);
     }
-
-    // Atenuación por obstrucción humana
-    let att = 0;
-    if (distH >= ini) {
-        att = Math.min((Math.log10(numPers + 1) * 6) + ((distH - ini) * 0.7), 45);
-    }
-    
-    const rssiR = Math.max(-100, potencia - fsplR - att - antLoss);
-    const rssiH = Math.max(-100, potencia - fsplH - att - antLoss);
-
-    // Cálculo de Airtime basado en interferencia y ruido
-    const factorBajaSeñal = Math.abs(Math.min(0, rssiR + 65)) / 2;
-    const airtimeUse = Math.min(98, (cci * 10) + (numPers / 350) + factorBajaSeñal);
-
-    // Estimación de Throughput según modulación QAM
-    let factorMod = Math.pow(Math.max(0, Math.min(1, (rssiR + 92) / 45)), 1.7);
-    const tputFinal = (factorMod * 1000) * ((100 - airtimeUse) / 100) / (1 + (cci * 0.2));
-
-    return {
-        rssiH: rssiH,
-        rssiR: rssiR,
-        tput: Math.max(0.1, tputFinal),
-        airtimeUse: airtimeUse
-    };
+    const dens = numPers / Math.max(4, areaPoligonoM2), fFreq = freq === 6 ? 1.25 : (freq === 5 ? 1.0 : 0.82);
+    const dbBase = (0.16 + Math.min(Math.log10(1 + dens * 4) * 0.45, 1.25)) * fFreq * fAbs;
+    const attH = Math.min(38, (Math.log10(1 + dens * 8) * 3.0 * fFreq * fAbs) + (distRadial * dbBase * 0.75));
+    const fDesp = altura <= altCab + 0.15 ? 1.75 + ((altCab + 0.15 - altura) * 0.60) : Math.max(0.30, 1.05 - (Math.max(0, angElev) / 65));
+    const pMuro = altura <= altCab + 0.15 ? distRadial * Math.min(1.6, 0.25 + Math.log10(1 + dens) * 0.65) * fAbs : 0;
+    const attR = Math.min(54, ((Math.log10(1 + dens * 10) * 3.8 * fFreq * fAbs) + (distRadial * dbBase)) * fDesp + pMuro);
+    const rssiH = Math.max(-105, Math.max(-95, eirp - fsplH - attH) + perfilDisp.offset), rssiR = Math.max(-105, Math.max(-95, eirp - fsplR - attR - antLoss) + perfilDisp.offset);
+    const snr = Math.max(0, rssiR - ((-95 + (10 * Math.log10(bw / 20))) + (cci > 0 ? Math.log10(1 + cci) * 6.5 : 0)));
+    let cap = (freq === 2.4 ? 110 : 155) * perfilDisp.factorMimo * Math.pow(bw / 20, 0.94) * Math.pow(snr / (snr + 18), 1.65) * (1 / (1 + Math.pow(distR / 44, 1.35))) * (1 / (1 + cci * 0.35)), mloSav = 1.0;
+    if (tech === 'mlo' && rssiR > -82) { const ef = Math.max(0, Math.min(1, (rssiR + 82) / 22)) * (freq === 2.4 ? 0.20 : (freq === 5 ? 0.85 : 1.15)); cap *= (1 + 0.60 * ef); mloSav = 1 - 0.30 * ef; }
+    const carga = ((numPers / celdas) * 0.22) * (1 + Math.min(0.6, Math.log10(1 + dens) * 0.20)) * mloSav, ov = 3.0 + Math.min(18, cci * 4.0) + (distRadial * 0.14);
+    const airtimeUse = Math.min(99.4, ov + ((carga + cci * 6) / (carga + cci * 6 + cap * 0.85)) * (96.4 - ov));
+    return { rssiH, rssiR, snr, tput: Math.max(0.5, cap * Math.max(0.02, (100 - airtimeUse) / 100)), airtimeUse };
 }
 
-/**
- * FUNCIÓN PRINCIPAL DE ACTUALIZACIÓN DE DATOS Y RENDERIZADO
- */
+function evaluarPosicionActualFlyer(prm, perfilDisp) {
+    if (!estadoSimulacion.simulacionIniciada || !estadoSimulacion.apsOptimos.length) return null;
+    const c = calcularCentroidePoligono(estadoSimulacion.poligonoZona);
+    const lista = prm.capaVisual === 'solo_ap_principal'
+        ? [{ id: 'AP Central', x: c.x, y: c.y, customZ: null, customTx: null, customAzimut: null, radios: { r24: true, r5: true, r6: true }, canal: estadoSimulacion.canalesDisponiblesPool[0] || 36, colorCanal: PALETA_CANALES[0] }]
+        : estadoSimulacion.apsOptimos.filter(ap => isAPActiveInBand(ap, prm.f, prm.tech));
+    if (!lista.length) return null;
+    let mejorEval = null, mejorAP = lista[0];
+    lista.forEach(ap => {
+        const res = calcularSenalEnFlyerXY(prm.flyerX, prm.flyerY, ap.x, ap.y, prm, prm.tAnt === 'sec', getAPAzimut(ap, prm.azimutDeg) * (Math.PI / 180), getAPTx(ap, prm.p), getAPZ(ap, prm.a));
+        if (!mejorEval || res.rssiCliente > mejorEval.rssiCliente) { mejorEval = res; mejorAP = ap; }
+    });
+    const m = calcularDataRadialFlyer(Math.hypot(prm.flyerX - mejorAP.x, prm.flyerY - mejorAP.y), getAPTx(mejorAP, prm.p), getAPZ(mejorAP, prm.a), prm.f, prm.bw, prm.numPers, estadoSimulacion.areaPoligonoRealM2, prm.cci, prm.tAnt, prm.montajeSec, prm.bWH, prm.bWV, prm.tech, prm.postura, prm.numCeldasActivas, perfilDisp);
+    return { apConectado: mejorAP, rssiCampoAP: mejorEval.rssiCampoAP, rssiCliente: mejorEval.rssiCliente, dist3D: mejorEval.dist3D, sinr: m.snr, tput: m.tput, airtime: m.airtimeUse, mcsStr: m.snr >= 32 ? (prm.tech === 'mlo' ? 'MCS 12-13 (4K-QAM)' : 'MCS 10-11 (1024-QAM)') : (m.snr >= 24 ? 'MCS 7-9 (256-QAM)' : (m.snr >= 15 ? 'MCS 3-5 (16-QAM)' : 'MCS 0-2 (QPSK)')) };
+}
+
 function actualizarTodo() {
-    const p = parseFloat(document.getElementById('potencia').value);
-    const a = parseFloat(document.getElementById('altura').value);
-    const f = parseFloat(document.getElementById('frecuencia').value);
-    const ini = parseFloat(document.getElementById('inicioBloque').value);
-    const cci = parseFloat(document.getElementById('cci').value);
-    const tech = document.getElementById('tecnologia').value;
-    const tAnt = document.getElementById('tipoAntena').value;
-    const bW = parseFloat(document.getElementById('beamwidth').value);
-    
-    // Sincronizar Reporte PDF
-    document.getElementById('repTech').innerText = tech === 'mlo' ? "Wi-Fi 7 MLO" : "Estándar";
-    document.getElementById('repPotencia').innerText = p + " dBm";
-    document.getElementById('repFrecuencia').innerText = f + " GHz";
-    document.getElementById('repCCI').innerText = cci;
+    const pais = document.getElementById('paisRegulacion').value || 'MX', reg = REGULACIONES_PAIS[pais] || REGULACIONES_PAIS.MX;
+    const p = parseFloat(document.getElementById('potencia').value) || 18, a = parseFloat(document.getElementById('altura').value) || 12.0;
+    const flyerX = isNaN(parseFloat(document.getElementById('apPosX').value)) ? 60 : parseFloat(document.getElementById('apPosX').value);
+    const flyerY = isNaN(parseFloat(document.getElementById('apPosY').value)) ? 37.5 : parseFloat(document.getElementById('apPosY').value);
+    const f = parseFloat(document.getElementById('frecuencia').value) || 6, bw = parseInt(document.getElementById('anchoCanal').value) || 20;
+    const modoDFS = document.getElementById('modoDFS').value || 'con_dfs', metaDbm = parseFloat(document.getElementById('metaOptimizacion').value) || -67;
+    const tech = document.getElementById('tecnologia').value || 'mlo', tAnt = document.getElementById('tipoAntena').value || 'sec', montajeSec = document.getElementById('montajeSectorial').value || 'techo';
+    const bWH = parseFloat(document.getElementById('beamwidthH').value) || 60, bWV = parseFloat(document.getElementById('beamwidthV').value) || 30, azimutDeg = parseFloat(document.getElementById('azimut').value) || 0;
+    const presetModo = document.getElementById('presetPersonas').value, numPersActivo = obtenerNumeroPersonasActivo(), postura = document.getElementById('posturaGente').value || 'mixta', capaVisual = document.getElementById('capaVisual').value || 'heatmap_aps', perfilDisp = obtenerPerfilDispositivo();
 
-    // Dataset detallado para Punto Crítico (1m a 60m)
-    const distsExtensas = Array.from({length: 60}, (_, i) => i + 1);
-    const distsGrafica = [1, 5, 10, 15, 20, 25, 30, 40, 50, 60];
-    
-    let puntoCriticoCalculado = "60+"; // Inicialización segura
+    validarYMostrarAlertaPSD(pais, f, bw, p, tAnt);
+    const elG = calcularElipse3dB(a, postura, bWH, bWV); estadoSimulacion.radioHaz3dBH = elG.rH; estadoSimulacion.radioHaz3dBV = elG.rV;
+    const poolBase = obtenerPoolCanales(f, bw, modoDFS, pais); estadoSimulacion.canalesDisponiblesPool = poolBase;
+    const areaParaCurvas = estadoSimulacion.simulacionIniciada ? Math.round(estadoSimulacion.areaPoligonoRealM2) : Math.round(estadoSimulacion.planoAnchoM * estadoSimulacion.planoAltoM);
 
-    // Escaneo de metros para hallar el límite real corregido
-    for (let d = 1; d <= 60; d++) {
-        let p1000 = calcularData(d, p, a, f, 1000, ini, cci, tAnt, bW);
-        if (tech === 'mlo') {
-            p1000.airtimeUse *= 0.55;
-            p1000.tput *= 1.65;
-        }
-        // Condición de ruptura de QoE Aceptable
-        if (p1000.rssiR < -75 || p1000.airtimeUse > 90) {
-            puntoCriticoCalculado = d;
-            break; // Detener escaneo al primer incumplimiento
-        }
+    let radioMeta = 45;
+    for (let d = 1; d <= 60; d++) if (calcularDataRadialFlyer(d, p, a, f, bw, numPersActivo, areaParaCurvas, 0, tAnt, montajeSec, bWH, bWV, tech, postura, 1, perfilDisp).rssiR < metaDbm) { radioMeta = Math.max(5, d - 1); break; }
+    estadoSimulacion.radioCeldaMeta = radioMeta;
+
+    let totalAPs = 0, activosEnBanda = 0, cci = 0, numCanalesDisp = poolBase.length, clientesPorAP = 0;
+    if (estadoSimulacion.simulacionIniciada) {
+        if (!estadoSimulacion.poligonoPersonalizadoActivo) sincronizarPoligonoDesdeInputsRect();
+        const bbox = obtenerBoundingBoxPoligono(estadoSimulacion.poligonoZona);
+        estadoSimulacion.planoAnchoM = Math.max(estadoSimulacion.planoAnchoM, bbox.maxX); estadoSimulacion.planoAltoM = Math.max(estadoSimulacion.planoAltoM, bbox.maxY);
+        if (estadoSimulacion.modoManualAPs) { totalAPs = estadoSimulacion.apsOptimos.length; estadoSimulacion.totalAPsCalculados = totalAPs; }
+        else { const sem = calcularSembradoIngenieria(numPersActivo, bw, tech, radioMeta); totalAPs = sem.totalAPs; estadoSimulacion.apsOptimos = sem.apsVisuales; }
+        const rCCI = calcularCCIFisicoAutomatico(estadoSimulacion.apsOptimos, totalAPs, p, a, f, bw, tAnt, montajeSec, bWH, bWV, areaParaCurvas, numPersActivo, postura, modoDFS, pais, capaVisual, tech);
+        cci = rCCI.cciPromedio; numCanalesDisp = rCCI.numCanales; activosEnBanda = rCCI.activosEnBanda;
+        clientesPorAP = activosEnBanda > 0 ? Math.ceil(numPersActivo / activosEnBanda) : 0;
+    } else { estadoSimulacion.apsOptimos = []; estadoSimulacion.totalAPsCalculados = 0; }
+
+    estadoSimulacion.cciCalculadoAuto = cci;
+    const cciEl = document.getElementById('cciAutoDisplay'); cciEl.innerText = `CCI Auto: ${cci} APs (${numCanalesDisp} Ch)`; cciEl.style.color = cci === 0 ? '#10b981' : (cci <= 2 ? '#fbbf24' : '#ef4444');
+    estadoSimulacion.params = { pais, p, a, flyerX, flyerY, f, bw, cci, tech, tAnt, montajeSec, bWH, bWV, azimutDeg, postura, capaVisual, metaDbm, numCeldasActivas: capaVisual === 'solo_ap_principal' ? 1 : Math.max(1, activosEnBanda), numPers: numPersActivo, clientOffset: perfilDisp.offset, perfilNombre: perfilDisp.nombre, perfilEtiqueta: perfilDisp.etiquetaCorta };
+    estadoSimulacion.heatmapDirty = true;
+
+    const evalFlyer = evaluarPosicionActualFlyer(estadoSimulacion.params, perfilDisp); estadoSimulacion.evalFlyerActual = evalFlyer;
+    const bR = document.getElementById('bulbRed'), bY = document.getElementById('bulbYellow'), bG = document.getElementById('bulbGreen');
+    bR.className = 'light-bulb red'; bY.className = 'light-bulb yellow'; bG.className = 'light-bulb green';
+    const vEl = document.getElementById('globalVerdict'), rEl = document.getElementById('globalReason'), nFmt = numPersActivo.toLocaleString('es-MX');
+
+    if (!estadoSimulacion.simulacionIniciada || !evalFlyer) {
+        if (estadoSimulacion.simulacionIniciada && activosEnBanda === 0) { bR.classList.add('on'); vEl.innerText = `SIN RADIOS ACTIVOS EN ${f} GHz`; vEl.style.color = '#ef4444'; rEl.innerText = (f === 6 && tech !== 'mlo') ? 'Wi-Fi 6/5 solo soporta 2 radios (2.4 y 5 GHz).' : `Enciende al menos un radio de ${f} GHz con "⚙ Editar AP".`; }
+        else { bG.classList.add('on'); vEl.innerText = `PLANO LIMPIO [${reg.nombre}] — CALIBRA METROS Y TRAZA TU POLÍGONO`; vEl.style.color = '#38bdf8'; rEl.innerText = `Espectro en ${reg.nombre}: ${numCanalesDisp} Ch en ${f} GHz (${bw} MHz).`; }
+        document.getElementById('flyerStatusLine').innerText = `Flyer Wifi en (${flyerX.toFixed(1)}m, ${flyerY.toFixed(1)}m) — Sin señal activa en ${f} GHz`;
+        document.getElementById('kpiNumAPs').innerText = `${totalAPs} AP(s) (${activosEnBanda} activos en ${f} GHz)`;
+        document.getElementById('kpiGridInfo').innerText = 'Traza el polígono o activa radios en esta banda';
+        document.getElementById('kpiFlyerSignal').innerText = 'Sin señal activa'; document.getElementById('kpiFlyerAPRef').innerText = `No hay radios activos en ${f} GHz`;
+        document.getElementById('kpiClientesPorAP').innerText = `CCI: 0 APs${tAnt === 'sec' ? ` | -3dB: ${elG.rH}×${elG.rV}m` : ''}`;
+        document.getElementById('kpiDensidadM2').innerText = `${reg.nombre}: ${numCanalesDisp} Ch (${f} GHz @ ${bw} MHz)`;
+        document.getElementById('kpiSondaRSSI').innerText = 'Sin asociación activa'; document.getElementById('kpiSondaDetalle').innerText = `Flyer: X=${flyerX.toFixed(1)}m, Y=${flyerY.toFixed(1)}m`;
+    } else {
+        if (evalFlyer.rssiCliente >= metaDbm && evalFlyer.sinr >= 22 && evalFlyer.airtime < 75 && cci <= 1) { bG.classList.add('on'); vEl.innerText = `ESTADO GLOBAL [${reg.nombre} | META ${metaDbm} dBm]: ÓPTIMO (VERDE)`; vEl.style.color = "#10b981"; rEl.innerText = `Flyer Wifi recibe ${evalFlyer.rssiCliente.toFixed(1)} dBm, CCI = ${cci} (${numCanalesDisp} Ch) y Airtime (${evalFlyer.airtime.toFixed(0)}%).`; }
+        else if (evalFlyer.rssiCliente >= -72 && evalFlyer.sinr >= 15 && evalFlyer.airtime < 88) { bY.classList.add('on'); vEl.innerText = `ESTADO GLOBAL [${reg.nombre} | META ${metaDbm} dBm]: ZONA ROAMING (AMARILLO)`; vEl.style.color = "#f59e0b"; rEl.innerText = `Flyer Wifi recibe ${evalFlyer.rssiCliente.toFixed(1)} dBm con CCI = ${cci} (${evalFlyer.airtime.toFixed(0)}% Airtime).`; }
+        else { bR.classList.add('on'); vEl.innerText = `ESTADO GLOBAL [${reg.nombre} | META ${metaDbm} dBm]: CRÍTICO (ROJO)`; vEl.style.color = "#ef4444"; rEl.innerText = `En (${flyerX}m, ${flyerY}m) la señal cae a ${evalFlyer.rssiCliente.toFixed(1)} dBm o CCI = ${cci}.`; }
+        document.getElementById('flyerStatusLine').innerText = `RSSI ${perfilDisp.nombre}: ${evalFlyer.rssiCliente.toFixed(1)} dBm (AP: ${evalFlyer.rssiCampoAP.toFixed(1)} dBm) | SINR: ${evalFlyer.sinr.toFixed(1)} dB | CCI: ${cci} | Tput: ${evalFlyer.tput.toFixed(1)} Mbps`;
+        document.getElementById('kpiNumAPs').innerText = `${activosEnBanda}/${totalAPs} Radios Activos (${f} GHz)`;
+        document.getElementById('kpiGridInfo').innerText = `${estadoSimulacion.poligonoZona.length} vértices (${areaParaCurvas.toLocaleString('es-MX')} m²) | ~${clientesPorAP} Disp/Radio`;
+        document.getElementById('kpiFlyerSignal').innerText = `${evalFlyer.rssiCliente.toFixed(1)} dBm (${perfilDisp.offset} dB Offset)`;
+        document.getElementById('kpiFlyerAPRef').innerText = `AP: ${evalFlyer.rssiCampoAP.toFixed(1)} dBm | Radio ${metaDbm}: ${radioMeta}m`;
+        document.getElementById('kpiClientesPorAP').innerText = `CCI: ${cci} APs${tAnt === 'sec' ? ` | -3dB: ${elG.rH}×${elG.rV}m` : ''}`;
+        document.getElementById('kpiDensidadM2').innerText = `${reg.nombre}: ${numCanalesDisp} Ch (${f} GHz @ ${bw} MHz)`;
+        document.getElementById('kpiSondaRSSI').innerText = `${evalFlyer.apConectado.id} [C${evalFlyer.apConectado.canal || 36}] (${evalFlyer.dist3D.toFixed(1)}m)`;
+        document.getElementById('kpiSondaDetalle').innerText = `Flyer: X=${flyerX.toFixed(1)}m, Y=${flyerY.toFixed(1)}m | ${evalFlyer.mcsStr}`;
     }
 
-    // Dataset para gráficas
-    const res = distsGrafica.map(function(d) {
-        let base = {
-            p10: calcularData(d, p, a, f, 10, ini, cci, tAnt, bW),
-            p100: calcularData(d, p, a, f, 100, ini, cci, tAnt, bW),
-            p1000: calcularData(d, p, a, f, 1000, ini, cci, tAnt, bW)
-        };
-        if (tech === 'mlo') {
-            ['p10', 'p100', 'p1000'].forEach(function(k) {
-                base[k].airtimeUse = base[k].airtimeUse * 0.55;
-                base[k].tput = base[k].tput * 1.65;
-            });
-        }
-        return { dist: d, p10: base.p10, p100: base.p100, p1000: base.p1000 };
+    document.getElementById('flyerBadgeHeader').innerText = `Telemetría en Agente "Flyer Wifi" — Perfil: ${perfilDisp.etiquetaCorta} | Meta: ${metaDbm} dBm`;
+    document.getElementById('legendFlyerLabel').innerText = `Flyer Wifi [${perfilDisp.etiquetaCorta}]:`;
+    document.getElementById('repTech').innerText = `${tech === 'mlo' ? "Wi-Fi 7 MLO (3 Radios)" : "Wi-Fi 6/5 (2 Radios)"} | ${reg.nombre}`;
+    document.getElementById('repPotencia').innerText = `${p} dBm | Z=${a}m | Meta: ${metaDbm} dBm`;
+    document.getElementById('repFrecuencia').innerText = `${f} GHz (${bw} MHz | ${numCanalesDisp} Ch)`;
+    document.getElementById('repZona').innerText = estadoSimulacion.simulacionIniciada ? `Polígono (${estadoSimulacion.poligonoZona.length} vért. | ${areaParaCurvas.toLocaleString('es-MX')} m²)` : `Plano Base`;
+    document.getElementById('repCohorte').innerText = `${nFmt} Disp. (${postura.toUpperCase()})`;
+    document.getElementById('repCCI').innerText = evalFlyer ? `CCI Auto: ${cci} | ${perfilDisp.etiquetaCorta}: ${evalFlyer.rssiCliente.toFixed(1)} dBm` : 'Sin calcular';
+
+    actualizarTablaEjecutivaAPs(estadoSimulacion.apsOptimos, totalAPs, activosEnBanda, estadoSimulacion.params, radioMeta, clientesPorAP, numCanalesDisp);
+
+    const esComp = (presetModo === 'all'), dists = [1, 5, 10, 15, 20, 25, 30, 40, 50, 60];
+    const cohs = esComp ? [
+        { key: 'c1', num: 100, label: '100 Disp.', color: '#2ecc71', bg: 'transparent' },
+        { key: 'c2', num: 1000, label: '1,000 Disp.', color: '#17a2b8', bg: 'transparent' },
+        { key: 'c3', num: 5000, label: '5,000 Disp.', color: '#0062cc', bg: 'transparent' },
+        { key: 'c4', num: 10000, label: '10,000 Disp.', color: '#fd7e14', bg: 'transparent' },
+        { key: 'c5', num: 20000, label: '20,000 Disp.', color: '#e83e8c', bg: 'transparent' },
+        { key: 'activa', num: numPersActivo, label: `${nFmt} Disp.`, color: '#dc3545', bg: 'rgba(220,53,69,0.12)' }
+    ] : [{ key: 'activa', num: numPersActivo, label: `Flyer Wifi [${perfilDisp.etiquetaCorta}] (${nFmt} Disp.)`, color: '#0062cc', bg: 'rgba(0,98,204,0.12)' }];
+
+    const res = dists.map(d => {
+        let pt = { dist: d };
+        cohs.forEach(c => {
+            const cMax = (tech === 'mlo' ? 200 : 140) * (bw >= 40 ? 1.15 : 1.0);
+            const celdasC = (c.key === 'activa' && estadoSimulacion.modoManualAPs && activosEnBanda > 0) ? activosEnBanda : Math.max(1, Math.ceil(c.num / cMax));
+            pt[c.key] = calcularDataRadialFlyer(d, p, a, f, bw, c.num, areaParaCurvas, cci, tAnt, montajeSec, bWH, bWV, tech, postura, capaVisual === 'solo_ap_principal' ? 1 : celdasC, perfilDisp);
+        });
+        return pt;
     });
-
-    // Referencia fija para estatus (30m)
-    const refData = res.find(function(r) { return r.dist === 30; }).p1000;
-    
-    // Actualizar Interfaz de Usuario
-    document.getElementById('distanciaCritica').innerText = puntoCriticoCalculado + (typeof puntoCriticoCalculado === 'number' ? " m" : "");
-    document.getElementById('statusText').innerText = "RSSI: " + refData.rssiR.toFixed(1) + " dBm";
-    document.getElementById('throughputText').innerText = "Throughput: " + refData.tput.toFixed(0) + " Mbps";
-    document.getElementById('airtimeText').innerText = "Air Time: " + refData.airtimeUse.toFixed(0) + "%";
-    
-    // Lógica QoE
-    let qoe = "CRÍTICO";
-    let qoeColor = "#e74c3c";
-    if (refData.rssiR > -72 && refData.airtimeUse < 75) {
-        qoe = "EXCELENTE";
-        qoeColor = "#2ecc71";
-    } else if (refData.rssiR >= -82 && refData.airtimeUse < 92) {
-        qoe = "ACEPTABLE";
-        qoeColor = "#f1c40f";
-    }
-    
-    document.getElementById('qoeText').innerText = "QoE: " + qoe;
-    document.getElementById('qoeText').style.color = qoeColor;
-
-    actualizarBarras(refData.rssiR);
-
-    // Renderizado de las 5 gráficas
-    renderLineChart('chartH', distsGrafica, res, 'rssiH', 'dBm', -100, -20);
-    renderLineChart('chartR', distsGrafica, res, 'rssiR', 'dBm', -100, -20);
-    renderThroughputChart('chartT', distsGrafica, res);
-    renderAirtimeChart('chartA', distsGrafica, res);
-    renderCapacidadChart('chartS', distsGrafica, res.map(function(r) { return r.p1000.tput; }));
+    renderLineChart('chartH', dists, res, 'rssiH', `dBm (${perfilDisp.nombre})`, -105, -15, cohs, metaDbm, `Meta (${metaDbm} dBm)`);
+    renderLineChart('chartR', dists, res, 'rssiR', `dBm (${perfilDisp.nombre})`, -105, -15, cohs, metaDbm, `Meta (${metaDbm} dBm)`);
+    renderThroughputChart('chartT', dists, res, cohs);
+    renderAirtimeChart('chartA', dists, res, cohs);
+    renderCapacidadChart('chartS', dists, res.map(r => r['activa'].tput));
 }
 
-/**
- * FUNCIÓN RENDERIZADO: RSSI (LÍNEAS)
- */
-function renderLineChart(id, labels, res, key, yTitle, min, max) {
-    const ctx = document.getElementById(id).getContext('2d');
-    if (chartInstances[id]) { chartInstances[id].destroy(); }
-    
-    chartInstances[id] = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels.map(function(l) { return l + 'm'; }),
-            datasets: [
-                { label: '10 P', data: res.map(function(r) { return r.p10[key]; }), borderColor: '#28a745', fill: false, borderWidth: 3 },
-                { label: '100 P', data: res.map(function(r) { return r.p100[key]; }), borderColor: '#fd7e14', fill: false, borderWidth: 3 },
-                { label: '1000 P', data: res.map(function(r) { return r.p1000[key]; }), borderColor: '#dc3545', fill: true, backgroundColor: 'rgba(220, 53, 69, 0.05)', borderWidth: 3 }
-            ]
-        },
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: min, max: max, title: { display: true, text: yTitle } } } }
-    });
+function encontrarAPCercanoEnPx(px, py, g) {
+    const toPxX = (mX) => g.padL + ((mX - g.minX) / (g.maxMetrosX - g.minX)) * g.plotW, toPxY = (mY) => g.padT + (mY / g.maxMetrosY) * g.plotH;
+    let mejorIdx = -1, mejorDist = 14 / Math.sqrt(estadoSimulacion.zoom);
+    estadoSimulacion.apsOptimos.forEach((ap, idx) => { const d = Math.hypot(px - toPxX(ap.x), py - toPxY(ap.y)); if (d <= mejorDist) { mejorDist = d; mejorIdx = idx; } });
+    return mejorIdx;
 }
 
-/**
- * FUNCIÓN RENDERIZADO: THROUGHPUT ESTIMADO (DINÁMICO)
- */
-function renderThroughputChart(id, labels, res) {
-    const ctx = document.getElementById(id).getContext('2d');
-    if (chartInstances[id]) { chartInstances[id].destroy(); }
-    
-    const allTput = res.flatMap(r => [r.p10.tput, r.p100.tput, r.p1000.tput]);
-    const maxTput = Math.max(...allTput);
-    const yMax = maxTput > 1000 ? Math.ceil(maxTput / 500) * 500 : Math.ceil(maxTput / 100) * 100;
-
-    chartInstances[id] = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels.map(l => l + 'm'),
-            datasets: [
-                { label: '10 P', data: res.map(r => r.p10.tput), borderColor: '#28a745', borderWidth: 4, tension: 0.3, fill: false },
-                { label: '100 P', data: res.map(r => r.p100.tput), borderColor: '#fd7e14', borderWidth: 4, tension: 0.3, fill: false },
-                { label: '1000 P', data: res.map(r => r.p1000.tput), borderColor: '#dc3545', borderWidth: 4, tension: 0.3, fill: true, backgroundColor: 'rgba(220, 53, 69, 0.1)' }
-            ]
-        },
-        options: { 
-            responsive: true, 
-            maintainAspectRatio: false, 
-            scales: { 
-                y: { 
-                    beginAtZero: true, 
-                    max: yMax + (yMax * 0.1),
-                    title: { display: true, text: 'Mbps' } 
-                } 
-            } 
-        }
-    });
-}
-
-/**
- * FUNCIÓN RENDERIZADO: AIRTIME
- */
-function renderAirtimeChart(id, labels, res) {
-    const ctx = document.getElementById(id).getContext('2d');
-    if (chartInstances[id]) { chartInstances[id].destroy(); }
-    chartInstances[id] = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels.map(function(l) { return l + 'm'; }),
-            datasets: [
-                { label: '10 P', data: res.map(function(r) { return r.p10.airtimeUse; }), borderColor: '#28a745', fill: false },
-                { label: '100 P', data: res.map(function(r) { return r.p100.airtimeUse; }), borderColor: '#fd7e14', fill: false },
-                { label: '1000 P', data: res.map(function(r) { return r.p1000.airtimeUse; }), borderColor: '#9b59b6', fill: true, backgroundColor: 'rgba(155, 89, 182, 0.05)' }
-            ]
-        },
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100, title: { display: true, text: '%' } } } }
-    });
-}
-
-/**
- * FUNCIÓN RENDERIZADO: CAPACIDAD POR SERVICIO
- */
-function renderCapacidadChart(id, labels, tputArray) {
-    const ctx = document.getElementById(id).getContext('2d');
-    if (chartInstances[id]) { chartInstances[id].destroy(); }
-    const capRealista = function(tput, req) {
-        let teorico = tput / req;
-        if (req < 1) return Math.min(teorico * 0.4, 512);
-        return Math.floor(teorico * 0.85);
+function inicializarEventosMouse() {
+    const canvas = document.getElementById('masterCanvas');
+    const getPos = (evt) => {
+        const rect = canvas.getBoundingClientRect(), rawX = (evt.clientX - rect.left) * (canvas.width / rect.width), rawY = (evt.clientY - rect.top) * (canvas.height / rect.height);
+        return { rawX, rawY, x: (rawX - estadoSimulacion.panX) / estadoSimulacion.zoom, y: (rawY - estadoSimulacion.panY) / estadoSimulacion.zoom };
     };
-    chartInstances[id] = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels.map(function(l) { return l + 'm'; }),
-            datasets: [
-                { label: 'WhatsApp', data: tputArray.map(function(t) { return capRealista(t, 0.1); }), backgroundColor: '#28a745' },
-                { label: 'HD Video', data: tputArray.map(function(t) { return capRealista(t, 5); }), backgroundColor: '#ffc107' },
-                { label: '4K Stream', data: tputArray.map(function(t) { return capRealista(t, 25); }), backgroundColor: '#dc3545' }
-            ]
-        },
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, title: { display: true, text: 'Disp.' }, max: 600 } } }
+    canvas.addEventListener('wheel', (e) => { e.preventDefault(); const pos = getPos(e); aplicarZoomEnPunto(e.deltaY < 0 ? 1.18 : 0.85, pos.rawX, pos.rawY); }, { passive: false });
+    canvas.addEventListener('mousedown', (e) => {
+        const pos = getPos(e), g = estadoSimulacion.geometriaMapa; if (!g) return;
+        const mX = Math.max(0, g.minX + ((pos.x - g.padL) / g.plotW) * (g.maxMetrosX - g.minX)), mY = Math.max(0, ((pos.y - g.padT) / g.plotH) * g.maxMetrosY);
+
+        if (estadoSimulacion.modoCursor === 'draw_polygon') {
+            if (e.button === 2) return;
+            const draft = estadoSimulacion.polyDraft;
+            if (draft.length >= 3 && Math.hypot(pos.x - draft[0].px, pos.y - draft[0].py) <= 14 / Math.sqrt(estadoSimulacion.zoom)) { intentarCerrarPoligonoIrregular(); return; }
+            if (nuevoSegmentoCruzaPoligono(draft.map(d => ({ x: d.mX, y: d.mY })), { x: mX, y: mY }, false)) { document.getElementById('calibInstruction').innerText = '⚠️ CRUCE BLOQUEADO: Elige otro punto sin cruzar líneas.'; return; }
+            draft.push({ px: pos.x, py: pos.y, mX, mY });
+            document.getElementById('calibInstruction').innerText = draft.length < 3 ? `Vértice ${draft.length} fijado.` : `Vértice ${draft.length} fijado. Haz clic en V1 (verde) o "Cerrar Polígono".`;
+            return;
+        }
+        if (estadoSimulacion.modoCursor === 'calibrate') {
+            if (!estadoSimulacion.calibPt1) { estadoSimulacion.calibPt1 = { px: pos.x, py: pos.y, mX, mY }; document.getElementById('calibInstruction').innerText = 'PASO 2 DE 2: Haz clic en el Punto Final (B)...'; }
+            else {
+                const distM = Math.hypot(mX - estadoSimulacion.calibPt1.mX, mY - estadoSimulacion.calibPt1.mY);
+                if (distM > 0.05) {
+                    setTimeout(() => {
+                        const mr = parseFloat(prompt('Ingresa cuántos METROS REALES mide este segmento:', distM.toFixed(1)));
+                        if (!isNaN(mr) && mr > 0.2) {
+                            const f = mr / distM;
+                            estadoSimulacion.planoAnchoM = Math.max(2, Number((estadoSimulacion.planoAnchoM * f).toFixed(1))); estadoSimulacion.planoAltoM = Math.max(2, Number((estadoSimulacion.planoAltoM * f).toFixed(1)));
+                            document.getElementById('inicioBloque').value = 0; document.getElementById('inicioBloqueY').value = 0; document.getElementById('largoEspacio').value = estadoSimulacion.planoAnchoM; document.getElementById('anchoEspacio').value = estadoSimulacion.planoAltoM;
+                            if (estadoSimulacion.poligonoZona.length >= 3) { estadoSimulacion.poligonoZona = estadoSimulacion.poligonoZona.map(pt => ({ x: Number((pt.x * f).toFixed(2)), y: Number((pt.y * f).toFixed(2)) })); estadoSimulacion.areaPoligonoRealM2 = calcularAreaPoligonoM2(estadoSimulacion.poligonoZona); }
+                            if (estadoSimulacion.modoManualAPs) estadoSimulacion.apsOptimos.forEach(ap => { ap.x = Number((ap.x * f).toFixed(1)); ap.y = Number((ap.y * f).toFixed(1)); });
+                            centrarFlyerEnZona(); if (estadoSimulacion.simulacionIniciada) regenerarAudiencia(); actualizarTodo();
+                        }
+                        cancelarModosEspeciales();
+                    }, 60);
+                } else cancelarModosEspeciales();
+            }
+            return;
+        }
+        if (estadoSimulacion.modoCursor === 'edit_ap' && e.button === 0) {
+            const idx = encontrarAPCercanoEnPx(pos.x, pos.y, g);
+            if (idx >= 0) abrirInspectorAP(idx); else document.getElementById('calibInstruction').innerText = 'Haz clic sobre el círculo numerado del AP que deseas inspeccionar.';
+            return;
+        }
+        if (estadoSimulacion.modoCursor === 'add_ap' && e.button === 0) {
+            if (!estadoSimulacion.simulacionIniciada || estadoSimulacion.poligonoZona.length < 3) { document.getElementById('calibInstruction').innerText = '⚠️ Primero delimita un polígono válido antes de añadir APs.'; return; }
+            if (!puntoDentroDePoligono(mX, mY, estadoSimulacion.poligonoZona)) { document.getElementById('calibInstruction').innerText = '⛔ FUERA DEL ÁREA VÁLIDA: Haz clic dentro del polígono azul.'; return; }
+            estadoSimulacion.modoManualAPs = true;
+            estadoSimulacion.apsOptimos.push({ num: 0, id: '', x: Number(mX.toFixed(1)), y: Number(mY.toFixed(1)), customZ: null, customTx: null, customAzimut: null, radios: { r24: true, r5: true, r6: true }, canal: 36, colorCanal: '#f59e0b' });
+            renumerarAPs(); document.getElementById('calibInstruction').innerText = `✅ AP-${estadoSimulacion.apsOptimos.length} añadido en (${mX.toFixed(1)}m, ${mY.toFixed(1)}m).`; actualizarTodo();
+            return;
+        }
+        if (estadoSimulacion.modoCursor === 'del_ap' && e.button === 0) {
+            const idx = encontrarAPCercanoEnPx(pos.x, pos.y, g);
+            if (idx >= 0) { const bor = estadoSimulacion.apsOptimos[idx].id; estadoSimulacion.modoManualAPs = true; estadoSimulacion.apsOptimos.splice(idx, 1); cerrarInspectorAP(); renumerarAPs(); document.getElementById('calibInstruction').innerText = `🗑️ ${bor} eliminado.`; actualizarTodo(); }
+            return;
+        }
+        if (estadoSimulacion.modoCursor === 'move_ap' && e.button === 0) {
+            const idx = encontrarAPCercanoEnPx(pos.x, pos.y, g);
+            if (idx >= 0) { estadoSimulacion.apArrastradoIdx = idx; estadoSimulacion.modoManualAPs = true; document.getElementById('btnResetAutoAPs').style.display = 'inline-block'; document.getElementById('calibInstruction').innerText = `Moviendo ${estadoSimulacion.apsOptimos[idx].id}...`; }
+            return;
+        }
+        if (estadoSimulacion.modoCursor === 'pan' || e.shiftKey || e.button === 1 || e.button === 2) {
+            estadoSimulacion.arrastrandoPan = true; estadoSimulacion.panStartMouse = { x: pos.rawX - estadoSimulacion.panX, y: pos.rawY - estadoSimulacion.panY }; return;
+        }
+        estadoSimulacion.arrastrandoFlyer = true; moverFlyerDesdeMapa(pos);
+    });
+    canvas.addEventListener('contextmenu', e => e.preventDefault());
+    window.addEventListener('mousemove', (e) => {
+        const pos = getPos(e), g = estadoSimulacion.geometriaMapa;
+        if (estadoSimulacion.modoCursor === 'draw_polygon' && g) {
+            const mX = Math.max(0, g.minX + ((pos.x - g.padL) / g.plotW) * (g.maxMetrosX - g.minX)), mY = Math.max(0, ((pos.y - g.padT) / g.plotH) * g.maxMetrosY);
+            estadoSimulacion.polyHover = { px: pos.x, py: pos.y, mX, mY };
+            estadoSimulacion.polyHoverCruza = nuevoSegmentoCruzaPoligono(estadoSimulacion.polyDraft.map(d => ({ x: d.mX, y: d.mY })), { x: mX, y: mY }, false);
+            return;
+        }
+        if (estadoSimulacion.apArrastradoIdx >= 0 && g) {
+            const mX = Math.max(0, g.minX + ((pos.x - g.padL) / g.plotW) * (g.maxMetrosX - g.minX)), mY = Math.max(0, ((pos.y - g.padT) / g.plotH) * g.maxMetrosY);
+            if (puntoDentroDePoligono(mX, mY, estadoSimulacion.poligonoZona)) { const ap = estadoSimulacion.apsOptimos[estadoSimulacion.apArrastradoIdx]; ap.x = Number(mX.toFixed(1)); ap.y = Number(mY.toFixed(1)); estadoSimulacion.heatmapDirty = true; }
+            return;
+        }
+        if (estadoSimulacion.arrastrandoPan) { estadoSimulacion.panX = pos.rawX - estadoSimulacion.panStartMouse.x; estadoSimulacion.panY = pos.rawY - estadoSimulacion.panStartMouse.y; }
+        else if (estadoSimulacion.arrastrandoFlyer) moverFlyerDesdeMapa(pos);
+    });
+    window.addEventListener('mouseup', () => {
+        if (estadoSimulacion.apArrastradoIdx >= 0) {
+            const ap = estadoSimulacion.apsOptimos[estadoSimulacion.apArrastradoIdx];
+            document.getElementById('calibInstruction').innerText = `✅ ${ap.id} reubicado en (${ap.x}m, ${ap.y}m).`;
+            if (estadoSimulacion.apSeleccionadoIdx === estadoSimulacion.apArrastradoIdx) document.getElementById('inspAPCoords').innerText = `(X: ${ap.x}m, Y: ${ap.y}m)`;
+            estadoSimulacion.apArrastradoIdx = -1; actualizarTodo();
+        }
+        estadoSimulacion.arrastrandoFlyer = false; estadoSimulacion.arrastrandoPan = false;
     });
 }
 
-/**
- * ACTUALIZACIÓN DE BARRAS DE SEÑAL
- */
-function actualizarBarras(rssi) {
-    const bars = document.querySelectorAll('#signalBars .bar');
-    let active = 0; let color = 'red';
-    if (rssi > -62) { active = 5; color = 'green'; }
-    else if (rssi > -72) { active = 4; color = 'green'; }
-    else if (rssi > -82) { active = 3; color = 'yellow'; }
-    else if (rssi > -92) { active = 2; color = 'red'; }
-    else if (rssi > -100) { active = 1; color = 'red'; }
-    bars.forEach(function(b, i) {
-        b.className = 'bar';
-        if (i < active) { b.classList.add('active'); b.classList.add(color); }
-    });
+function moverFlyerDesdeMapa(pos) {
+    const g = estadoSimulacion.geometriaMapa; if (!g) return;
+    document.getElementById('apPosX').value = Math.max(g.minX, Math.min(g.maxMetrosX, g.minX + ((pos.x - g.padL) / g.plotW) * (g.maxMetrosX - g.minX))).toFixed(1);
+    document.getElementById('apPosY').value = Math.max(0, Math.min(g.maxMetrosY, ((pos.y - g.padT) / g.plotH) * g.maxMetrosY)).toFixed(1);
+    activarCaminataFlyer(); actualizarTodo();
+}
+
+function dibujarPersonajeFlyerWifi(ctx, x, y, phase, isMoving, evalFlyer, prm) {
+    ctx.save(); ctx.translate(x, y);
+    const swing = isMoving ? Math.sin(phase) * 9 : Math.sin(Date.now() * 0.004) * 2, armSwing = isMoving ? Math.cos(phase) * 10 : Math.sin(Date.now() * 0.004) * 3;
+    ctx.translate(0, isMoving ? Math.abs(Math.sin(phase)) * -3 : 0);
+    let col = !evalFlyer ? '#38bdf8' : (evalFlyer.rssiCliente < -72 ? '#ef4444' : (evalFlyer.rssiCliente < prm.metaDbm ? '#f59e0b' : '#10b981'));
+    ctx.beginPath(); ctx.ellipse(0, 18, 16, 6, 0, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,229,255,0.22)'; ctx.fill(); ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.strokeStyle = '#00e5ff'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(-4, 4); ctx.lineTo(-7 + swing * 0.6, 16); ctx.lineTo(-11 + swing * 0.6, 17); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(4, 4); ctx.lineTo(7 - swing * 0.6, 16); ctx.lineTo(11 - swing * 0.6, 17); ctx.stroke();
+    const lx = -17 - armSwing * 0.4, ly = -2 + armSwing * 0.7, rx = 17 + armSwing * 0.4, ry = -2 - armSwing * 0.7;
+    ctx.beginPath(); ctx.moveTo(-8, -4); ctx.lineTo(-13, -3 + armSwing * 0.3); ctx.lineTo(lx, ly); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(8, -4); ctx.lineTo(13, -3 - armSwing * 0.3); ctx.lineTo(rx, ry); ctx.stroke();
+    ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(lx, ly, 3.2, 0, Math.PI * 2); ctx.arc(rx, ry, 3.2, 0, Math.PI * 2); ctx.fill();
+    if (prm.clientOffset === -3) { ctx.fillStyle = '#e2e8f0'; ctx.fillRect(rx + 1, ry - 8, 9, 6); ctx.fillStyle = '#94a3b8'; ctx.fillRect(rx - 1, ry - 2, 13, 3); }
+    else if (prm.clientOffset === -11) { ctx.fillStyle = '#a855f7'; ctx.fillRect(rx + 1, ry - 6, 7, 7); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(rx + 4.5, ry - 6); ctx.lineTo(rx + 4.5, ry - 12); ctx.stroke(); }
+    else { ctx.fillStyle = col; ctx.fillRect(rx + 1, ry - 6, 5, 8); }
+    ctx.beginPath(); ctx.arc(0, 0, 7.5, 0, Math.PI * 2); ctx.fillStyle = '#00e5ff'; ctx.fill(); ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(-2.5, -1, 1.3, 0, Math.PI * 2); ctx.arc(2.5, -1, 1.3, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = col; ctx.lineWidth = 2.8;
+    ctx.beginPath(); ctx.arc(0, -2, 12, -Math.PI * 0.78, -Math.PI * 0.22); ctx.stroke();
+    ctx.beginPath(); ctx.arc(0, -2, 17, -Math.PI * 0.75, -Math.PI * 0.25); ctx.stroke();
+    ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2.2; ctx.beginPath(); ctx.arc(0, -2, 22, -Math.PI * 0.72, -Math.PI * 0.28); ctx.stroke();
+    ctx.font = 'bold 10.5px Segoe UI';
+    if (!evalFlyer) {
+        const l0 = `Flyer Wifi (${prm.flyerX.toFixed(1)}m, ${prm.flyerY.toFixed(1)}m)`, bw0 = ctx.measureText(l0).width + 16;
+        ctx.fillStyle = 'rgba(15,23,42,0.9)'; ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.roundRect(-bw0 / 2, -44, bw0, 20, 5); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#f8fafc'; ctx.fillText(l0, -bw0 / 2 + 8, -30);
+    } else {
+        const l1 = `Flyer Wifi [${prm.perfilEtiqueta}]: ${evalFlyer.rssiCliente.toFixed(1)} dBm`, l2 = `Sirve: ${evalFlyer.apConectado.id} [C${evalFlyer.apConectado.canal}] | CCI: ${prm.cci} | SINR: ${evalFlyer.sinr.toFixed(1)} dB | Tput: ${evalFlyer.tput.toFixed(1)} Mbps`;
+        const det = estadoSimulacion.zoom >= 1.35, bw1 = Math.max(ctx.measureText(l1).width, det ? ctx.measureText(l2).width : 0) + 16, bh = det ? 36 : 20, by = det ? -60 : -44;
+        ctx.fillStyle = 'rgba(15,23,42,0.94)'; ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.roundRect(-bw1 / 2, by, bw1, bh, 5); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#f8fafc'; ctx.fillText(l1, -bw1 / 2 + 8, by + 14);
+        if (det) { ctx.font = '9.5px Segoe UI'; ctx.fillStyle = '#38bdf8'; ctx.fillText(l2, -bw1 / 2 + 8, by + 29); }
+    }
+    ctx.restore();
+}
+
+function actualizarCacheHeatmapMaestro(W, H, prm, g) {
+    const cache = estadoSimulacion.heatmapCacheCanvas; cache.width = W; cache.height = H;
+    const hCtx = cache.getContext('2d'); hCtx.clearRect(0, 0, W, H);
+    if (!estadoSimulacion.simulacionIniciada || !estadoSimulacion.apsOptimos.length) { estadoSimulacion.heatmapDirty = false; return; }
+    const stepPx = 8, c = calcularCentroidePoligono(estadoSimulacion.poligonoZona);
+    const listaTx = prm.capaVisual === 'solo_ap_principal'
+        ? [{ x: c.x, y: c.y, z: prm.a, esSec: prm.tAnt === 'sec', tx: prm.p, azRad: prm.azimutDeg * (Math.PI / 180) }]
+        : estadoSimulacion.apsOptimos.filter(ap => isAPActiveInBand(ap, prm.f, prm.tech)).map(ap => ({ x: ap.x, y: ap.y, z: getAPZ(ap, prm.a), esSec: prm.tAnt === 'sec', tx: getAPTx(ap, prm.p), azRad: getAPAzimut(ap, prm.azimutDeg) * (Math.PI / 180) }));
+    if (!listaTx.length) { estadoSimulacion.heatmapDirty = false; return; }
+    for (let py = g.padT; py <= H - g.padB; py += stepPx) {
+        const mY = ((py - g.padT) / g.plotH) * g.maxMetrosY;
+        for (let px = g.padL; px <= W - g.padR; px += stepPx) {
+            const mX = g.minX + ((px - g.padL) / g.plotW) * (g.maxMetrosX - g.minX);
+            let mejor = -105;
+            for (let t = 0; t < listaTx.length; t++) { const r = calcularSenalEnFlyerXY(mX, mY, listaTx[t].x, listaTx[t].y, prm, listaTx[t].esSec, listaTx[t].azRad, listaTx[t].tx, listaTx[t].z).rssiCliente; if (r > mejor) mejor = r; }
+            if (mejor > -88) {
+                let r = 0, gr = 0, b = 0, a = 0.44;
+                if (mejor >= -62) { r = 16; gr = 185; b = 129; a = 0.50; }
+                else if (mejor >= prm.metaDbm) { const t = (mejor - prm.metaDbm) / Math.max(1, -62 - prm.metaDbm); r = Math.round(234 - t * 190); gr = Math.round(179 + t * 20); b = Math.round(8 + t * 80); }
+                else if (mejor >= -72) { const t = (mejor + 72) / Math.max(1, prm.metaDbm + 72); r = 245; gr = Math.round(100 + t * 75); b = 15; a = 0.36; }
+                else { r = 239; gr = 68; b = 68; a = ((mejor + 88) / 16) * 0.26; }
+                hCtx.fillStyle = `rgba(${r},${gr},${b},${a})`; hCtx.fillRect(px, py, stepPx, stepPx);
+            }
+        }
+    }
+    estadoSimulacion.heatmapDirty = false;
+}
+
+function animarPlanoMaestro() {
+    const canvas = document.getElementById('masterCanvas'); if (!canvas) return;
+    const ctx = canvas.getContext('2d'), W = canvas.width, H = canvas.height, prm = estadoSimulacion.params;
+    if (!prm.numPers) { requestAnimationFrame(animarPlanoMaestro); return; }
+    if (estadoSimulacion.flyerMovingTimer > 0) { estadoSimulacion.flyerMovingTimer--; estadoSimulacion.flyerWalkPhase += 0.32; }
+
+    const bbox = obtenerBoundingBoxPoligono(estadoSimulacion.poligonoZona), minX = Math.min(0, prm.flyerX - 2);
+    const maxMetrosX = Math.max(25, estadoSimulacion.planoAnchoM * 1.06, estadoSimulacion.simulacionIniciada ? bbox.maxX + 4 : 0, prm.flyerX + 4);
+    const maxMetrosY = Math.max(12, estadoSimulacion.planoAltoM * 1.08, estadoSimulacion.simulacionIniciada ? bbox.maxY + 3 : 0, prm.flyerY + 3);
+    const padL = 55, padR = 28, padT = 38, padB = 34, plotW = W - padL - padR, plotH = H - padT - padB;
+    const toPxX = (mX) => padL + ((mX - minX) / (maxMetrosX - minX)) * plotW, toPxY = (mY) => padT + (mY / maxMetrosY) * plotH;
+    estadoSimulacion.geometriaMapa = { minX, maxMetrosX, maxMetrosY, padL, padR, padT, padB, plotW, plotH };
+    if (estadoSimulacion.heatmapDirty) actualizarCacheHeatmapMaestro(W, H, prm, estadoSimulacion.geometriaMapa);
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.save(); ctx.translate(estadoSimulacion.panX, estadoSimulacion.panY); ctx.scale(estadoSimulacion.zoom, estadoSimulacion.zoom);
+
+    if (estadoSimulacion.imagenPlano) {
+        const imgX = toPxX(0), imgY = toPxY(0), imgW = toPxX(estadoSimulacion.planoAnchoM) - imgX, imgH = toPxY(estadoSimulacion.planoAltoM) - imgY;
+        ctx.save(); ctx.globalAlpha = estadoSimulacion.opacidadImg; ctx.drawImage(estadoSimulacion.imagenPlano, imgX, imgY, imgW, imgH); ctx.restore();
+        ctx.strokeStyle = 'rgba(148,163,184,0.45)'; ctx.lineWidth = 1 / estadoSimulacion.zoom; ctx.strokeRect(imgX, imgY, imgW, imgH);
+    }
+    if (estadoSimulacion.simulacionIniciada) ctx.drawImage(estadoSimulacion.heatmapCacheCanvas, 0, 0);
+
+    const pasoX = (maxMetrosX - minX) > 200 ? 50 : ((maxMetrosX - minX) > 90 ? 20 : ((maxMetrosX - minX) > 45 ? 10 : 5));
+    const pasoY = maxMetrosY > 120 ? 50 : (maxMetrosY > 50 ? 20 : (maxMetrosY > 25 ? 10 : 5));
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)'; ctx.fillStyle = '#94a3b8'; ctx.font = '10.5px Segoe UI'; ctx.lineWidth = 1 / estadoSimulacion.zoom;
+    for (let x = Math.ceil(minX / pasoX) * pasoX; x <= maxMetrosX; x += pasoX) { const px = toPxX(x); ctx.beginPath(); ctx.moveTo(px, padT); ctx.lineTo(px, H - padB); ctx.stroke(); ctx.fillText('X:' + x + 'm', px - 14, H - 12); }
+    for (let y = 0; y <= maxMetrosY; y += pasoY) { const py = toPxY(y); ctx.beginPath(); ctx.moveTo(padL, py); ctx.lineTo(W - padR, py); ctx.stroke(); ctx.fillText('Y:' + y + 'm', 8, py + 4); }
+
+    const poly = estadoSimulacion.poligonoZona;
+    if (estadoSimulacion.simulacionIniciada && poly.length >= 3) {
+        ctx.beginPath(); ctx.moveTo(toPxX(poly[0].x), toPxY(poly[0].y));
+        for (let i = 1; i < poly.length; i++) ctx.lineTo(toPxX(poly[i].x), toPxY(poly[i].y));
+        ctx.closePath(); ctx.fillStyle = 'rgba(56,189,248,0.09)'; ctx.fill();
+        ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2.2 / Math.sqrt(estadoSimulacion.zoom); ctx.setLineDash([6, 4]); ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillStyle = '#f8fafc'; ctx.font = 'bold 11px Segoe UI';
+        ctx.fillText(`POLÍGONO (${poly.length} Vért. | ${Math.round(estadoSimulacion.areaPoligonoRealM2).toLocaleString('es-MX')} m² | ${prm.numPers.toLocaleString('es-MX')} Disp.)`, toPxX(bbox.minX) + 4, Math.max(padT + 12, toPxY(bbox.minY) - 6));
+    }
+
+    if (estadoSimulacion.modoCursor === 'draw_polygon' && estadoSimulacion.polyDraft.length > 0) {
+        const d = estadoSimulacion.polyDraft;
+        ctx.beginPath(); ctx.moveTo(d[0].px, d[0].py); for (let i = 1; i < d.length; i++) ctx.lineTo(d[i].px, d[i].py);
+        ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2.5 / Math.sqrt(estadoSimulacion.zoom); ctx.stroke();
+        if (estadoSimulacion.polyHover) { ctx.beginPath(); ctx.moveTo(d[d.length - 1].px, d[d.length - 1].py); ctx.lineTo(estadoSimulacion.polyHover.px, estadoSimulacion.polyHover.py); ctx.strokeStyle = estadoSimulacion.polyHoverCruza ? '#ef4444' : '#34d399'; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]); }
+        d.forEach((v, idx) => { ctx.beginPath(); ctx.arc(v.px, v.py, (idx === 0 ? 7 : 4.5) / Math.sqrt(estadoSimulacion.zoom), 0, Math.PI * 2); ctx.fillStyle = idx === 0 ? '#10b981' : '#f8fafc'; ctx.fill(); });
+    }
+
+    if (estadoSimulacion.simulacionIniciada) {
+        estadoSimulacion.personas.forEach(p => {
+            ctx.fillStyle = prm.capaVisual === 'trafico_clientes' ? (p.tipo === 'sentada' ? '#38bdf8' : '#4ade80') : 'rgba(15,23,42,0.55)';
+            ctx.beginPath(); ctx.arc(toPxX(p.x), toPxY(p.y), prm.capaVisual === 'trafico_clientes' ? 3 : 2, 0, Math.PI * 2); ctx.fill();
+        });
+        const cPoly = calcularCentroidePoligono(poly);
+        const listaAPs = prm.capaVisual === 'solo_ap_principal' ? [{ num: 1, id: 'AP-1', x: cPoly.x, y: cPoly.y, customZ: null, customTx: null, customAzimut: null, radios: { r24: true, r5: true, r6: true }, canal: estadoSimulacion.canalesDisponiblesPool[0] || 36, colorCanal: PALETA_CANALES[0] }] : estadoSimulacion.apsOptimos;
+        const rMetaX = (estadoSimulacion.radioCeldaMeta / (maxMetrosX - minX)) * plotW, rMetaY = (estadoSimulacion.radioCeldaMeta / maxMetrosY) * plotH;
+
+        listaAPs.forEach((ap, idx) => {
+            const ox = toPxX(ap.x), oy = toPxY(ap.y), activo = isAPActiveInBand(ap, prm.f, prm.tech), apZ = getAPZ(ap, prm.a);
+            const azR = getAPAzimut(ap, prm.azimutDeg) * (Math.PI / 180), cosA = Math.cos(azR), sinA = Math.sin(azR);
+            if (activo && estadoSimulacion.mostrarAnillos) {
+                ctx.beginPath(); ctx.ellipse(ox, oy, rMetaX, rMetaY, 0, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(255,255,255,0.16)'; ctx.setLineDash([3, 4]); ctx.lineWidth = 1 / Math.sqrt(estadoSimulacion.zoom); ctx.stroke(); ctx.setLineDash([]);
+                if (prm.tAnt === 'sec') {
+                    const el = calcularElipse3dB(apZ, prm.postura, prm.bWH, prm.bWV);
+                    ctx.beginPath();
+                    if (prm.montajeSec === 'techo') {
+                        for (let k = 0; k <= 36; k++) {
+                            const ang = (k / 36) * Math.PI * 2, lx = el.rH * Math.cos(ang), ly = el.rV * Math.sin(ang);
+                            const mx = ap.x + (lx * cosA - ly * sinA), my = ap.y + (lx * sinA + ly * cosA);
+                            if (k === 0) ctx.moveTo(toPxX(mx), toPxY(my)); else ctx.lineTo(toPxX(mx), toPxY(my));
+                        }
+                        ctx.closePath();
+                    } else { const hb = (prm.bWH / 2) * (Math.PI / 180); ctx.moveTo(ox, oy); ctx.ellipse(ox, oy, rMetaX, rMetaY, 0, azR - hb, azR + hb); ctx.closePath(); }
+                    ctx.strokeStyle = 'rgba(192,132,252,0.85)'; ctx.setLineDash([4, 3]); ctx.lineWidth = 1.4 / Math.sqrt(estadoSimulacion.zoom); ctx.stroke(); ctx.setLineDash([]);
+                    if (idx === 0 || estadoSimulacion.zoom >= 1.3 || typeof ap.customZ === 'number') { ctx.fillStyle = '#e9d5ff'; ctx.font = 'bold 8.5px Segoe UI'; ctx.fillText(`-3dB (${el.rH}×${el.rV}m)`, ox + 10, oy - 12); }
+                }
+            }
+            const esAct = (idx === estadoSimulacion.apArrastradoIdx || idx === estadoSimulacion.apSeleccionadoIdx), tieneCust = (typeof ap.customZ === 'number' || typeof ap.customTx === 'number' || typeof ap.customAzimut === 'number');
+            ctx.beginPath(); ctx.arc(ox, oy, esAct ? 10.5 : 8.5, 0, Math.PI * 2); ctx.fillStyle = activo ? (ap.colorCanal || '#f59e0b') : '#475569'; ctx.fill();
+            if (!activo) ctx.setLineDash([2, 2]);
+            ctx.strokeStyle = esAct ? '#ffffff' : (tieneCust ? '#c084fc' : (activo ? '#0f172a' : '#94a3b8')); ctx.lineWidth = esAct ? 2.6 : (tieneCust ? 2.2 : 1.8); ctx.stroke(); ctx.setLineDash([]);
+            ctx.fillStyle = activo ? '#0f172a' : '#e2e8f0'; ctx.font = 'bold 9px Segoe UI'; const ns = String(ap.num); ctx.fillText(ns, ox - (ns.length > 1 ? 5.2 : 2.8), oy + 3.2);
+            ctx.fillStyle = activo ? '#fde68a' : '#94a3b8'; ctx.font = 'bold 8.5px Segoe UI'; ctx.fillText(activo ? `C${ap.canal || 36}` : 'OFF', ox - 9, oy + 18);
+        });
+    }
+
+    const fx = toPxX(prm.flyerX), fy = toPxY(prm.flyerY), ev = estadoSimulacion.evalFlyerActual;
+    if (ev && ev.apConectado) { ctx.beginPath(); ctx.moveTo(toPxX(ev.apConectado.x), toPxY(ev.apConectado.y)); ctx.lineTo(fx, fy); ctx.strokeStyle = 'rgba(0,229,255,0.75)'; ctx.lineWidth = 2 / Math.sqrt(estadoSimulacion.zoom); ctx.setLineDash([5, 5]); ctx.stroke(); ctx.setLineDash([]); }
+    if (estadoSimulacion.calibPt1) { ctx.fillStyle = '#ec4899'; ctx.beginPath(); ctx.arc(estadoSimulacion.calibPt1.px, estadoSimulacion.calibPt1.py, 6, 0, Math.PI * 2); ctx.fill(); }
+    dibujarPersonajeFlyerWifi(ctx, fx, fy, estadoSimulacion.flyerWalkPhase, estadoSimulacion.arrastrandoFlyer || estadoSimulacion.flyerMovingTimer > 0, ev, prm);
+
+    ctx.restore();
+    requestAnimationFrame(animarPlanoMaestro);
+}
+
+function crearDatasets(res, key, tens, cohs, umb, umbLbl) {
+    const u = cohs.length === 1;
+    const ds = cohs.map(c => ({ label: c.label, data: res.map(r => Number(r[c.key][key].toFixed(1))), borderColor: c.color, backgroundColor: u ? c.bg : 'transparent', fill: u, borderWidth: u ? 3.5 : 2.5, pointRadius: u ? 4 : 3, tension: tens || 0.25 }));
+    if (typeof umb === 'number') {
+        ds.push({ label: umbLbl, data: res.map(() => umb), borderColor: 'rgba(16,185,129,0.85)', borderWidth: 2, borderDash: [6, 6], pointRadius: 0, fill: false });
+        if (umb < 0) ds.push({ label: 'Umbral Roaming (-72 dBm)', data: res.map(() => -72), borderColor: 'rgba(245,158,11,0.80)', borderWidth: 1.8, borderDash: [3, 5], pointRadius: 0, fill: false });
+    }
+    return ds;
+}
+function renderLineChart(id, labels, res, key, yTitle, min, max, cohs, umb, umbLbl) {
+    const ctx = document.getElementById(id).getContext('2d'); if (chartInstances[id]) chartInstances[id].destroy();
+    chartInstances[id] = new Chart(ctx, { type: 'line', data: { labels: labels.map(l => l + 'm'), datasets: crearDatasets(res, key, 0.2, cohs, umb, umbLbl) }, options: { responsive: true, maintainAspectRatio: false, animation: false, scales: { y: { min, max, title: { display: true, text: yTitle } } } } });
+}
+function renderThroughputChart(id, labels, res, cohs) {
+    const ctx = document.getElementById(id).getContext('2d'); if (chartInstances[id]) chartInstances[id].destroy();
+    const m = Math.max(...res.flatMap(r => cohs.map(c => r[c.key].tput)), 20);
+    chartInstances[id] = new Chart(ctx, { type: 'line', data: { labels: labels.map(l => l + 'm'), datasets: crearDatasets(res, 'tput', 0.3, cohs) }, options: { responsive: true, maintainAspectRatio: false, animation: false, scales: { y: { beginAtZero: true, max: Math.ceil((m > 1000 ? Math.ceil(m / 500) * 500 : Math.ceil(m / 20) * 20) * 1.15), title: { display: true, text: 'Mbps' } } } } });
+}
+function renderAirtimeChart(id, labels, res, cohs) {
+    const ctx = document.getElementById(id).getContext('2d'); if (chartInstances[id]) chartInstances[id].destroy();
+    chartInstances[id] = new Chart(ctx, { type: 'line', data: { labels: labels.map(l => l + 'm'), datasets: crearDatasets(res, 'airtimeUse', 0.25, cohs, 75, 'Límite Saturación (75%)') }, options: { responsive: true, maintainAspectRatio: false, animation: false, scales: { y: { min: 0, max: 100, title: { display: true, text: '%' } } } } });
+}
+function renderCapacidadChart(id, labels, tputArr) {
+    const ctx = document.getElementById(id).getContext('2d'); if (chartInstances[id]) chartInstances[id].destroy();
+    const cap = (t, req) => t <= 0.6 ? 0 : Math.min(Math.round((t / req) * (req < 1 ? 0.35 : 0.95)), 512);
+    const dW = tputArr.map(t => cap(t, 0.1)), dH = tputArr.map(t => cap(t, 5.0)), d4 = tputArr.map(t => cap(t, 25.0));
+    chartInstances[id] = new Chart(ctx, { type: 'bar', data: { labels: labels.map(l => l + 'm'), datasets: [{ label: 'WhatsApp (100 kbps)', data: dW, backgroundColor: '#28a745', borderRadius: 3 }, { label: 'HD Video (5 Mbps)', data: dH, backgroundColor: '#ffc107', borderRadius: 3 }, { label: '4K Stream (25 Mbps)', data: d4, backgroundColor: '#dc3545', borderRadius: 3 }] }, options: { responsive: true, maintainAspectRatio: false, animation: false, scales: { y: { beginAtZero: true, title: { display: true, text: 'Disp. Simultáneos / Celda' }, max: Math.min(550, Math.ceil((Math.max(...dW, ...dH, ...d4, 20) * 1.15) / 20) * 20) } } } });
 }
 
 window.onload = function() {
     toggleBeamwidth();
+    actualizarAnchosCanal();
+    actualizarMenuEspectroDFS();
+    inicializarEventosMouse();
     actualizarTodo();
+    requestAnimationFrame(animarPlanoMaestro);
 };
 </script>
 </body>
