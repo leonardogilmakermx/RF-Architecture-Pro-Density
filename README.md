@@ -1,4 +1,4 @@
-# RF Architecture Pro — Consola Profesional de Análisis de RF para Alta Densidad
+# RF Architecture Pro — Consola Profesional de Análisis de RF para Alta Densidad (v3.2)
 
 Herramienta web interactiva de ingeniería y simulación RF diseñada para el dimensionamiento, optimización y auditoría de redes Wi-Fi de alta densidad (arenas, centros de convenciones, estadios, auditorios y recintos masivos) en las bandas de **2.4 GHz**, **5 GHz** y **6 GHz**.
 
@@ -29,7 +29,7 @@ Además del sembrado automático por capacidad y cobertura, la consola permite a
   * **Potencia Tx (`1` a `30 dBm`)** y **Rotación / Azimut (`0°` a `360°`)**.
 
 ### 4. Balanceo Estricto de Canales + Refinamiento Espacial (*Swap Pass*) + CCI 3D
-* **Fase 1 (Asignación Balanceada):** Reparte equitativamente los canales disponibles entre los radios activos (evitando desbalances como `5-4-2` y asegurando distribuciones como `4-4-3` en 2.4 GHz).
+* **Fase 1 (Asignación Balanceada):** Reparte equitativamente los canales disponibles entre los radios activos (evitando desbalances y asegurando distribuciones óptimas como `4-4-3` en 2.4 GHz o `2-2-3` en 5 GHz).
 * **Fase 2 (*Swap Pass*):** Ejecuta pasadas de intercambio entre pares de APs para maximizar la distancia 3D mínima entre vecinos co-canal sin alterar el balance.
 * **Cálculo automático de CCI:** Evalúa la contención co-canal real usando un umbral de detección de señal (`-82 dBm` CCA-SD ajustado por ancho de canal), ganancia de antena, aislamiento lateral y atenuación por densidad humana.
 
@@ -41,10 +41,12 @@ Además del sembrado automático por capacidad y cobertura, la consola permite a
 * **Métricas en vivo:** RSSI percibido, RSSI bruto del AP, SINR, CCI, Throughput neto, utilización de Airtime y modulación exacta (**`MCS 10-11 (1024-QAM)`** para Wi-Fi 6/5 y **`MCS 12-13 (4K-QAM)`** para Wi-Fi 7 MLO).
 * **5 Gráficas analíticas:** RSSI Ideal 2D, RSSI Real 3D, Throughput Neto por Celda, Utilización de Airtime y Capacidad de Dispositivos Simultáneos (WhatsApp, HD Video y 4K Stream).
 
-### 6. Flujo CAD, Persistencia `.hdwp` y Reportes Ejecutivos
+### 6. Flujo CAD, Persistencia `.hdwp` y Reportes Ejecutivos PDF/CSV
 * **Plano Maestro CAD:** Importación de planos arquitectónicos, control de opacidad, calibración métrica en 2 clics, trazado de polígonos irregulares con bloqueo de cruces, zoom y paneo.
-* **Proyectos Portables (`.hdwp`):** Guarda e importa todos los parámetros RF, país regulatorio, polígono irregular, APs editados manualmente (con sus alturas Z, radios, Tx y rotación) y plano opcional.
-* **Exportación:** Tabla ejecutiva de sembrado exportable a **CSV (Excel)** e impresión directa a **PDF** con maquetación optimizada sin recortes.
+* **Proyectos Portables (`.hdwp` v3.2):** Guarda e importa todos los parámetros RF, país regulatorio, polígono irregular, APs editados manualmente (con sus alturas Z, radios, Tx y rotación) y plano opcional.
+* **Exportación Profesional:**
+  * **CSV (Excel):** Tabla ejecutiva completa con coordenadas `(X, Y, Z)`, radios activos, canal, sub-banda, EIRP, rotación y dimensiones de la elipse `-3 dB`.
+  * **Reporte PDF Optimizado:** Impresión directa con alto contraste garantizado en el lienzo (`#090d16`), ejes `X/Y` siempre visibles, gráficas sin recortes y tabla ejecutiva compacta sin saltos de línea irregulares.
 
 ---
 
@@ -56,6 +58,13 @@ Además del sembrado automático por capacidad y cobertura, la consola permite a
 4. **Ajustar parámetros RF:** Selecciona País, Tecnología, Banda, Ancho de Canal, Antena (`H × V`) y Aforo, o pulsa **⚡ AUTO-OPTIMIZAR A META**.
 5. **Ajuste fino (Toque Humano):** Usa `⚙ Editar AP`, `✥ Mover`, `➕ Añadir` y `🗑 Quitar` para adaptar los equipos a la arquitectura real y apagar radios redundantes (ej. en 2.4 GHz para terminales POS).
 6. **Guardar y reportar:** Exporta el proyecto en `.hdwp`, descarga la tabla en `.csv` o genera el reporte ejecutivo en PDF.
+
+---
+
+## Novedades de la Versión 3.2
+* **Motor de impresión PDF de alto contraste:** Fondo oscuro renderizado directamente en `<canvas>` y `print-color-adjust: exact` para preservar ejes `X/Y`, canales y etiquetas al exportar.
+* **Tabla ejecutiva compacta:** Reglas `white-space: nowrap` en columnas críticas (`ID AP`, coordenadas, radios, potencia y carga) para evitar saltos de línea en PDF.
+* **Presets genéricos:** Limpieza de etiquetas en el selector de aforo (hasta 100,000 dispositivos) y nombres sugeridos de proyecto `.hdwp`.
 
 ---
 
