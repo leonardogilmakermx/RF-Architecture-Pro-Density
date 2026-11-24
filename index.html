@@ -111,24 +111,32 @@
         .btn-csv:hover { background: #059669; }
         .ap-table-wrapper { max-height: 320px; overflow-y: auto; border: 1px solid #e4e6eb; border-radius: 6px; }
         .ap-schedule-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-        .ap-schedule-table th { position: sticky; top: 0; background: #2c3e50; color: #ffffff; text-align: left; padding: 9px 12px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.4px; }
-        .ap-schedule-table td { padding: 8px 12px; border-bottom: 1px solid #e9ecef; color: #2d3748; }
+        .ap-schedule-table th { position: sticky; top: 0; background: #2c3e50; color: #ffffff; text-align: left; padding: 9px 10px; font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; }
+        .ap-schedule-table td { padding: 8px 10px; border-bottom: 1px solid #e9ecef; color: #2d3748; }
+        .ap-schedule-table td:nth-child(1), .ap-schedule-table td:nth-child(2), .ap-schedule-table td:nth-child(3), .ap-schedule-table td:nth-child(5), .ap-schedule-table td:nth-child(8) { white-space: nowrap; }
         .ap-schedule-table tr:nth-child(even) { background-color: #f8fafc; }
-        .ch-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; color: #0f172a; font-weight: 800; font-size: 0.75rem; }
+        .ch-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; color: #0f172a; font-weight: 800; font-size: 0.74rem; white-space: nowrap; }
         .glossary-section { margin-top: 25px; padding: 20px; background: #f8f9fa; border: 1px solid #e4e6eb; border-radius: 8px; font-size: 0.85rem; color: #444; }
         .glossary-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
         .glossary-item { margin-bottom: 15px; line-height: 1.4; }
         .glossary-item strong { color: #0062cc; display: block; margin-bottom: 3px; }
         @media print {
-            @page { margin: 10mm; size: auto; }
+            @page { margin: 9mm; size: auto; }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .controls, button, .header-btns, .glossary-section, .layer-controls, .cad-toolbar, .btn-csv, .btn-psd-fix, .ap-inspector-bar { display: none !important; }
             .report-params { display: table !important; }
+            .sim-card { background: #0f172a !important; color: #e2e8f0 !important; padding: 12px !important; }
+            .master-canvas-wrap { background: #090d16 !important; height: 420px !important; }
             .charts-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 12px !important; width: 100% !important; }
             .chart-card { padding: 8px !important; break-inside: avoid; page-break-inside: avoid; overflow: hidden !important; }
             .chart-wrapper { height: 220px !important; width: 100% !important; max-width: 100% !important; }
             .chart-wrapper canvas { max-width: 100% !important; max-height: 220px !important; }
             .ap-table-wrapper { max-height: none !important; overflow: visible !important; }
-            .ap-schedule-section { page-break-before: always; border: 1px solid #999; }
+            .ap-schedule-section { page-break-before: always; border: 1px solid #999; padding: 10px !important; }
+            .ap-schedule-table { font-size: 0.72rem !important; }
+            .ap-schedule-table th { padding: 6px 6px !important; font-size: 0.68rem !important; }
+            .ap-schedule-table td { padding: 5px 6px !important; }
+            .ap-schedule-table tr { break-inside: avoid; page-break-inside: avoid; }
             .container { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 4px; margin: 0; }
             body { background-color: white; margin: 0; }
         }
@@ -305,7 +313,7 @@
                     <option value="4000">Preset: 4,000 Dispositivos</option>
                     <option value="5000">Preset: 5,000 Dispositivos</option>
                     <option value="6000">Preset: 6,000 Dispositivos</option>
-                    <option value="8000" selected>Preset: 8,000 Dispositivos (Pepsi Center)</option>
+                    <option value="8000" selected>Preset: 8,000 Dispositivos</option>
                     <option value="9000">Preset: 9,000 Dispositivos</option>
                     <option value="10000">Preset: 10,000 Dispositivos</option>
                     <option value="20000">Preset: 20,000 Dispositivos</option>
@@ -685,14 +693,14 @@ function activarSimulacionCompleta() {
 }
 
 function guardarProyectoHDWP() {
-    const nombreSugerido = prompt('Nombre del proyecto (.hdwp):', estadoSimulacion.nombreProyecto || 'Pepsi_Center_WiFi7');
+    const nombreSugerido = prompt('Nombre del proyecto (.hdwp):', estadoSimulacion.nombreProyecto || 'Proyecto_Alta_Densidad_WiFi7');
     if (nombreSugerido === null) return;
     const nombreLimpio = (nombreSugerido.trim() || 'Proyecto_RF_RedCorp').replace(/[^a-zA-Z0-9_\-áéíóúÁÉÍÓÚñÑ ]/g, '_');
     estadoSimulacion.nombreProyecto = nombreLimpio;
     let incluirImagen = false;
     if (estadoSimulacion.imagenPlanoDataURL) incluirImagen = confirm('Tienes un plano arquitectónico cargado.\n\n• ACEPTAR: incrustar imagen en .hdwp.\n• CANCELAR: guardar solo datos y polígono (< 3 KB para correo).');
     const proyectoData = {
-        format: 'HDWP', version: '3.1', author: 'Ing. G. Leonardo Dominguez Garcia - RedCorp 802.11 México',
+        format: 'HDWP', version: '3.2', author: 'Ing. G. Leonardo Dominguez Garcia - RedCorp 802.11 México',
         timestamp: new Date().toISOString(), projectName: nombreLimpio,
         simulacionIniciada: estadoSimulacion.simulacionIniciada, modoManualAPs: estadoSimulacion.modoManualAPs, mostrarAnillos: estadoSimulacion.mostrarAnillos,
         rfInputs: {
@@ -810,7 +818,6 @@ function calcularCCIFisicoAutomatico(apsVisuales, totalAPsReales, potenciaTxGlob
         return { cciPromedio: 0, numCanales: numCanalesDisponibles, activosEnBanda: apsActivos.length };
     }
 
-    // FASE 1: Coloración espacial con balanceo estricto de carga por canal
     const asignadosPorCanal = Array.from({ length: numCanalesDisponibles }, () => []);
     apsActivos.forEach(ap => {
         const minUso = Math.min(...asignadosPorCanal.map(lista => lista.length));
@@ -832,7 +839,6 @@ function calcularCCIFisicoAutomatico(apsVisuales, totalAPsReales, potenciaTxGlob
         asignadosPorCanal[mejorIndiceCanal].push(ap);
     });
 
-    // FASE 2: Refinamiento espacial por intercambio (conserva balance exacto y maximiza separación co-canal)
     const distMinCoCanal = (idxTarget, cIdxTest, idxIgnorar) => {
         let minD = Infinity;
         const apT = apsActivos[idxTarget], zT = getAPZ(apT, zGlobal);
@@ -1524,7 +1530,9 @@ function animarPlanoMaestro() {
     estadoSimulacion.geometriaMapa = { minX, maxMetrosX, maxMetrosY, padL, padR, padT, padB, plotW, plotH };
     if (estadoSimulacion.heatmapDirty) actualizarCacheHeatmapMaestro(W, H, prm, estadoSimulacion.geometriaMapa);
 
-    ctx.clearRect(0, 0, W, H);
+    // Pintar fondo oscuro directamente en el canvas para garantizar alto contraste al imprimir a PDF
+    ctx.fillStyle = '#090d16';
+    ctx.fillRect(0, 0, W, H);
     ctx.save(); ctx.translate(estadoSimulacion.panX, estadoSimulacion.panY); ctx.scale(estadoSimulacion.zoom, estadoSimulacion.zoom);
 
     if (estadoSimulacion.imagenPlano) {
@@ -1536,9 +1544,9 @@ function animarPlanoMaestro() {
 
     const pasoX = (maxMetrosX - minX) > 200 ? 50 : ((maxMetrosX - minX) > 90 ? 20 : ((maxMetrosX - minX) > 45 ? 10 : 5));
     const pasoY = maxMetrosY > 120 ? 50 : (maxMetrosY > 50 ? 20 : (maxMetrosY > 25 ? 10 : 5));
-    ctx.strokeStyle = 'rgba(255,255,255,0.12)'; ctx.fillStyle = '#94a3b8'; ctx.font = '10.5px Segoe UI'; ctx.lineWidth = 1 / estadoSimulacion.zoom;
+    ctx.strokeStyle = 'rgba(255,255,255,0.16)'; ctx.fillStyle = '#e2e8f0'; ctx.font = 'bold 10.5px Segoe UI'; ctx.lineWidth = 1 / estadoSimulacion.zoom;
     for (let x = Math.ceil(minX / pasoX) * pasoX; x <= maxMetrosX; x += pasoX) { const px = toPxX(x); ctx.beginPath(); ctx.moveTo(px, padT); ctx.lineTo(px, H - padB); ctx.stroke(); ctx.fillText('X:' + x + 'm', px - 14, H - 12); }
-    for (let y = 0; y <= maxMetrosY; y += pasoY) { const py = toPxY(y); ctx.beginPath(); ctx.moveTo(padL, py); ctx.lineTo(W - padR, py); ctx.stroke(); ctx.fillText('Y:' + y + 'm', 8, py + 4); }
+    for (let y = 0; y <= maxMetrosY; y += pasoY) { const py = toPxY(y); ctx.beginPath(); ctx.moveTo(padL, py); ctx.lineTo(W - padR, py); ctx.stroke(); ctx.fillText('Y:' + y + 'm', 6, py + 4); }
 
     const poly = estadoSimulacion.poligonoZona;
     if (estadoSimulacion.simulacionIniciada && poly.length >= 3) {
