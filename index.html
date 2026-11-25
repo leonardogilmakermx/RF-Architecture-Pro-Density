@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>RF Architecture Pro - Balanced Spatial Channels, Per-AP Height Z & Radio Control</title>
-    <meta name="description" content="Consola profesional de análisis de RF para alta densidad con balanceo estricto de canales y refinamiento espacial, Altura Z individual, control de radios (2 radios Wi-Fi 6 / 3 radios Wi-Fi 7), Beamwidth H×V, elipse -3 dB ocultable, validador PSD 6 GHz LPI, .hdwp y Flyer Wifi. Diseñado por Ing. G. Leonardo Dominguez Garcia.">
+    <title>RF Architecture Pro - Wi-Fi 6 / 6E / 7 MLO, Balanced Channels & Per-AP Control</title>
+    <meta name="description" content="Consola profesional de análisis de RF para alta densidad con soporte Wi-Fi 6, Wi-Fi 6E y Wi-Fi 7 MLO, balanceo estricto de canales, Altura Z individual, control de radios, Beamwidth H×V, elipse -3 dB ocultable, validador PSD 6 GHz LPI, DTIM, Mínimo Data Rate, SSIDs, Beacon Overhead, .hdwp y Flyer Wifi. Diseñado por Ing. G. Leonardo Dominguez Garcia.">
     <meta name="author" content="Gilberto Leonardo Dominguez Garcia - RedCorp 802.11 México">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -48,6 +48,9 @@
         .psd-alert-banner { display: none; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; background: #fffbeb; border: 1px solid #f59e0b; border-left: 5px solid #d97706; color: #92400e; padding: 10px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 0.83rem; }
         .btn-psd-fix { padding: 6px 12px; background: #d97706; color: #ffffff; border: none; border-radius: 5px; font-size: 0.76rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-psd-fix:hover { background: #b45309; }
+        .beacon-alert-banner { display: none; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; background: #fef2f2; border: 1px solid #ef4444; border-left: 5px solid #dc2626; color: #991b1b; padding: 10px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 0.83rem; }
+        .btn-beacon-fix { padding: 6px 12px; background: #dc2626; color: #ffffff; border: none; border-radius: 5px; font-size: 0.76rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-beacon-fix:hover { background: #b91c1c; }
         .global-semaphore-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; background: #1e293b; color: #f8fafc; padding: 14px 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #334155; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         .semaphore-left { display: flex; align-items: center; gap: 14px; }
         .traffic-lights { display: flex; gap: 7px; background: #0f172a; padding: 7px 11px; border-radius: 20px; border: 1px solid #475569; }
@@ -123,7 +126,7 @@
         @media print {
             @page { margin: 9mm; size: auto; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            .controls, button, .header-btns, .glossary-section, .layer-controls, .cad-toolbar, .btn-csv, .btn-psd-fix, .ap-inspector-bar { display: none !important; }
+            .controls, button, .header-btns, .glossary-section, .layer-controls, .cad-toolbar, .btn-csv, .btn-psd-fix, .btn-beacon-fix, .ap-inspector-bar { display: none !important; }
             .report-params { display: table !important; }
             .sim-card { background: #0f172a !important; color: #e2e8f0 !important; padding: 12px !important; }
             .master-canvas-wrap { background: #090d16 !important; height: 420px !important; }
@@ -175,6 +178,7 @@
             <label>Tecnología / Protocolo</label>
             <select id="tecnologia" onchange="alCambiarTecnologia()">
                 <option value="legacy">Wi-Fi 6 / 5 (2 Radios: 2.4/5)</option>
+                <option value="wifi6e">Wi-Fi 6E (3 Radios: 2.4/5/6, sin MLO)</option>
                 <option value="mlo" selected>Wi-Fi 7 MLO (3 Radios: 2.4/5/6)</option>
             </select>
         </div>
@@ -244,7 +248,7 @@
         </div>
         <div class="input-group">
             <label>Frecuencia</label>
-            <select id="frecuencia" onchange="actualizarAnchosCanal(); actualizarMenuEspectroDFS(); actualizarTodo();">
+            <select id="frecuencia" onchange="actualizarAnchosCanal(); actualizarOpcionesMinDataRate(); actualizarMenuEspectroDFS(); actualizarTodo();">
                 <option value="2.4">2.4 GHz</option>
                 <option value="5">5 GHz</option>
                 <option value="6" selected>6 GHz</option>
@@ -258,6 +262,37 @@
                 <option value="80">80 MHz (Estándar 6 GHz)</option>
                 <option value="160">160 MHz (Ultra Tput)</option>
                 <option value="320">320 MHz (Wi-Fi 7 Max)</option>
+            </select>
+        </div>
+        <div class="input-group cci-auto-bg">
+            <label>Mínimo Data Rate (Basic Rate)</label>
+            <select id="minDataRate" onchange="actualizarTodo()">
+                <option value="6">6 Mbps (Estándar Básico)</option>
+                <option value="12" selected>12 Mbps (Recomendado HD)</option>
+                <option value="24">24 Mbps (Ultra Alta Densidad)</option>
+                <option value="36">36 Mbps (Celdas Muy Compactas)</option>
+            </select>
+        </div>
+        <div class="input-group cci-auto-bg">
+            <label>DTIM Interval (Beacons)</label>
+            <select id="dtimInterval" onchange="actualizarTodo()">
+                <option value="1">DTIM 1 (Máx. Latencia Baja / +Consumo)</option>
+                <option value="2">DTIM 2 (Balanceado Voz/Datos)</option>
+                <option value="3" selected>DTIM 3 (Recomendado HD / Apple-Android)</option>
+                <option value="5">DTIM 5 (Ahorro Batería Extremo / IoT)</option>
+            </select>
+        </div>
+        <div class="input-group cci-auto-bg">
+            <label>Cantidad de SSIDs (Beacons)</label>
+            <select id="numSSIDs" onchange="actualizarTodo()">
+                <option value="1">1 SSID (Óptimo HD)</option>
+                <option value="2">2 SSIDs (Recomendado)</option>
+                <option value="3" selected>3 SSIDs (Estándar)</option>
+                <option value="4">4 SSIDs (Límite Sano)</option>
+                <option value="5">5 SSIDs (Overhead Alto)</option>
+                <option value="6">6 SSIDs (Degradación)</option>
+                <option value="7">7 SSIDs (Crítico HD)</option>
+                <option value="8">8 SSIDs (Saturación Beacon)</option>
             </select>
         </div>
         <div class="input-group cci-auto-bg">
@@ -337,6 +372,11 @@
     <div id="psdAlertBanner" class="psd-alert-banner">
         <span id="psdAlertText">Aviso PSD 6 GHz LPI...</span>
         <button type="button" class="btn-psd-fix" onclick="ajustarPotenciaALimitePSD()">&#9878; Ajustar Tx al Tope Legal PSD</button>
+    </div>
+
+    <div id="beaconAlertBanner" class="beacon-alert-banner">
+        <span id="beaconAlertText">Aviso de Saturación de Beacons...</span>
+        <button type="button" class="btn-beacon-fix" onclick="optimizarBeaconOverhead()">&#9889; Optimizar a 3 SSIDs y 12/24 Mbps</button>
     </div>
 
     <div class="global-semaphore-bar">
@@ -464,7 +504,7 @@
                 <div class="kpi-sub" id="kpiFlyerAPRef">Esperando sembrado de APs en el plano</div>
             </div>
             <div class="kpi-box" style="border-left-color: #f59e0b;">
-                <div class="kpi-title">Contención Co-Canal &amp; Elipse -3 dB</div>
+                <div class="kpi-title">Contención Co-Canal &amp; Gestión</div>
                 <div class="kpi-val" id="kpiClientesPorAP">CCI Auto: 0 APs</div>
                 <div class="kpi-sub" id="kpiDensidadM2">Canales disponibles: -</div>
             </div>
@@ -472,6 +512,11 @@
                 <div class="kpi-title">AP Conectado a "Flyer Wifi"</div>
                 <div class="kpi-val" id="kpiSondaRSSI">Sin asociación activa</div>
                 <div class="kpi-sub" id="kpiSondaDetalle">Posición Flyer: X=-m, Y=-m</div>
+            </div>
+            <div class="kpi-box" id="kpiBeaconBox" style="border-left-color: #10b981;">
+                <div class="kpi-title">Beacon Overhead (Airtime)</div>
+                <div class="kpi-val" id="kpiBeaconOverhead">1.5% Airtime</div>
+                <div class="kpi-sub" id="kpiBeaconDetail">3 SSIDs @ 12 Mbps | CCI: 0</div>
             </div>
         </div>
     </div>
@@ -511,15 +556,15 @@
         <div class="glossary-grid">
             <div>
                 <div class="glossary-item"><strong>Balanceo Estricto de Canales + Swap Pass:</strong> Reparte equitativamente los canales disponibles entre los radios activos (ej. 4-4-3 en 2.4 GHz) y ejecuta intercambios espaciales para maximizar la distancia entre APs co-canal.</div>
-                <div class="glossary-item"><strong>Altura Z Individual por AP:</strong> Permite modelar techos a distinto nivel recalculando el *Slant Path* 3D y la elipse `-3 dB` exacta de cada AP.</div>
+                <div class="glossary-item"><strong>Altura Z Individual por AP:</strong> Permite modelar techos a distinto nivel recalculando el <em>Slant Path</em> 3D y la elipse -3 dB exacta de cada AP.</div>
             </div>
             <div>
-                <div class="glossary-item"><strong>Control Individual de Radios (2.4 / 5 / 6 GHz):</strong> En modo <strong>Wi-Fi 7 (MLO)</strong> cada AP cuenta con 3 radios independientes; en <strong>Wi-Fi 6/5</strong> cuenta con 2 radios (2.4 y 5 GHz).</div>
-                <div class="glossary-item"><strong>Validador PSD en 6 GHz LPI:</strong> Verifica el tope de $5\text{ dBm/MHz}$ en IFT/FCC/ANATEL ($18\text{ dBm}$ EIRP en $20\text{ MHz}$) o $23\text{ dBm}$ en ETSI/MIC.</div>
+                <div class="glossary-item"><strong>Wi-Fi 6 vs. Wi-Fi 6E vs. Wi-Fi 7 MLO:</strong> <strong>Wi-Fi 6/5</strong> opera en 2 radios (2.4/5 GHz); <strong>Wi-Fi 6E</strong> opera en 3 radios (2.4/5/6 GHz) hasta 160 MHz y 1024-QAM sin MLO; <strong>Wi-Fi 7 MLO</strong> habilita 320 MHz, 4K-QAM y agregación MLO.</div>
+                <div class="glossary-item"><strong>Mínimo Data Rate, DTIM y SSIDs:</strong> Subir el <em>Basic Rate</em> (12–24 Mbps) y limitar a 1–3 SSIDs reduce drásticamente el <em>Beacon Overhead</em> en el Airtime; <strong>DTIM 3</strong> optimiza batería y tramas multicast en alta densidad.</div>
             </div>
             <div>
-                <div class="glossary-item"><strong>Archivos de Proyecto Portable (.HDWP):</strong> Guarda Altura Z individual, radios activos/inactivos, Tx y Rotación de cada AP, país regulatorio, polígono irregular y plano opcional.</div>
-                <div class="glossary-item"><strong>Modulación MCS Exacta:</strong> Diferencia automáticamente entre <strong>MCS 10-11 (1024-QAM)</strong> para Wi-Fi 6/5 y <strong>MCS 12-13 (4K-QAM)</strong> para Wi-Fi 7 MLO.</div>
+                <div class="glossary-item"><strong>Archivos de Proyecto Portable (.HDWP):</strong> Guarda Altura Z individual, radios activos/inactivos, Tx, Rotación, DTIM, Min Data Rate, SSIDs, país regulatorio, polígono irregular y plano opcional.</div>
+                <div class="glossary-item"><strong>Validador PSD en 6 GHz LPI:</strong> Verifica el tope de 5 dBm/MHz en IFT/FCC/ANATEL (18 dBm EIRP en 20 MHz) o 23 dBm en ETSI/MIC.</div>
             </div>
         </div>
     </div>
@@ -551,6 +596,7 @@ let estadoSimulacion = {
     flyerWalkPhase: 0, flyerMovingTimer: 0, geometriaMapa: null, heatmapCacheCanvas: document.createElement('canvas'), heatmapDirty: true, evalFlyerActual: null, params: {}
 };
 
+function soporta6GHz(tech) { return tech === 'mlo' || tech === 'wifi6e'; }
 function getAPTx(ap, pGlobal) { return (ap && typeof ap.customTx === 'number' && !isNaN(ap.customTx)) ? ap.customTx : pGlobal; }
 function getAPAzimut(ap, azGlobal) { return (ap && typeof ap.customAzimut === 'number' && !isNaN(ap.customAzimut)) ? ap.customAzimut : azGlobal; }
 function getAPZ(ap, zGlobal) { return (ap && typeof ap.customZ === 'number' && !isNaN(ap.customZ)) ? ap.customZ : zGlobal; }
@@ -559,14 +605,14 @@ function isAPActiveInBand(ap, freq, tech) {
     const r = getAPRadios(ap);
     if (freq === 2.4) return Boolean(r.r24);
     if (freq === 5) return Boolean(r.r5);
-    if (freq === 6) return (tech === 'mlo') && Boolean(r.r6);
+    if (freq === 6) return soporta6GHz(tech) && Boolean(r.r6);
     return true;
 }
 function formatRadiosTexto(ap, tech) {
     const r = getAPRadios(ap), list = [];
     if (r.r24) list.push('2.4');
     if (r.r5) list.push('5');
-    if (tech === 'mlo' && r.r6) list.push('6');
+    if (soporta6GHz(tech) && r.r6) list.push('6');
     return list.length ? list.join(' / ') + ' GHz' : 'Todos OFF';
 }
 function calcularElipse3dB(zAP, postura, bWH, bWV) {
@@ -575,7 +621,57 @@ function calcularElipse3dB(zAP, postura, bWH, bWV) {
     return { rH: Number((hEf * Math.tan((bWH / 2) * (Math.PI / 180))).toFixed(1)), rV: Number((hEf * Math.tan((bWV / 2) * (Math.PI / 180))).toFixed(1)) };
 }
 
-function alCambiarTecnologia() { if (estadoSimulacion.apSeleccionadoIdx >= 0) abrirInspectorAP(estadoSimulacion.apSeleccionadoIdx); actualizarTodo(); }
+function actualizarOpcionesMinDataRate() {
+    const freq = parseFloat(document.getElementById('frecuencia').value) || 5;
+    const sel = document.getElementById('minDataRate');
+    const prev = parseInt(sel.value) || 12;
+    const ops = freq === 2.4
+        ? [
+            { val: 1, text: '1 Mbps (Legacy 802.11b - Alto Overhead)' },
+            { val: 6, text: '6 Mbps (Estándar Básico)' },
+            { val: 12, text: '12 Mbps (Recomendado HD)' },
+            { val: 24, text: '24 Mbps (Ultra Alta Densidad)' }
+          ]
+        : [
+            { val: 6, text: '6 Mbps (Estándar Básico)' },
+            { val: 12, text: '12 Mbps (Recomendado HD)' },
+            { val: 24, text: '24 Mbps (Ultra Alta Densidad)' },
+            { val: 36, text: '36 Mbps (Celdas Muy Compactas)' }
+          ];
+    sel.innerHTML = '';
+    const fin = ops.some(o => o.val === prev) ? prev : 12;
+    ops.forEach(o => {
+        const el = document.createElement('option');
+        el.value = o.val;
+        el.textContent = o.text;
+        if (o.val === fin) el.selected = true;
+        sel.appendChild(el);
+    });
+}
+
+function sincronizarFrecuenciaPorTecnologia() {
+    const tech = document.getElementById('tecnologia').value || 'mlo';
+    const selFreq = document.getElementById('frecuencia');
+    const opt6 = Array.from(selFreq.options).find(o => o.value === '6');
+    if (!opt6) return;
+    if (!soporta6GHz(tech)) {
+        opt6.disabled = true;
+        opt6.textContent = '6 GHz (Solo Wi-Fi 6E / 7)';
+        if (selFreq.value === '6') selFreq.value = '5';
+    } else {
+        opt6.disabled = false;
+        opt6.textContent = '6 GHz';
+    }
+}
+
+function alCambiarTecnologia() {
+    sincronizarFrecuenciaPorTecnologia();
+    actualizarAnchosCanal();
+    actualizarOpcionesMinDataRate();
+    actualizarMenuEspectroDFS();
+    if (estadoSimulacion.apSeleccionadoIdx >= 0) abrirInspectorAP(estadoSimulacion.apSeleccionadoIdx);
+    actualizarTodo();
+}
 
 function abrirInspectorAP(idx) {
     if (idx < 0 || idx >= estadoSimulacion.apsOptimos.length) return;
@@ -590,7 +686,7 @@ function abrirInspectorAP(idx) {
     document.getElementById('inspR24').checked = Boolean(r.r24);
     document.getElementById('inspR5').checked = Boolean(r.r5);
     document.getElementById('inspR6').checked = Boolean(r.r6);
-    document.getElementById('inspR6Wrap').style.display = (tech === 'mlo') ? 'flex' : 'none';
+    document.getElementById('inspR6Wrap').style.display = soporta6GHz(tech) ? 'flex' : 'none';
     document.getElementById('apInspectorBar').style.display = 'flex';
 }
 function cerrarInspectorAP() { estadoSimulacion.apSeleccionadoIdx = -1; document.getElementById('apInspectorBar').style.display = 'none'; }
@@ -636,6 +732,31 @@ function validarYMostrarAlertaPSD(paisCod, freq, bw, potenciaTx, tipoAnt) {
 }
 function ajustarPotenciaALimitePSD() { document.getElementById('potencia').value = estadoSimulacion.txMaxLegalPSD; actualizarTodo(); }
 
+function validarYMostrarAlertaBeacon(numSSIDs, minDataRate, beaconOverheadPct, cci) {
+    const banner = document.getElementById('beaconAlertBanner');
+    if (!banner) return;
+    if (numSSIDs > 4 || beaconOverheadPct >= 12) {
+        const motivos = [];
+        if (numSSIDs > 4) motivos.push(`<strong>${numSSIDs} SSIDs</strong> (máximo recomendado: 3–4)`);
+        if (beaconOverheadPct >= 12) motivos.push(`<strong>${beaconOverheadPct.toFixed(1)}% de Airtime</strong> consumido solo por Beacons (límite crítico: 12%)`);
+        document.getElementById('beaconAlertText').innerHTML =
+            `<strong>🚨 Alerta de Overhead de Gestión:</strong> Estás operando con ${motivos.join(' y ')} a <strong>${minDataRate} Mbps</strong> (CCI: ${cci} APs). Esto degrada el throughput de la celda antes de cursar tráfico de usuarios.`;
+        banner.style.display = 'flex';
+    } else {
+        banner.style.display = 'none';
+    }
+}
+
+function optimizarBeaconOverhead() {
+    const freq = parseFloat(document.getElementById('frecuencia').value) || 5;
+    const numPers = obtenerNumeroPersonasActivo();
+    const rateOptimo = (freq !== 2.4 && numPers >= 2000) ? '24' : '12';
+    document.getElementById('numSSIDs').value = '3';
+    actualizarOpcionesMinDataRate();
+    document.getElementById('minDataRate').value = rateOptimo;
+    actualizarTodo();
+}
+
 function obtenerPoolCanales(freq, bw, modoDFS, paisCod) {
     const reg = REGULACIONES_PAIS[paisCod] || REGULACIONES_PAIS.MX, incluirDFS = (modoDFS === 'con_dfs');
     if (freq === 2.4) return bw >= 40 ? [3] : [1, 6, 11];
@@ -649,7 +770,7 @@ function obtenerPoolCanales(freq, bw, modoDFS, paisCod) {
 }
 function actualizarMenuEspectroDFS() {
     const pais = document.getElementById('paisRegulacion').value || 'MX', reg = REGULACIONES_PAIS[pais] || REGULACIONES_PAIS.MX;
-    const freq = parseFloat(document.getElementById('frecuencia').value) || 6, bw = parseInt(document.getElementById('anchoCanal').value) || 20;
+    const freq = parseFloat(document.getElementById('frecuencia').value) || 5, bw = parseInt(document.getElementById('anchoCanal').value) || 20;
     const sel = document.getElementById('modoDFS'), valPrevio = sel.value; sel.innerHTML = '';
     if (freq === 2.4) { sel.innerHTML = `<option value="con_dfs">ISM 2.4 GHz (${bw >= 40 ? 1 : 3} Ch sin DFS)</option>`; }
     else if (freq === 5) {
@@ -700,7 +821,7 @@ function guardarProyectoHDWP() {
     let incluirImagen = false;
     if (estadoSimulacion.imagenPlanoDataURL) incluirImagen = confirm('Tienes un plano arquitectónico cargado.\n\n• ACEPTAR: incrustar imagen en .hdwp.\n• CANCELAR: guardar solo datos y polígono (< 3 KB para correo).');
     const proyectoData = {
-        format: 'HDWP', version: '3.2', author: 'Ing. G. Leonardo Dominguez Garcia - RedCorp 802.11 México',
+        format: 'HDWP', version: '3.6', author: 'Ing. G. Leonardo Dominguez Garcia - RedCorp 802.11 México',
         timestamp: new Date().toISOString(), projectName: nombreLimpio,
         simulacionIniciada: estadoSimulacion.simulacionIniciada, modoManualAPs: estadoSimulacion.modoManualAPs, mostrarAnillos: estadoSimulacion.mostrarAnillos,
         rfInputs: {
@@ -711,6 +832,9 @@ function guardarProyectoHDWP() {
             altura: parseFloat(document.getElementById('altura').value) || 12.0, perfilDispositivo: document.getElementById('perfilDispositivo').value,
             flyerX: parseFloat(document.getElementById('apPosX').value) || 60, flyerY: parseFloat(document.getElementById('apPosY').value) || 37.5,
             frecuencia: document.getElementById('frecuencia').value, anchoCanal: parseInt(document.getElementById('anchoCanal').value) || 20,
+            minDataRate: parseInt(document.getElementById('minDataRate').value) || 12,
+            dtimInterval: parseInt(document.getElementById('dtimInterval').value) || 3,
+            numSSIDs: parseInt(document.getElementById('numSSIDs').value) || 3,
             modoDFS: document.getElementById('modoDFS').value, metaOptimizacion: document.getElementById('metaOptimizacion').value,
             inicioBloque: parseFloat(document.getElementById('inicioBloque').value) || 0, inicioBloqueY: parseFloat(document.getElementById('inicioBloqueY').value) || 0,
             largoEspacio: parseFloat(document.getElementById('largoEspacio').value) || 120, anchoEspacio: parseFloat(document.getElementById('anchoEspacio').value) || 75,
@@ -755,10 +879,25 @@ function importarProyectoHDWP(event) {
             document.getElementById('apPosX').value = inp.flyerX !== undefined ? inp.flyerX : 60;
             document.getElementById('apPosY').value = inp.flyerY !== undefined ? inp.flyerY : 37.5;
             document.getElementById('frecuencia').value = inp.frecuencia || '6';
+            sincronizarFrecuenciaPorTecnologia();
             actualizarAnchosCanal();
-            document.getElementById('anchoCanal').value = String(inp.anchoCanal || 20);
+            actualizarOpcionesMinDataRate();
+            if (Array.from(document.getElementById('anchoCanal').options).some(o => o.value === String(inp.anchoCanal))) {
+                document.getElementById('anchoCanal').value = String(inp.anchoCanal);
+            }
+            if (inp.minDataRate && Array.from(document.getElementById('minDataRate').options).some(o => o.value === String(inp.minDataRate))) {
+                document.getElementById('minDataRate').value = String(inp.minDataRate);
+            }
+            if (inp.dtimInterval && Array.from(document.getElementById('dtimInterval').options).some(o => o.value === String(inp.dtimInterval))) {
+                document.getElementById('dtimInterval').value = String(inp.dtimInterval);
+            }
+            if (inp.numSSIDs && Array.from(document.getElementById('numSSIDs').options).some(o => o.value === String(inp.numSSIDs))) {
+                document.getElementById('numSSIDs').value = String(inp.numSSIDs);
+            }
             actualizarMenuEspectroDFS();
-            if (inp.modoDFS) document.getElementById('modoDFS').value = inp.modoDFS;
+            if (inp.modoDFS && Array.from(document.getElementById('modoDFS').options).some(o => o.value === inp.modoDFS)) {
+                document.getElementById('modoDFS').value = inp.modoDFS;
+            }
             document.getElementById('metaOptimizacion').value = inp.metaOptimizacion || '-67';
             document.getElementById('inicioBloque').value = inp.inicioBloque || 0;
             document.getElementById('inicioBloqueY').value = inp.inicioBloqueY || 0;
@@ -803,9 +942,6 @@ function importarProyectoHDWP(event) {
     reader.readAsText(file);
 }
 
-/**
- * ASIGNACIÓN BALANCEADA DE CANALES + REFINAMIENTO ESPACIAL (SWAP PASS) + CCI 3D
- */
 function calcularCCIFisicoAutomatico(apsVisuales, totalAPsReales, potenciaTxGlobal, zGlobal, freq, bw, tipoAnt, montajeSec, bWH, bWV, areaPoligonoM2, numPers, postura, modoDFS, paisCod, capaVisual, tech) {
     const poolCanales = obtenerPoolCanales(freq, bw, modoDFS, paisCod), numCanalesDisponibles = poolCanales.length;
     estadoSimulacion.canalesDisponiblesPool = poolCanales;
@@ -896,21 +1032,29 @@ function calcularCCIFisicoAutomatico(apsVisuales, totalAPsReales, potenciaTxGlob
 function autoOptimizarRF() {
     estadoSimulacion.simulacionIniciada = true;
     if (!estadoSimulacion.poligonoPersonalizadoActivo || estadoSimulacion.poligonoZona.length < 3) sincronizarPoligonoDesdeInputsRect();
-    const metaDbm = parseFloat(document.getElementById('metaOptimizacion').value) || -67, freq = parseFloat(document.getElementById('frecuencia').value) || 6;
+    const metaDbm = parseFloat(document.getElementById('metaOptimizacion').value) || -67, freq = parseFloat(document.getElementById('frecuencia').value) || 5;
     const altura = parseFloat(document.getElementById('altura').value) || 12.0, tipoAnt = document.getElementById('tipoAntena').value || 'sec';
     const montajeSec = document.getElementById('montajeSectorial').value || 'techo', bWH = parseFloat(document.getElementById('beamwidthH').value) || 60;
     const bWV = parseFloat(document.getElementById('beamwidthV').value) || 30, tech = document.getElementById('tecnologia').value || 'mlo';
     const postura = document.getElementById('posturaGente').value || 'mixta', numPers = obtenerNumeroPersonasActivo(), perfilDisp = obtenerPerfilDispositivo(), areaTotal = Math.max(4, estadoSimulacion.areaPoligonoRealM2);
 
-    document.getElementById('anchoCanal').value = '20'; actualizarMenuEspectroDFS();
+    document.getElementById('anchoCanal').value = '20';
+    actualizarOpcionesMinDataRate();
+    document.getElementById('minDataRate').value = (numPers >= 2000 && freq !== 2.4) ? '24' : '12';
+    document.getElementById('dtimInterval').value = '3';
+    actualizarMenuEspectroDFS();
+
     if (freq === 5 && numPers >= 800) document.getElementById('modoDFS').value = 'con_dfs';
+    const minRate = parseInt(document.getElementById('minDataRate').value) || 12;
+    const dtim = parseInt(document.getElementById('dtimInterval').value) || 3;
+    const numSSIDs = parseInt(document.getElementById('numSSIDs').value) || 3;
     const apsPorCapacidad = estadoSimulacion.modoManualAPs && estadoSimulacion.apsOptimos.length > 0 ? estadoSimulacion.apsOptimos.length : Math.max(1, Math.ceil(numPers / (tech === 'mlo' ? 200 : 140)));
     const radioObjetivoM = Math.max(7, Math.min(22, Math.sqrt((areaTotal / apsPorCapacidad) / Math.PI) * 1.15));
 
     let potenciaOptima = 14;
     for (let pTest = 8; pTest <= 26; pTest++) {
         potenciaOptima = pTest;
-        if (calcularDataRadialFlyer(radioObjetivoM, pTest, altura, freq, 20, numPers, areaTotal, 0, tipoAnt, montajeSec, bWH, bWV, tech, postura, apsPorCapacidad, perfilDisp).rssiR >= metaDbm) break;
+        if (calcularDataRadialFlyer(radioObjetivoM, pTest, altura, freq, 20, numPers, areaTotal, 0, tipoAnt, montajeSec, bWH, bWV, tech, postura, apsPorCapacidad, perfilDisp, minRate, dtim, numSSIDs).rssiR >= metaDbm) break;
     }
     document.getElementById('potencia').value = potenciaOptima; document.getElementById('capaVisual').value = 'heatmap_aps';
     centrarFlyerEnZona(); regenerarAudiencia(); actualizarTodo();
@@ -926,7 +1070,7 @@ function actualizarTablaEjecutivaAPs(apsLista, totalAPsReales, activosEnBanda, p
     }
     const reg = REGULACIONES_PAIS[prm.pais] || REGULACIONES_PAIS.MX, gain = (prm.tAnt === 'sec') ? 9 : 4;
     document.getElementById('scheduleTitle').innerText = `Tabla Ejecutiva de Sembrado de APs — ${totalAPsReales.toLocaleString('es-MX')} AP(s) (${activosEnBanda} activos en ${prm.f} GHz)${estadoSimulacion.modoManualAPs ? ' [Edición Manual]' : ''}`;
-    document.getElementById('scheduleSubtitle').innerText = `${reg.nombre} | Polígono ${Math.round(estadoSimulacion.areaPoligonoRealM2).toLocaleString('es-MX')} m² | ${prm.f} GHz (${prm.bw} MHz) | Pool: ${numCanalesDisp} Ch | Meta: ${prm.metaDbm} dBm | CCI Auto: ${prm.cci} (* = ajuste individual)`;
+    document.getElementById('scheduleSubtitle').innerText = `${reg.nombre} | Polígono ${Math.round(estadoSimulacion.areaPoligonoRealM2).toLocaleString('es-MX')} m² | ${prm.f} GHz (${prm.bw} MHz) | ${prm.numSSIDs} SSIDs | MinRate: ${prm.minDataRate} Mbps | DTIM: ${prm.dtim} | Pool: ${numCanalesDisp} Ch | Meta: ${prm.metaDbm} dBm | CCI Auto: ${prm.cci} (* = ajuste individual)`;
 
     apsLista.forEach(ap => {
         const activo = isAPActiveInBand(ap, prm.f, prm.tech), subBanda = activo ? obtenerSubBandaCanal(prm.f, ap.canal) : 'Radio Apagado';
@@ -946,12 +1090,12 @@ function exportarTablaAPsCSV() {
     if (!estadoSimulacion.simulacionIniciada || !estadoSimulacion.apsOptimos.length) { alert('Primero traza un polígono o ejecuta el cálculo.'); return; }
     const prm = estadoSimulacion.params, aps = estadoSimulacion.apsOptimos, reg = REGULACIONES_PAIS[prm.pais] || REGULACIONES_PAIS.MX, gain = (prm.tAnt === 'sec') ? 9 : 4;
     const activos = aps.filter(ap => isAPActiveInBand(ap, prm.f, prm.tech)).length, clientesPorAP = activos > 0 ? Math.ceil(prm.numPers / activos) : 0;
-    let csv = "Pais_Regulacion,ID_AP,Coord_X_m,Coord_Y_m,Altura_Z_m,Radios_Activos,Banda_Vista_GHz,Ancho_Canal_MHz,Canal_Asignado,SubBanda,Potencia_Tx_dBm,EIRP_dBm,Rotacion_Azimut_deg,Antena_Montaje,Radio_Meta_m,Elipse_3dB_H_m,Elipse_3dB_V_m,Meta_dBm,Clientes_Estimados,CCI_Auto\n";
+    let csv = "Pais_Regulacion,ID_AP,Coord_X_m,Coord_Y_m,Altura_Z_m,Radios_Activos,Banda_Vista_GHz,Ancho_Canal_MHz,Cantidad_SSIDs,Min_Data_Rate_Mbps,DTIM_Interval,Canal_Asignado,SubBanda,Potencia_Tx_dBm,EIRP_dBm,Rotacion_Azimut_deg,Antena_Montaje,Radio_Meta_m,Elipse_3dB_H_m,Elipse_3dB_V_m,Meta_dBm,Clientes_Estimados,CCI_Auto\n";
     aps.forEach(ap => {
         const activo = isAPActiveInBand(ap, prm.f, prm.tech), subBanda = activo ? obtenerSubBandaCanal(prm.f, ap.canal) : 'RADIO_OFF';
         const apZ = getAPZ(ap, prm.a), apTx = getAPTx(ap, prm.p), eirp = apTx + gain, apAz = getAPAzimut(ap, prm.azimutDeg), el = calcularElipse3dB(apZ, prm.postura, prm.bWH, prm.bWV);
         const pat = prm.tAnt === 'sec' ? (prm.montajeSec === 'techo' ? `Sectorial Techo -Z (${prm.bWH}x${prm.bWV}deg)` : `Sectorial Muro (${prm.bWH}x${prm.bWV}deg)`) : 'Omnidireccional 360deg';
-        csv += `"${reg.nombre}",${ap.id},${ap.x.toFixed(1)},${ap.y.toFixed(1)},${apZ.toFixed(1)},"${formatRadiosTexto(ap, prm.tech)}",${prm.f},${prm.bw},${activo ? ap.canal : 'OFF'},"${subBanda}",${activo ? apTx : 0},${activo ? eirp : 0},${apAz},"${pat}",${estadoSimulacion.radioCeldaMeta},${el.rH},${el.rV},${prm.metaDbm},${activo ? clientesPorAP : 0},${prm.cci}\n`;
+        csv += `"${reg.nombre}",${ap.id},${ap.x.toFixed(1)},${ap.y.toFixed(1)},${apZ.toFixed(1)},"${formatRadiosTexto(ap, prm.tech)}",${prm.f},${prm.bw},${prm.numSSIDs},${prm.minDataRate},${prm.dtim},${activo ? ap.canal : 'OFF'},"${subBanda}",${activo ? apTx : 0},${activo ? eirp : 0},${apAz},"${pat}",${estadoSimulacion.radioCeldaMeta},${el.rH},${el.rV},${prm.metaDbm},${activo ? clientesPorAP : 0},${prm.cci}\n`;
     });
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' })), link = document.createElement('a');
     link.setAttribute('href', url); link.setAttribute('download', `Plan_Sembrado_APs_${prm.pais}_${prm.f}GHz_${prm.numPers}Disp.csv`);
@@ -1113,10 +1257,14 @@ function centrarFlyerEnZona() {
 function moverFlyerAlCentro() { centrarFlyerEnZona(); activarCaminataFlyer(); actualizarTodo(); }
 function ajustarAltura(delta) { const el = document.getElementById('altura'); el.value = Math.max(0.5, Math.min(45, (parseFloat(el.value) || 12.0) + delta)).toFixed(1); actualizarTodo(); }
 function actualizarAnchosCanal() {
-    const freq = parseFloat(document.getElementById('frecuencia').value) || 6, sel = document.getElementById('anchoCanal'), prev = parseInt(sel.value) || 20;
+    const freq = parseFloat(document.getElementById('frecuencia').value) || 5;
+    const tech = document.getElementById('tecnologia').value || 'mlo';
+    const sel = document.getElementById('anchoCanal'), prev = parseInt(sel.value) || 20;
     let ops = freq === 2.4 ? [{ val: 20, text: '20 MHz (Estándar HD)' }, { val: 40, text: '40 MHz (No Rec. HD)' }]
         : (freq === 5 ? [{ val: 20, text: '20 MHz (Alta Densidad)' }, { val: 40, text: '40 MHz (Balanceado HD)' }, { val: 80, text: '80 MHz (Alto Tput)' }, { val: 160, text: '160 MHz (Baja Densidad)' }]
-        : [{ val: 20, text: '20 MHz (Alta Densidad)' }, { val: 40, text: '40 MHz (Alta Densidad)' }, { val: 80, text: '80 MHz (Estándar 6 GHz)' }, { val: 160, text: '160 MHz (Ultra Tput)' }, { val: 320, text: '320 MHz (Wi-Fi 7 Max)' }]);
+        : (tech === 'mlo'
+            ? [{ val: 20, text: '20 MHz (Alta Densidad)' }, { val: 40, text: '40 MHz (Alta Densidad)' }, { val: 80, text: '80 MHz (Estándar 6 GHz)' }, { val: 160, text: '160 MHz (Ultra Tput)' }, { val: 320, text: '320 MHz (Wi-Fi 7 Max)' }]
+            : [{ val: 20, text: '20 MHz (Alta Densidad)' }, { val: 40, text: '40 MHz (Alta Densidad)' }, { val: 80, text: '80 MHz (Estándar 6 GHz)' }, { val: 160, text: '160 MHz (Wi-Fi 6E Max)' }]));
     sel.innerHTML = ''; const fin = ops.some(o => o.val === prev) ? prev : 20;
     ops.forEach(o => { const el = document.createElement('option'); el.value = o.val; el.textContent = o.text; if (o.val === fin) el.selected = true; sel.appendChild(el); });
 }
@@ -1194,7 +1342,8 @@ function calcularSenalEnFlyerXY(px, py, txX, txY, prm, esSectorial, angRad, txOv
     return { rssiCampoAP, rssiCliente: Math.max(-105, rssiCampoAP + prm.clientOffset), dist3D };
 }
 
-function calcularDataRadialFlyer(distRadial, potencia, altura, freq, bw, numPers, areaPoligonoM2, cci, tipoAnt, montajeSec, bWH, bWV, tech, postura, numCeldasActivas, perfilDisp) {
+function calcularDataRadialFlyer(distRadial, potencia, altura, freq, bw, numPers, areaPoligonoM2, cci, tipoAnt, montajeSec, bWH, bWV, tech, postura, numCeldasActivas, perfilDisp, minDataRate, dtimInterval, numSSIDs) {
+    const minRate = minDataRate || 12, dtim = dtimInterval || 3, ssids = Math.max(1, Math.min(8, numSSIDs || 3));
     const celdas = Math.max(1, numCeldasActivas || 1), altCab = postura === 'sentada' ? 1.25 : (postura === 'mixta' ? 1.50 : 1.75), altDisp = postura === 'sentada' ? 0.90 : (postura === 'mixta' ? 1.08 : 1.25);
     const fAbs = postura === 'sentada' ? 0.68 : (postura === 'mixta' ? 0.85 : 1.0), hDelta = altura - altDisp, hEf = Math.abs(hDelta), distR = Math.hypot(distRadial, hEf);
     const angElev = Math.atan2(hDelta, Math.max(distRadial, 0.5)) * (180 / Math.PI), eirp = potencia + (tipoAnt === 'sec' ? 9.0 : 4.0);
@@ -1215,7 +1364,10 @@ function calcularDataRadialFlyer(distRadial, potencia, altura, freq, bw, numPers
     const snr = Math.max(0, rssiR - ((-95 + (10 * Math.log10(bw / 20))) + (cci > 0 ? Math.log10(1 + cci) * 6.5 : 0)));
     let cap = (freq === 2.4 ? 110 : 155) * perfilDisp.factorMimo * Math.pow(bw / 20, 0.94) * Math.pow(snr / (snr + 18), 1.65) * (1 / (1 + Math.pow(distR / 44, 1.35))) * (1 / (1 + cci * 0.35)), mloSav = 1.0;
     if (tech === 'mlo' && rssiR > -82) { const ef = Math.max(0, Math.min(1, (rssiR + 82) / 22)) * (freq === 2.4 ? 0.20 : (freq === 5 ? 0.85 : 1.15)); cap *= (1 + 0.60 * ef); mloSav = 1 - 0.30 * ef; }
-    const carga = ((numPers / celdas) * 0.22) * (1 + Math.min(0.6, Math.log10(1 + dens) * 0.20)) * mloSav, ov = 3.0 + Math.min(18, cci * 4.0) + (distRadial * 0.14);
+    const beaconOverhead = ssids * (6.0 / Math.max(1, minRate)) * (1 + cci * 0.55);
+    const dtimOverhead = (2.4 / Math.max(1, dtim)) * (1 + (ssids - 1) * 0.12);
+    const carga = ((numPers / celdas) * 0.22) * (1 + Math.min(0.6, Math.log10(1 + dens) * 0.20)) * mloSav;
+    const ov = Math.min(65, 1.5 + beaconOverhead + dtimOverhead + Math.min(16, cci * 3.5) + (distRadial * 0.14));
     const airtimeUse = Math.min(99.4, ov + ((carga + cci * 6) / (carga + cci * 6 + cap * 0.85)) * (96.4 - ov));
     return { rssiH, rssiR, snr, tput: Math.max(0.5, cap * Math.max(0.02, (100 - airtimeUse) / 100)), airtimeUse };
 }
@@ -1232,7 +1384,7 @@ function evaluarPosicionActualFlyer(prm, perfilDisp) {
         const res = calcularSenalEnFlyerXY(prm.flyerX, prm.flyerY, ap.x, ap.y, prm, prm.tAnt === 'sec', getAPAzimut(ap, prm.azimutDeg) * (Math.PI / 180), getAPTx(ap, prm.p), getAPZ(ap, prm.a));
         if (!mejorEval || res.rssiCliente > mejorEval.rssiCliente) { mejorEval = res; mejorAP = ap; }
     });
-    const m = calcularDataRadialFlyer(Math.hypot(prm.flyerX - mejorAP.x, prm.flyerY - mejorAP.y), getAPTx(mejorAP, prm.p), getAPZ(mejorAP, prm.a), prm.f, prm.bw, prm.numPers, estadoSimulacion.areaPoligonoRealM2, prm.cci, prm.tAnt, prm.montajeSec, prm.bWH, prm.bWV, prm.tech, prm.postura, prm.numCeldasActivas, perfilDisp);
+    const m = calcularDataRadialFlyer(Math.hypot(prm.flyerX - mejorAP.x, prm.flyerY - mejorAP.y), getAPTx(mejorAP, prm.p), getAPZ(mejorAP, prm.a), prm.f, prm.bw, prm.numPers, estadoSimulacion.areaPoligonoRealM2, prm.cci, prm.tAnt, prm.montajeSec, prm.bWH, prm.bWV, prm.tech, prm.postura, prm.numCeldasActivas, perfilDisp, prm.minDataRate, prm.dtim, prm.numSSIDs);
     return { apConectado: mejorAP, rssiCampoAP: mejorEval.rssiCampoAP, rssiCliente: mejorEval.rssiCliente, dist3D: mejorEval.dist3D, sinr: m.snr, tput: m.tput, airtime: m.airtimeUse, mcsStr: m.snr >= 32 ? (prm.tech === 'mlo' ? 'MCS 12-13 (4K-QAM)' : 'MCS 10-11 (1024-QAM)') : (m.snr >= 24 ? 'MCS 7-9 (256-QAM)' : (m.snr >= 15 ? 'MCS 3-5 (16-QAM)' : 'MCS 0-2 (QPSK)')) };
 }
 
@@ -1241,7 +1393,8 @@ function actualizarTodo() {
     const p = parseFloat(document.getElementById('potencia').value) || 18, a = parseFloat(document.getElementById('altura').value) || 12.0;
     const flyerX = isNaN(parseFloat(document.getElementById('apPosX').value)) ? 60 : parseFloat(document.getElementById('apPosX').value);
     const flyerY = isNaN(parseFloat(document.getElementById('apPosY').value)) ? 37.5 : parseFloat(document.getElementById('apPosY').value);
-    const f = parseFloat(document.getElementById('frecuencia').value) || 6, bw = parseInt(document.getElementById('anchoCanal').value) || 20;
+    const f = parseFloat(document.getElementById('frecuencia').value) || 5, bw = parseInt(document.getElementById('anchoCanal').value) || 20;
+    const minDataRate = parseInt(document.getElementById('minDataRate').value) || 12, dtim = parseInt(document.getElementById('dtimInterval').value) || 3, numSSIDs = parseInt(document.getElementById('numSSIDs').value) || 3;
     const modoDFS = document.getElementById('modoDFS').value || 'con_dfs', metaDbm = parseFloat(document.getElementById('metaOptimizacion').value) || -67;
     const tech = document.getElementById('tecnologia').value || 'mlo', tAnt = document.getElementById('tipoAntena').value || 'sec', montajeSec = document.getElementById('montajeSectorial').value || 'techo';
     const bWH = parseFloat(document.getElementById('beamwidthH').value) || 60, bWV = parseFloat(document.getElementById('beamwidthV').value) || 30, azimutDeg = parseFloat(document.getElementById('azimut').value) || 0;
@@ -1253,7 +1406,7 @@ function actualizarTodo() {
     const areaParaCurvas = estadoSimulacion.simulacionIniciada ? Math.round(estadoSimulacion.areaPoligonoRealM2) : Math.round(estadoSimulacion.planoAnchoM * estadoSimulacion.planoAltoM);
 
     let radioMeta = 45;
-    for (let d = 1; d <= 60; d++) if (calcularDataRadialFlyer(d, p, a, f, bw, numPersActivo, areaParaCurvas, 0, tAnt, montajeSec, bWH, bWV, tech, postura, 1, perfilDisp).rssiR < metaDbm) { radioMeta = Math.max(5, d - 1); break; }
+    for (let d = 1; d <= 60; d++) if (calcularDataRadialFlyer(d, p, a, f, bw, numPersActivo, areaParaCurvas, 0, tAnt, montajeSec, bWH, bWV, tech, postura, 1, perfilDisp, minDataRate, dtim, numSSIDs).rssiR < metaDbm) { radioMeta = Math.max(5, d - 1); break; }
     estadoSimulacion.radioCeldaMeta = radioMeta;
 
     let totalAPs = 0, activosEnBanda = 0, cci = 0, numCanalesDisp = poolBase.length, clientesPorAP = 0;
@@ -1270,8 +1423,24 @@ function actualizarTodo() {
 
     estadoSimulacion.cciCalculadoAuto = cci;
     const cciEl = document.getElementById('cciAutoDisplay'); cciEl.innerText = `CCI Auto: ${cci} APs (${numCanalesDisp} Ch)`; cciEl.style.color = cci === 0 ? '#10b981' : (cci <= 2 ? '#fbbf24' : '#ef4444');
-    estadoSimulacion.params = { pais, p, a, flyerX, flyerY, f, bw, cci, tech, tAnt, montajeSec, bWH, bWV, azimutDeg, postura, capaVisual, metaDbm, numCeldasActivas: capaVisual === 'solo_ap_principal' ? 1 : Math.max(1, activosEnBanda), numPers: numPersActivo, clientOffset: perfilDisp.offset, perfilNombre: perfilDisp.nombre, perfilEtiqueta: perfilDisp.etiquetaCorta };
+    estadoSimulacion.params = { pais, p, a, flyerX, flyerY, f, bw, minDataRate, dtim, numSSIDs, cci, tech, tAnt, montajeSec, bWH, bWV, azimutDeg, postura, capaVisual, metaDbm, numCeldasActivas: capaVisual === 'solo_ap_principal' ? 1 : Math.max(1, activosEnBanda), numPers: numPersActivo, clientOffset: perfilDisp.offset, perfilNombre: perfilDisp.nombre, perfilEtiqueta: perfilDisp.etiquetaCorta };
     estadoSimulacion.heatmapDirty = true;
+
+    const beaconOverheadPct = Math.min(65, numSSIDs * (6.0 / Math.max(1, minDataRate)) * (1 + cci * 0.55));
+    validarYMostrarAlertaBeacon(numSSIDs, minDataRate, beaconOverheadPct, cci);
+
+    const beaconBox = document.getElementById('kpiBeaconBox');
+    const beaconVal = document.getElementById('kpiBeaconOverhead');
+    const beaconDet = document.getElementById('kpiBeaconDetail');
+    let beaconColor = '#10b981', beaconEstado = 'Óptimo';
+    if (beaconOverheadPct >= 12) { beaconColor = '#ef4444'; beaconEstado = 'Crítico'; }
+    else if (beaconOverheadPct >= 5) { beaconColor = '#f59e0b'; beaconEstado = 'Moderado'; }
+    if (beaconBox && beaconVal && beaconDet) {
+        beaconBox.style.borderLeftColor = beaconColor;
+        beaconVal.style.color = beaconColor;
+        beaconVal.innerText = `${beaconOverheadPct.toFixed(1)}% Airtime (${beaconEstado})`;
+        beaconDet.innerText = `${numSSIDs} SSID(s) @ ${minDataRate} Mbps | CCI: ${cci} APs`;
+    }
 
     const evalFlyer = evaluarPosicionActualFlyer(estadoSimulacion.params, perfilDisp); estadoSimulacion.evalFlyerActual = evalFlyer;
     const bR = document.getElementById('bulbRed'), bY = document.getElementById('bulbYellow'), bG = document.getElementById('bulbGreen');
@@ -1279,35 +1448,36 @@ function actualizarTodo() {
     const vEl = document.getElementById('globalVerdict'), rEl = document.getElementById('globalReason'), nFmt = numPersActivo.toLocaleString('es-MX');
 
     if (!estadoSimulacion.simulacionIniciada || !evalFlyer) {
-        if (estadoSimulacion.simulacionIniciada && activosEnBanda === 0) { bR.classList.add('on'); vEl.innerText = `SIN RADIOS ACTIVOS EN ${f} GHz`; vEl.style.color = '#ef4444'; rEl.innerText = (f === 6 && tech !== 'mlo') ? 'Wi-Fi 6/5 solo soporta 2 radios (2.4 y 5 GHz).' : `Enciende al menos un radio de ${f} GHz con "⚙ Editar AP".`; }
-        else { bG.classList.add('on'); vEl.innerText = `PLANO LIMPIO [${reg.nombre}] — CALIBRA METROS Y TRAZA TU POLÍGONO`; vEl.style.color = '#38bdf8'; rEl.innerText = `Espectro en ${reg.nombre}: ${numCanalesDisp} Ch en ${f} GHz (${bw} MHz).`; }
+        if (estadoSimulacion.simulacionIniciada && activosEnBanda === 0) { bR.classList.add('on'); vEl.innerText = `SIN RADIOS ACTIVOS EN ${f} GHz`; vEl.style.color = '#ef4444'; rEl.innerText = `Enciende al menos un radio de ${f} GHz con "⚙ Editar AP".`; }
+        else { bG.classList.add('on'); vEl.innerText = `PLANO LIMPIO [${reg.nombre}] — CALIBRA METROS Y TRAZA TU POLÍGONO`; vEl.style.color = '#38bdf8'; rEl.innerText = `Espectro en ${reg.nombre}: ${numCanalesDisp} Ch en ${f} GHz (${bw} MHz) | ${numSSIDs} SSIDs | MinRate: ${minDataRate} Mbps | DTIM: ${dtim}.`; }
         document.getElementById('flyerStatusLine').innerText = `Flyer Wifi en (${flyerX.toFixed(1)}m, ${flyerY.toFixed(1)}m) — Sin señal activa en ${f} GHz`;
         document.getElementById('kpiNumAPs').innerText = `${totalAPs} AP(s) (${activosEnBanda} activos en ${f} GHz)`;
         document.getElementById('kpiGridInfo').innerText = 'Traza el polígono o activa radios en esta banda';
         document.getElementById('kpiFlyerSignal').innerText = 'Sin señal activa'; document.getElementById('kpiFlyerAPRef').innerText = `No hay radios activos en ${f} GHz`;
-        document.getElementById('kpiClientesPorAP').innerText = `CCI: 0 APs${tAnt === 'sec' ? ` | -3dB: ${elG.rH}×${elG.rV}m` : ''}`;
+        document.getElementById('kpiClientesPorAP').innerText = `CCI: 0 APs | ${numSSIDs} SSIDs | MinRate ${minDataRate}M | DTIM ${dtim}`;
         document.getElementById('kpiDensidadM2').innerText = `${reg.nombre}: ${numCanalesDisp} Ch (${f} GHz @ ${bw} MHz)`;
         document.getElementById('kpiSondaRSSI').innerText = 'Sin asociación activa'; document.getElementById('kpiSondaDetalle').innerText = `Flyer: X=${flyerX.toFixed(1)}m, Y=${flyerY.toFixed(1)}m`;
     } else {
-        if (evalFlyer.rssiCliente >= metaDbm && evalFlyer.sinr >= 22 && evalFlyer.airtime < 75 && cci <= 1) { bG.classList.add('on'); vEl.innerText = `ESTADO GLOBAL [${reg.nombre} | META ${metaDbm} dBm]: ÓPTIMO (VERDE)`; vEl.style.color = "#10b981"; rEl.innerText = `Flyer Wifi recibe ${evalFlyer.rssiCliente.toFixed(1)} dBm, CCI = ${cci} (${numCanalesDisp} Ch) y Airtime (${evalFlyer.airtime.toFixed(0)}%).`; }
-        else if (evalFlyer.rssiCliente >= -72 && evalFlyer.sinr >= 15 && evalFlyer.airtime < 88) { bY.classList.add('on'); vEl.innerText = `ESTADO GLOBAL [${reg.nombre} | META ${metaDbm} dBm]: ZONA ROAMING (AMARILLO)`; vEl.style.color = "#f59e0b"; rEl.innerText = `Flyer Wifi recibe ${evalFlyer.rssiCliente.toFixed(1)} dBm con CCI = ${cci} (${evalFlyer.airtime.toFixed(0)}% Airtime).`; }
-        else { bR.classList.add('on'); vEl.innerText = `ESTADO GLOBAL [${reg.nombre} | META ${metaDbm} dBm]: CRÍTICO (ROJO)`; vEl.style.color = "#ef4444"; rEl.innerText = `En (${flyerX}m, ${flyerY}m) la señal cae a ${evalFlyer.rssiCliente.toFixed(1)} dBm o CCI = ${cci}.`; }
+        if (evalFlyer.rssiCliente >= metaDbm && evalFlyer.sinr >= 22 && evalFlyer.airtime < 75 && cci <= 1) { bG.classList.add('on'); vEl.innerText = `ESTADO GLOBAL [${reg.nombre} | META ${metaDbm} dBm]: ÓPTIMO (VERDE)`; vEl.style.color = "#10b981"; rEl.innerText = `Flyer Wifi recibe ${evalFlyer.rssiCliente.toFixed(1)} dBm, CCI = ${cci} (${numCanalesDisp} Ch), ${numSSIDs} SSIDs, MinRate ${minDataRate} Mbps, DTIM ${dtim} y Airtime (${evalFlyer.airtime.toFixed(0)}%).`; }
+        else if (evalFlyer.rssiCliente >= -72 && evalFlyer.sinr >= 15 && evalFlyer.airtime < 88) { bY.classList.add('on'); vEl.innerText = `ESTADO GLOBAL [${reg.nombre} | META ${metaDbm} dBm]: ZONA ROAMING (AMARILLO)`; vEl.style.color = "#f59e0b"; rEl.innerText = `Flyer Wifi recibe ${evalFlyer.rssiCliente.toFixed(1)} dBm con CCI = ${cci}, ${numSSIDs} SSIDs, MinRate ${minDataRate} Mbps, DTIM ${dtim} (${evalFlyer.airtime.toFixed(0)}% Airtime).`; }
+        else { bR.classList.add('on'); vEl.innerText = `ESTADO GLOBAL [${reg.nombre} | META ${metaDbm} dBm]: CRÍTICO (ROJO)`; vEl.style.color = "#ef4444"; rEl.innerText = `En (${flyerX}m, ${flyerY}m) la señal cae a ${evalFlyer.rssiCliente.toFixed(1)} dBm, CCI = ${cci} o Airtime = ${evalFlyer.airtime.toFixed(0)}%.`; }
         document.getElementById('flyerStatusLine').innerText = `RSSI ${perfilDisp.nombre}: ${evalFlyer.rssiCliente.toFixed(1)} dBm (AP: ${evalFlyer.rssiCampoAP.toFixed(1)} dBm) | SINR: ${evalFlyer.sinr.toFixed(1)} dB | CCI: ${cci} | Tput: ${evalFlyer.tput.toFixed(1)} Mbps`;
         document.getElementById('kpiNumAPs').innerText = `${activosEnBanda}/${totalAPs} Radios Activos (${f} GHz)`;
         document.getElementById('kpiGridInfo').innerText = `${estadoSimulacion.poligonoZona.length} vértices (${areaParaCurvas.toLocaleString('es-MX')} m²) | ~${clientesPorAP} Disp/Radio`;
         document.getElementById('kpiFlyerSignal').innerText = `${evalFlyer.rssiCliente.toFixed(1)} dBm (${perfilDisp.offset} dB Offset)`;
         document.getElementById('kpiFlyerAPRef').innerText = `AP: ${evalFlyer.rssiCampoAP.toFixed(1)} dBm | Radio ${metaDbm}: ${radioMeta}m`;
-        document.getElementById('kpiClientesPorAP').innerText = `CCI: ${cci} APs${tAnt === 'sec' ? ` | -3dB: ${elG.rH}×${elG.rV}m` : ''}`;
-        document.getElementById('kpiDensidadM2').innerText = `${reg.nombre}: ${numCanalesDisp} Ch (${f} GHz @ ${bw} MHz)`;
+        document.getElementById('kpiClientesPorAP').innerText = `CCI: ${cci} APs | ${numSSIDs} SSIDs | MinRate ${minDataRate}M | DTIM ${dtim}`;
+        document.getElementById('kpiDensidadM2').innerText = `${reg.nombre}: ${numCanalesDisp} Ch (${f} GHz @ ${bw} MHz)${tAnt === 'sec' ? ` | -3dB: ${elG.rH}×${elG.rV}m` : ''}`;
         document.getElementById('kpiSondaRSSI').innerText = `${evalFlyer.apConectado.id} [C${evalFlyer.apConectado.canal || 36}] (${evalFlyer.dist3D.toFixed(1)}m)`;
         document.getElementById('kpiSondaDetalle').innerText = `Flyer: X=${flyerX.toFixed(1)}m, Y=${flyerY.toFixed(1)}m | ${evalFlyer.mcsStr}`;
     }
 
+    const techNombreRep = tech === 'mlo' ? 'Wi-Fi 7 MLO (3 Radios)' : (tech === 'wifi6e' ? 'Wi-Fi 6E (3 Radios, sin MLO)' : 'Wi-Fi 6/5 (2 Radios)');
     document.getElementById('flyerBadgeHeader').innerText = `Telemetría en Agente "Flyer Wifi" — Perfil: ${perfilDisp.etiquetaCorta} | Meta: ${metaDbm} dBm`;
     document.getElementById('legendFlyerLabel').innerText = `Flyer Wifi [${perfilDisp.etiquetaCorta}]:`;
-    document.getElementById('repTech').innerText = `${tech === 'mlo' ? "Wi-Fi 7 MLO (3 Radios)" : "Wi-Fi 6/5 (2 Radios)"} | ${reg.nombre}`;
+    document.getElementById('repTech').innerText = `${techNombreRep} | ${reg.nombre}`;
     document.getElementById('repPotencia').innerText = `${p} dBm | Z=${a}m | Meta: ${metaDbm} dBm`;
-    document.getElementById('repFrecuencia').innerText = `${f} GHz (${bw} MHz | ${numCanalesDisp} Ch)`;
+    document.getElementById('repFrecuencia').innerText = `${f} GHz (${bw} MHz | ${numCanalesDisp} Ch) | ${numSSIDs} SSIDs (${beaconOverheadPct.toFixed(1)}% Beacon) | MinRate: ${minDataRate} Mbps | DTIM: ${dtim}`;
     document.getElementById('repZona').innerText = estadoSimulacion.simulacionIniciada ? `Polígono (${estadoSimulacion.poligonoZona.length} vért. | ${areaParaCurvas.toLocaleString('es-MX')} m²)` : `Plano Base`;
     document.getElementById('repCohorte').innerText = `${nFmt} Disp. (${postura.toUpperCase()})`;
     document.getElementById('repCCI').innerText = evalFlyer ? `CCI Auto: ${cci} | ${perfilDisp.etiquetaCorta}: ${evalFlyer.rssiCliente.toFixed(1)} dBm` : 'Sin calcular';
@@ -1329,7 +1499,7 @@ function actualizarTodo() {
         cohs.forEach(c => {
             const cMax = (tech === 'mlo' ? 200 : 140) * (bw >= 40 ? 1.15 : 1.0);
             const celdasC = (c.key === 'activa' && estadoSimulacion.modoManualAPs && activosEnBanda > 0) ? activosEnBanda : Math.max(1, Math.ceil(c.num / cMax));
-            pt[c.key] = calcularDataRadialFlyer(d, p, a, f, bw, c.num, areaParaCurvas, cci, tAnt, montajeSec, bWH, bWV, tech, postura, capaVisual === 'solo_ap_principal' ? 1 : celdasC, perfilDisp);
+            pt[c.key] = calcularDataRadialFlyer(d, p, a, f, bw, c.num, areaParaCurvas, cci, tAnt, montajeSec, bWH, bWV, tech, postura, capaVisual === 'solo_ap_principal' ? 1 : celdasC, perfilDisp, minDataRate, dtim, numSSIDs);
         });
         return pt;
     });
@@ -1530,7 +1700,6 @@ function animarPlanoMaestro() {
     estadoSimulacion.geometriaMapa = { minX, maxMetrosX, maxMetrosY, padL, padR, padT, padB, plotW, plotH };
     if (estadoSimulacion.heatmapDirty) actualizarCacheHeatmapMaestro(W, H, prm, estadoSimulacion.geometriaMapa);
 
-    // Pintar fondo oscuro directamente en el canvas para garantizar alto contraste al imprimir a PDF
     ctx.fillStyle = '#090d16';
     ctx.fillRect(0, 0, W, H);
     ctx.save(); ctx.translate(estadoSimulacion.panX, estadoSimulacion.panY); ctx.scale(estadoSimulacion.zoom, estadoSimulacion.zoom);
@@ -1644,7 +1813,9 @@ function renderCapacidadChart(id, labels, tputArr) {
 
 window.onload = function() {
     toggleBeamwidth();
+    sincronizarFrecuenciaPorTecnologia();
     actualizarAnchosCanal();
+    actualizarOpcionesMinDataRate();
     actualizarMenuEspectroDFS();
     inicializarEventosMouse();
     actualizarTodo();
