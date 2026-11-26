@@ -268,7 +268,9 @@
             <label>Mínimo Data Rate (Basic Rate)</label>
             <select id="minDataRate" onchange="actualizarTodo()">
                 <option value="6">6 Mbps (Estándar Básico)</option>
+                <option value="9">9 Mbps (OFDM)</option>
                 <option value="12" selected>12 Mbps (Recomendado HD)</option>
+                <option value="18">18 Mbps (Alta Densidad)</option>
                 <option value="24">24 Mbps (Ultra Alta Densidad)</option>
                 <option value="36">36 Mbps (Celdas Muy Compactas)</option>
             </select>
@@ -376,7 +378,7 @@
 
     <div id="beaconAlertBanner" class="beacon-alert-banner">
         <span id="beaconAlertText">Aviso de Saturación de Beacons...</span>
-        <button type="button" class="btn-beacon-fix" onclick="optimizarBeaconOverhead()">&#9889; Optimizar a 3 SSIDs y 12/24 Mbps</button>
+        <button type="button" class="btn-beacon-fix" onclick="optimizarBeaconOverhead()">&#9889; Optimizar a 3 SSIDs, 12/24 Mbps y DTIM 3</button>
     </div>
 
     <div class="global-semaphore-bar">
@@ -615,6 +617,7 @@ function formatRadiosTexto(ap, tech) {
     if (soporta6GHz(tech) && r.r6) list.push('6');
     return list.length ? list.join(' / ') + ' GHz' : 'Todos OFF';
 }
+function formatSSIDTexto(n) { return `${n} ${n === 1 ? 'SSID' : 'SSIDs'}`; }
 function calcularElipse3dB(zAP, postura, bWH, bWV) {
     const altDisp = postura === 'sentada' ? 0.90 : (postura === 'mixta' ? 1.08 : 1.25);
     const hEf = Math.max(0.5, Math.abs(zAP - altDisp));
@@ -624,17 +627,24 @@ function calcularElipse3dB(zAP, postura, bWH, bWV) {
 function actualizarOpcionesMinDataRate() {
     const freq = parseFloat(document.getElementById('frecuencia').value) || 5;
     const sel = document.getElementById('minDataRate');
-    const prev = parseInt(sel.value) || 12;
+    const prev = parseFloat(sel.value) || 12;
     const ops = freq === 2.4
         ? [
-            { val: 1, text: '1 Mbps (Legacy 802.11b - Alto Overhead)' },
-            { val: 6, text: '6 Mbps (Estándar Básico)' },
-            { val: 12, text: '12 Mbps (Recomendado HD)' },
-            { val: 24, text: '24 Mbps (Ultra Alta Densidad)' }
+            { val: 1, text: '1 Mbps (802.11b - Máx. Overhead)' },
+            { val: 2, text: '2 Mbps (802.11b - Legacy)' },
+            { val: 5.5, text: '5.5 Mbps (802.11b - Legacy)' },
+            { val: 6, text: '6 Mbps (OFDM Básico)' },
+            { val: 9, text: '9 Mbps (OFDM)' },
+            { val: 11, text: '11 Mbps (802.11b Máx.)' },
+            { val: 12, text: '12 Mbps (OFDM - Recomendado HD)' },
+            { val: 18, text: '18 Mbps (OFDM - Alta Densidad)' },
+            { val: 24, text: '24 Mbps (OFDM - Ultra HD)' }
           ]
         : [
             { val: 6, text: '6 Mbps (Estándar Básico)' },
+            { val: 9, text: '9 Mbps (OFDM)' },
             { val: 12, text: '12 Mbps (Recomendado HD)' },
+            { val: 18, text: '18 Mbps (Alta Densidad)' },
             { val: 24, text: '24 Mbps (Ultra Alta Densidad)' },
             { val: 36, text: '36 Mbps (Celdas Muy Compactas)' }
           ];
@@ -737,7 +747,7 @@ function validarYMostrarAlertaBeacon(numSSIDs, minDataRate, beaconOverheadPct, c
     if (!banner) return;
     if (numSSIDs > 4 || beaconOverheadPct >= 12) {
         const motivos = [];
-        if (numSSIDs > 4) motivos.push(`<strong>${numSSIDs} SSIDs</strong> (máximo recomendado: 3–4)`);
+        if (numSSIDs > 4) motivos.push(`<strong>${formatSSIDTexto(numSSIDs)}</strong> (máximo recomendado: 3–4)`);
         if (beaconOverheadPct >= 12) motivos.push(`<strong>${beaconOverheadPct.toFixed(1)}% de Airtime</strong> consumido solo por Beacons (límite crítico: 12%)`);
         document.getElementById('beaconAlertText').innerHTML =
             `<strong>🚨 Alerta de Overhead de Gestión:</strong> Estás operando con ${motivos.join(' y ')} a <strong>${minDataRate} Mbps</strong> (CCI: ${cci} APs). Esto degrada el throughput de la celda antes de cursar tráfico de usuarios.`;
@@ -754,6 +764,7 @@ function optimizarBeaconOverhead() {
     document.getElementById('numSSIDs').value = '3';
     actualizarOpcionesMinDataRate();
     document.getElementById('minDataRate').value = rateOptimo;
+    document.getElementById('dtimInterval').value = '3';
     actualizarTodo();
 }
 
@@ -832,7 +843,7 @@ function guardarProyectoHDWP() {
             altura: parseFloat(document.getElementById('altura').value) || 12.0, perfilDispositivo: document.getElementById('perfilDispositivo').value,
             flyerX: parseFloat(document.getElementById('apPosX').value) || 60, flyerY: parseFloat(document.getElementById('apPosY').value) || 37.5,
             frecuencia: document.getElementById('frecuencia').value, anchoCanal: parseInt(document.getElementById('anchoCanal').value) || 20,
-            minDataRate: parseInt(document.getElementById('minDataRate').value) || 12,
+            minDataRate: parseFloat(document.getElementById('minDataRate').value) || 12,
             dtimInterval: parseInt(document.getElementById('dtimInterval').value) || 3,
             numSSIDs: parseInt(document.getElementById('numSSIDs').value) || 3,
             modoDFS: document.getElementById('modoDFS').value, metaOptimizacion: document.getElementById('metaOptimizacion').value,
@@ -1045,7 +1056,7 @@ function autoOptimizarRF() {
     actualizarMenuEspectroDFS();
 
     if (freq === 5 && numPers >= 800) document.getElementById('modoDFS').value = 'con_dfs';
-    const minRate = parseInt(document.getElementById('minDataRate').value) || 12;
+    const minRate = parseFloat(document.getElementById('minDataRate').value) || 12;
     const dtim = parseInt(document.getElementById('dtimInterval').value) || 3;
     const numSSIDs = parseInt(document.getElementById('numSSIDs').value) || 3;
     const apsPorCapacidad = estadoSimulacion.modoManualAPs && estadoSimulacion.apsOptimos.length > 0 ? estadoSimulacion.apsOptimos.length : Math.max(1, Math.ceil(numPers / (tech === 'mlo' ? 200 : 140)));
@@ -1070,7 +1081,7 @@ function actualizarTablaEjecutivaAPs(apsLista, totalAPsReales, activosEnBanda, p
     }
     const reg = REGULACIONES_PAIS[prm.pais] || REGULACIONES_PAIS.MX, gain = (prm.tAnt === 'sec') ? 9 : 4;
     document.getElementById('scheduleTitle').innerText = `Tabla Ejecutiva de Sembrado de APs — ${totalAPsReales.toLocaleString('es-MX')} AP(s) (${activosEnBanda} activos en ${prm.f} GHz)${estadoSimulacion.modoManualAPs ? ' [Edición Manual]' : ''}`;
-    document.getElementById('scheduleSubtitle').innerText = `${reg.nombre} | Polígono ${Math.round(estadoSimulacion.areaPoligonoRealM2).toLocaleString('es-MX')} m² | ${prm.f} GHz (${prm.bw} MHz) | ${prm.numSSIDs} SSIDs | MinRate: ${prm.minDataRate} Mbps | DTIM: ${prm.dtim} | Pool: ${numCanalesDisp} Ch | Meta: ${prm.metaDbm} dBm | CCI Auto: ${prm.cci} (* = ajuste individual)`;
+    document.getElementById('scheduleSubtitle').innerText = `${reg.nombre} | Polígono ${Math.round(estadoSimulacion.areaPoligonoRealM2).toLocaleString('es-MX')} m² | ${prm.f} GHz (${prm.bw} MHz) | ${formatSSIDTexto(prm.numSSIDs)} | MinRate: ${prm.minDataRate} Mbps | DTIM: ${prm.dtim} | Pool: ${numCanalesDisp} Ch | Meta: ${prm.metaDbm} dBm | CCI Auto: ${prm.cci} (* = ajuste individual)`;
 
     apsLista.forEach(ap => {
         const activo = isAPActiveInBand(ap, prm.f, prm.tech), subBanda = activo ? obtenerSubBandaCanal(prm.f, ap.canal) : 'Radio Apagado';
@@ -1300,16 +1311,36 @@ function calcularSembradoIngenieria(numPers, bw, tech, radioCeldaMeta) {
         aps.push({ num: 1, id: 'AP-1', x: Number(c.x.toFixed(1)), y: Number(c.y.toFixed(1)), customZ: null, customTx: null, customAzimut: null, radios: { r24: true, r5: true, r6: true }, canal: 36, colorCanal: PALETA_CANALES[0] });
         estadoSimulacion.gridCols = 1; estadoSimulacion.gridRows = 1; return { totalAPs, apsVisuales: aps };
     }
-    const celdas = Math.ceil(apsParaDibujar / Math.max(0.2, areaReal / Math.max(1, bbox.largoX * bbox.anchoY)));
-    const cols = Math.max(2, Math.round(Math.sqrt(celdas * (bbox.largoX / bbox.anchoY)))), rows = Math.max(2, Math.ceil(celdas / cols)), cand = [];
+
+    const ratioArea = areaReal / Math.max(1, bbox.largoX * bbox.anchoY);
+    const aspect = bbox.largoX / Math.max(1, bbox.anchoY);
+    const celdas = Math.ceil(apsParaDibujar / Math.max(0.2, ratioArea));
+    let cols = Math.max(2, Math.round(Math.sqrt(celdas * aspect)));
+    let rows = Math.max(2, Math.ceil(celdas / cols));
+
+    if (ratioArea >= 0.95) {
+        let mejorCols = cols, mejorRows = rows, mejorErr = Infinity;
+        for (let c = 1; c <= apsParaDibujar; c++) {
+            if (apsParaDibujar % c === 0) {
+                const r = apsParaDibujar / c;
+                const err = Math.abs((c / r) - aspect);
+                if (err < mejorErr) { mejorErr = err; mejorCols = c; mejorRows = r; }
+            }
+        }
+        if (mejorErr < Math.max(1.2, aspect * 0.65)) { cols = mejorCols; rows = mejorRows; }
+    }
+
+    const cand = [];
     for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
         const ax = bbox.minX + ((c + 0.5) / cols) * bbox.largoX, ay = bbox.minY + ((r + 0.5) / rows) * bbox.anchoY;
         if (puntoDentroDePoligono(ax, ay, poly)) cand.push({ x: ax, y: ay });
     }
     if (!cand.length) cand.push(calcularCentroidePoligono(poly));
-    const paso = Math.max(1, cand.length / apsParaDibujar);
-    for (let i = 0; i < apsParaDibujar && Math.floor(i * paso) < cand.length; i++) {
-        const pt = cand[Math.floor(i * paso)];
+
+    const nSel = Math.min(apsParaDibujar, cand.length);
+    for (let i = 0; i < nSel; i++) {
+        const idx = nSel === 1 ? 0 : Math.round((i * (cand.length - 1)) / (nSel - 1));
+        const pt = cand[idx];
         aps.push({ num: i + 1, id: 'AP-' + (i + 1), x: Number(pt.x.toFixed(1)), y: Number(pt.y.toFixed(1)), customZ: null, customTx: null, customAzimut: null, radios: { r24: true, r5: true, r6: true }, canal: 36, colorCanal: PALETA_CANALES[i % PALETA_CANALES.length] });
     }
     estadoSimulacion.gridCols = cols; estadoSimulacion.gridRows = rows; return { totalAPs, apsVisuales: aps };
@@ -1394,7 +1425,8 @@ function actualizarTodo() {
     const flyerX = isNaN(parseFloat(document.getElementById('apPosX').value)) ? 60 : parseFloat(document.getElementById('apPosX').value);
     const flyerY = isNaN(parseFloat(document.getElementById('apPosY').value)) ? 37.5 : parseFloat(document.getElementById('apPosY').value);
     const f = parseFloat(document.getElementById('frecuencia').value) || 5, bw = parseInt(document.getElementById('anchoCanal').value) || 20;
-    const minDataRate = parseInt(document.getElementById('minDataRate').value) || 12, dtim = parseInt(document.getElementById('dtimInterval').value) || 3, numSSIDs = parseInt(document.getElementById('numSSIDs').value) || 3;
+    const minDataRate = parseFloat(document.getElementById('minDataRate').value) || 12, dtim = parseInt(document.getElementById('dtimInterval').value) || 3, numSSIDs = parseInt(document.getElementById('numSSIDs').value) || 3;
+    const ssidTxt = formatSSIDTexto(numSSIDs);
     const modoDFS = document.getElementById('modoDFS').value || 'con_dfs', metaDbm = parseFloat(document.getElementById('metaOptimizacion').value) || -67;
     const tech = document.getElementById('tecnologia').value || 'mlo', tAnt = document.getElementById('tipoAntena').value || 'sec', montajeSec = document.getElementById('montajeSectorial').value || 'techo';
     const bWH = parseFloat(document.getElementById('beamwidthH').value) || 60, bWV = parseFloat(document.getElementById('beamwidthV').value) || 30, azimutDeg = parseFloat(document.getElementById('azimut').value) || 0;
@@ -1439,7 +1471,7 @@ function actualizarTodo() {
         beaconBox.style.borderLeftColor = beaconColor;
         beaconVal.style.color = beaconColor;
         beaconVal.innerText = `${beaconOverheadPct.toFixed(1)}% Airtime (${beaconEstado})`;
-        beaconDet.innerText = `${numSSIDs} SSID(s) @ ${minDataRate} Mbps | CCI: ${cci} APs`;
+        beaconDet.innerText = `${ssidTxt} @ ${minDataRate} Mbps | CCI: ${cci} APs`;
     }
 
     const evalFlyer = evaluarPosicionActualFlyer(estadoSimulacion.params, perfilDisp); estadoSimulacion.evalFlyerActual = evalFlyer;
@@ -1449,24 +1481,42 @@ function actualizarTodo() {
 
     if (!estadoSimulacion.simulacionIniciada || !evalFlyer) {
         if (estadoSimulacion.simulacionIniciada && activosEnBanda === 0) { bR.classList.add('on'); vEl.innerText = `SIN RADIOS ACTIVOS EN ${f} GHz`; vEl.style.color = '#ef4444'; rEl.innerText = `Enciende al menos un radio de ${f} GHz con "⚙ Editar AP".`; }
-        else { bG.classList.add('on'); vEl.innerText = `PLANO LIMPIO [${reg.nombre}] — CALIBRA METROS Y TRAZA TU POLÍGONO`; vEl.style.color = '#38bdf8'; rEl.innerText = `Espectro en ${reg.nombre}: ${numCanalesDisp} Ch en ${f} GHz (${bw} MHz) | ${numSSIDs} SSIDs | MinRate: ${minDataRate} Mbps | DTIM: ${dtim}.`; }
+        else { bG.classList.add('on'); vEl.innerText = `PLANO LIMPIO [${reg.nombre}] — CALIBRA METROS Y TRAZA TU POLÍGONO`; vEl.style.color = '#38bdf8'; rEl.innerText = `Espectro en ${reg.nombre}: ${numCanalesDisp} Ch en ${f} GHz (${bw} MHz) | ${ssidTxt} | MinRate: ${minDataRate} Mbps | DTIM: ${dtim}.`; }
         document.getElementById('flyerStatusLine').innerText = `Flyer Wifi en (${flyerX.toFixed(1)}m, ${flyerY.toFixed(1)}m) — Sin señal activa en ${f} GHz`;
         document.getElementById('kpiNumAPs').innerText = `${totalAPs} AP(s) (${activosEnBanda} activos en ${f} GHz)`;
         document.getElementById('kpiGridInfo').innerText = 'Traza el polígono o activa radios en esta banda';
         document.getElementById('kpiFlyerSignal').innerText = 'Sin señal activa'; document.getElementById('kpiFlyerAPRef').innerText = `No hay radios activos en ${f} GHz`;
-        document.getElementById('kpiClientesPorAP').innerText = `CCI: 0 APs | ${numSSIDs} SSIDs | MinRate ${minDataRate}M | DTIM ${dtim}`;
+        document.getElementById('kpiClientesPorAP').innerText = `CCI: 0 APs | ${ssidTxt} | MinRate ${minDataRate}M | DTIM ${dtim}`;
         document.getElementById('kpiDensidadM2').innerText = `${reg.nombre}: ${numCanalesDisp} Ch (${f} GHz @ ${bw} MHz)`;
         document.getElementById('kpiSondaRSSI').innerText = 'Sin asociación activa'; document.getElementById('kpiSondaDetalle').innerText = `Flyer: X=${flyerX.toFixed(1)}m, Y=${flyerY.toFixed(1)}m`;
     } else {
-        if (evalFlyer.rssiCliente >= metaDbm && evalFlyer.sinr >= 22 && evalFlyer.airtime < 75 && cci <= 1) { bG.classList.add('on'); vEl.innerText = `ESTADO GLOBAL [${reg.nombre} | META ${metaDbm} dBm]: ÓPTIMO (VERDE)`; vEl.style.color = "#10b981"; rEl.innerText = `Flyer Wifi recibe ${evalFlyer.rssiCliente.toFixed(1)} dBm, CCI = ${cci} (${numCanalesDisp} Ch), ${numSSIDs} SSIDs, MinRate ${minDataRate} Mbps, DTIM ${dtim} y Airtime (${evalFlyer.airtime.toFixed(0)}%).`; }
-        else if (evalFlyer.rssiCliente >= -72 && evalFlyer.sinr >= 15 && evalFlyer.airtime < 88) { bY.classList.add('on'); vEl.innerText = `ESTADO GLOBAL [${reg.nombre} | META ${metaDbm} dBm]: ZONA ROAMING (AMARILLO)`; vEl.style.color = "#f59e0b"; rEl.innerText = `Flyer Wifi recibe ${evalFlyer.rssiCliente.toFixed(1)} dBm con CCI = ${cci}, ${numSSIDs} SSIDs, MinRate ${minDataRate} Mbps, DTIM ${dtim} (${evalFlyer.airtime.toFixed(0)}% Airtime).`; }
-        else { bR.classList.add('on'); vEl.innerText = `ESTADO GLOBAL [${reg.nombre} | META ${metaDbm} dBm]: CRÍTICO (ROJO)`; vEl.style.color = "#ef4444"; rEl.innerText = `En (${flyerX}m, ${flyerY}m) la señal cae a ${evalFlyer.rssiCliente.toFixed(1)} dBm, CCI = ${cci} o Airtime = ${evalFlyer.airtime.toFixed(0)}%.`; }
+        if (evalFlyer.rssiCliente >= metaDbm && evalFlyer.sinr >= 22 && evalFlyer.airtime < 75 && cci <= 1) {
+            bG.classList.add('on');
+            vEl.innerText = `ESTADO GLOBAL [${reg.nombre} | META ${metaDbm} dBm]: ÓPTIMO (VERDE)`;
+            vEl.style.color = "#10b981";
+            rEl.innerText = `Flyer Wifi recibe ${evalFlyer.rssiCliente.toFixed(1)} dBm, CCI = ${cci} (${numCanalesDisp} Ch), ${ssidTxt}, MinRate ${minDataRate} Mbps, DTIM ${dtim} y Airtime (${evalFlyer.airtime.toFixed(0)}%).`;
+        } else if (evalFlyer.rssiCliente >= -72 && evalFlyer.sinr >= 15 && evalFlyer.airtime < 88) {
+            bY.classList.add('on');
+            vEl.innerText = `ESTADO GLOBAL [${reg.nombre} | META ${metaDbm} dBm]: ZONA ROAMING (AMARILLO)`;
+            vEl.style.color = "#f59e0b";
+            rEl.innerText = `Flyer Wifi recibe ${evalFlyer.rssiCliente.toFixed(1)} dBm con CCI = ${cci}, ${ssidTxt}, MinRate ${minDataRate} Mbps, DTIM ${dtim} (${evalFlyer.airtime.toFixed(0)}% Airtime).`;
+        } else {
+            bR.classList.add('on');
+            vEl.innerText = `ESTADO GLOBAL [${reg.nombre} | META ${metaDbm} dBm]: CRÍTICO (ROJO)`;
+            vEl.style.color = "#ef4444";
+            const causas = [];
+            if (evalFlyer.rssiCliente < -72) causas.push(`señal baja (${evalFlyer.rssiCliente.toFixed(1)} dBm)`);
+            if (evalFlyer.sinr < 15) causas.push(`SINR crítico (${evalFlyer.sinr.toFixed(1)} dB)`);
+            if (evalFlyer.airtime >= 88) causas.push(`saturación de Airtime (${evalFlyer.airtime.toFixed(0)}%)`);
+            if (cci > 1) causas.push(`alto CCI (${cci} APs)`);
+            rEl.innerText = `En (${flyerX}m, ${flyerY}m) [RSSI: ${evalFlyer.rssiCliente.toFixed(1)} dBm]: ${causas.length ? causas.join(', ') : 'parámetros fuera de umbral'}.`;
+        }
         document.getElementById('flyerStatusLine').innerText = `RSSI ${perfilDisp.nombre}: ${evalFlyer.rssiCliente.toFixed(1)} dBm (AP: ${evalFlyer.rssiCampoAP.toFixed(1)} dBm) | SINR: ${evalFlyer.sinr.toFixed(1)} dB | CCI: ${cci} | Tput: ${evalFlyer.tput.toFixed(1)} Mbps`;
         document.getElementById('kpiNumAPs').innerText = `${activosEnBanda}/${totalAPs} Radios Activos (${f} GHz)`;
         document.getElementById('kpiGridInfo').innerText = `${estadoSimulacion.poligonoZona.length} vértices (${areaParaCurvas.toLocaleString('es-MX')} m²) | ~${clientesPorAP} Disp/Radio`;
         document.getElementById('kpiFlyerSignal').innerText = `${evalFlyer.rssiCliente.toFixed(1)} dBm (${perfilDisp.offset} dB Offset)`;
         document.getElementById('kpiFlyerAPRef').innerText = `AP: ${evalFlyer.rssiCampoAP.toFixed(1)} dBm | Radio ${metaDbm}: ${radioMeta}m`;
-        document.getElementById('kpiClientesPorAP').innerText = `CCI: ${cci} APs | ${numSSIDs} SSIDs | MinRate ${minDataRate}M | DTIM ${dtim}`;
+        document.getElementById('kpiClientesPorAP').innerText = `CCI: ${cci} APs | ${ssidTxt} | MinRate ${minDataRate}M | DTIM ${dtim}`;
         document.getElementById('kpiDensidadM2').innerText = `${reg.nombre}: ${numCanalesDisp} Ch (${f} GHz @ ${bw} MHz)${tAnt === 'sec' ? ` | -3dB: ${elG.rH}×${elG.rV}m` : ''}`;
         document.getElementById('kpiSondaRSSI').innerText = `${evalFlyer.apConectado.id} [C${evalFlyer.apConectado.canal || 36}] (${evalFlyer.dist3D.toFixed(1)}m)`;
         document.getElementById('kpiSondaDetalle').innerText = `Flyer: X=${flyerX.toFixed(1)}m, Y=${flyerY.toFixed(1)}m | ${evalFlyer.mcsStr}`;
@@ -1477,7 +1527,7 @@ function actualizarTodo() {
     document.getElementById('legendFlyerLabel').innerText = `Flyer Wifi [${perfilDisp.etiquetaCorta}]:`;
     document.getElementById('repTech').innerText = `${techNombreRep} | ${reg.nombre}`;
     document.getElementById('repPotencia').innerText = `${p} dBm | Z=${a}m | Meta: ${metaDbm} dBm`;
-    document.getElementById('repFrecuencia').innerText = `${f} GHz (${bw} MHz | ${numCanalesDisp} Ch) | ${numSSIDs} SSIDs (${beaconOverheadPct.toFixed(1)}% Beacon) | MinRate: ${minDataRate} Mbps | DTIM: ${dtim}`;
+    document.getElementById('repFrecuencia').innerText = `${f} GHz (${bw} MHz | ${numCanalesDisp} Ch) | ${ssidTxt} (${beaconOverheadPct.toFixed(1)}% Beacon) | MinRate: ${minDataRate} Mbps | DTIM: ${dtim}`;
     document.getElementById('repZona').innerText = estadoSimulacion.simulacionIniciada ? `Polígono (${estadoSimulacion.poligonoZona.length} vért. | ${areaParaCurvas.toLocaleString('es-MX')} m²)` : `Plano Base`;
     document.getElementById('repCohorte').innerText = `${nFmt} Disp. (${postura.toUpperCase()})`;
     document.getElementById('repCCI').innerText = evalFlyer ? `CCI Auto: ${cci} | ${perfilDisp.etiquetaCorta}: ${evalFlyer.rssiCliente.toFixed(1)} dBm` : 'Sin calcular';
